@@ -1,4 +1,4 @@
-package cotato.csquiz.entity;
+package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -11,18 +11,23 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class ShortAnswer {
-
+public class Session {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "short_answer_id")
+    @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "short_answer_content")
-    private String content;
+    @Column(name = "session_num")
+    private int number;
+
+    @Column(name = "session_photo_url")
+    private String photoUrl;
+
+    @Column(name = "session_description")
+    private String description;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "quiz_id")
-    private Quiz quiz;
+    @JoinColumn(name = "generation_id")
+    private Generation generation;
 
 }

@@ -1,4 +1,4 @@
-package cotato.csquiz.entity;
+package cotato.csquiz.domain.entity;
 
 public enum ChoiceCorrect {
     ANSWER,
