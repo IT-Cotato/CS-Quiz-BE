@@ -11,11 +11,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+
 
 @Entity
+@DynamicInsert
 public class Quiz {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_id")
@@ -24,12 +27,12 @@ public class Quiz {
     @Column(name = "quiz_number")
     private int number;
 
-    @Column(name = "quiz_question")//todo
+    @Column(name = "quiz_question")
     private String question;
 
     @Column(name = "quiz_type")
     @Enumerated(EnumType.STRING)
-    @ColumnDefault(value = "MULTIPLE_CHOICES")
+    @ColumnDefault(value = "'MULTIPLE_CHOICES'")
     private QuizType type;
 
     @Column(name = "quiz_photo_url")

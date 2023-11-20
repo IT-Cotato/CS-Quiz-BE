@@ -18,9 +18,16 @@ public class Session {
     private Long id;
 
     @Column(name = "session_num")
-    private int num;
+    private int number;
+
+    @Column(name = "session_photo_url")
+    private String photoUrl;
+
+    @Column(name = "session_description")
+    private String description;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "session_id")
-    private Session session;
+    @JoinColumn(name = "generation_id")
+    private Generation generation;
+
 }

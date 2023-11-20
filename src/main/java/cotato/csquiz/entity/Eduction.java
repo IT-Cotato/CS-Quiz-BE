@@ -31,4 +31,8 @@ public class Eduction {
     @JoinColumn(name = "member_id")
     private Member winner;
 
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "session_id")
+    private Session session;
+
 }

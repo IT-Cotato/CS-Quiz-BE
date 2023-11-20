@@ -15,7 +15,7 @@ public class Generation {
     @Column(name = "generation_id")
     private Long id;
 
-    @Column(name = "generation_name")
+    @Column(name = "generation_name", unique = true, nullable = false)
     private String name;
 
     @Column(name = "generation_start_date")
@@ -23,4 +23,7 @@ public class Generation {
 
     @Column(name = "generation_end_date")
     private LocalDate endDate;
+
+    @Column(name = "generation_recruiting")
+    private Boolean isRecruit;
 }

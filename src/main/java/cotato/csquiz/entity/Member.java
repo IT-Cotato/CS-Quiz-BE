@@ -13,8 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
+@DynamicInsert
 public class Member {
 
     @Id
@@ -25,16 +27,13 @@ public class Member {
     @Column(name = "member_name")
     private String name;
 
-    @Column(name = "member_phone", unique = true, nullable = false)
-    private String phoneNumber;
-
     @Column(name = "member_position", nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberPosition position;
 
     @Column(name = "member_role")
     @Enumerated(EnumType.STRING)
-    @ColumnDefault(value = "GENERAL")
+    @ColumnDefault(value = "'GENERAL'")
     private MemberRole role;
 
     @OneToOne
