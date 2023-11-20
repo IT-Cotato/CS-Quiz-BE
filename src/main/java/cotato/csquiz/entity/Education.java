@@ -13,7 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
 @Entity
-public class Eduction {
+public class Education {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -47,6 +47,6 @@ public class Quiz {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
-    private Eduction eduction;
+    private Education education;
 
 }
