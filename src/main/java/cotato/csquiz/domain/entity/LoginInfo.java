@@ -9,12 +9,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Table(name = "login")
 @DynamicInsert
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginInfo {
 
     @Id
@@ -39,4 +43,12 @@ public class LoginInfo {
     @Enumerated(EnumType.STRING)
     @ColumnDefault(value = "'OUTSTANDING'")
     private AccessStatus accessStatus;
+
+    @Builder
+    public LoginInfo(String email, String password, String name, String phoneNumber) {
+        this.email = email;
+        this.encryptedPassword = password;
+        this.name = name;
+        this.phoneNum = phoneNumber;
+    }
 }
