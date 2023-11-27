@@ -33,21 +33,22 @@ public class GenerationService {
                 .build();
 
         Generation savedGeneration = generationRepository.save(generation);
-
         return savedGeneration.getId();
     }
 
     //모집 변경
     public long changeRecruiting(ChangeRecruitingRequest request) {
         //해당 멤버가 운영진인지 확인 TODO
-        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(() -> new ApplicationAppException(ErrorCode.GENERATION_NOTFOUND, "해당 기수가 없습니다"));
+        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
+                () -> new ApplicationAppException(ErrorCode.GENERATION_NOTFOUND, "해당 기수가 없습니다"));
         return generation.changeRecruit(request.isStatement());
     }
 
     public long changePeriod(ChangePeriodRequest request) {
         //해당 멤버가 운영진인지 확인 TODO
         //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
-        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(() -> new ApplicationAppException(ErrorCode.GENERATION_NOTFOUND, "해당 기수가 없습니다"));
+        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
+                () -> new ApplicationAppException(ErrorCode.GENERATION_NOTFOUND, "해당 기수가 없습니다"));
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         return generation.changePeriod(startDate,endDate);
