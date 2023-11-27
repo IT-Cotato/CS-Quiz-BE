@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 	//기수 관련 에러 코드
-	GENERATION_NOTFOUND(HttpStatus.NOT_FOUND, "");
+	DATA_NOTFOUND(HttpStatus.NOT_FOUND, "");
 
 
 	private HttpStatus httpStatus;
