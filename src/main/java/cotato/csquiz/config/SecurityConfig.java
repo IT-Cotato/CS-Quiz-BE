@@ -10,7 +10,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -25,6 +24,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/auth/join").permitAll()
+                        .requestMatchers("v1/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 );
 
