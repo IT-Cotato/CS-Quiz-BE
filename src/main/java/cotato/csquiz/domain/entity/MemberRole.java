@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum MemberRole {
-    GENERAL("GENERAL"),
-    MEMBER("MEMBER"),
-    ADMIN("ADMIN"),
-    EDUCATION("EDUCATION");
+    GENERAL("ROLE_GENERAL"),
+    MEMBER("ROLE_MEMBER"),
+    ADMIN("ROLE_ADMIN"),
+    EDUCATION("ROLE_EDUCATION");
 
     private final String key;
 
