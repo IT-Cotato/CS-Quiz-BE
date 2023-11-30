@@ -66,4 +66,8 @@ public class AuthService {
         }
         return null;
     }
+
+    public void logout(String refreshToken) {
+        jwtUtil.setBlackList(refreshToken);
+    }
 }

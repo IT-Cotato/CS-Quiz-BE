@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,8 @@ public class JwtUtil {
 
     @Value("${jwt.refresh.expiration}")
     Long refreshExpiration;
+
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public boolean validateToken(String accessToken) {
         if (accessToken.isEmpty()) {
@@ -68,6 +71,13 @@ public class JwtUtil {
                 .accessToken(createAccessToken(email,authority))
                 .refreshToken(createRefreshToken(email,authority))
                 .build();
+    }
+
+    public void setBlackList(String token){
+        String id = getEmail(token);
+        RefreshToken findToken = refreshTokenRepository.findById(id)
+                        .orElseThrow();
+        refreshTokenRepository.delete(findToken);
     }
 
     private String createAccessToken(String email,String authority) {
