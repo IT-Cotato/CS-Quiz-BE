@@ -12,3 +12,16 @@ spring:
       hibernate:
         format_sql: true
     show_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  access:
+    expiration: 1800000
+
+  refresh:
+    expiration: 86400000
