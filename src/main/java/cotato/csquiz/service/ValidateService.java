@@ -27,4 +27,10 @@ public class ValidateService {
             throw new AppException(ErrorCode.PHONE_NUMBER_DUPLICATED);
         }
     }
+
+    public void emailNotExist(String email) {
+        if (memberRepository.findByEmail(email).isPresent()) {
+            throw new AppException(ErrorCode.EMAIL_DUPLICATED);
+        }
+    }
 }

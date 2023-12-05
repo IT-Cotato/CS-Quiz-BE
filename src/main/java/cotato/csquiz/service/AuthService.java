@@ -74,6 +74,7 @@ public class AuthService {
     }
 
     public void sendSignUpEmail(SendSignupEmailRequest request) {
+        validateService.emailNotExist(request.getEmail());
         emailVerificationService.sendVerificationCodeToEmail(request.getEmail());
     }
 

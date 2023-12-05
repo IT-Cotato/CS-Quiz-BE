@@ -44,7 +44,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/verification")
+    @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody SendSignupEmailRequest request) {
         authService.sendSignUpEmail(request);
         return ResponseEntity.ok().build();
@@ -52,8 +52,8 @@ public class AuthController {
 
     @GetMapping("/verification")
     public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email, @RequestParam(name = "code")
-                                        String code) {
-        authService.verifyCode(email,code);
+    String code) {
+        authService.verifyCode(email, code);
         return ResponseEntity.ok().build();
     }
 }
