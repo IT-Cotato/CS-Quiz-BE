@@ -1,8 +1,8 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendSignupEmailRequest;
-import cotato.csquiz.dto.ReissueResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
