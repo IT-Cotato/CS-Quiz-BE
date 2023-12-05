@@ -1,16 +1,20 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.email.SendSignupEmailRequest;
 import cotato.csquiz.dto.ReissueResponse;
 import cotato.csquiz.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -35,9 +39,21 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken){
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/verification")
+    public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody SendSignupEmailRequest request) {
+        authService.sendSignUpEmail(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/verification")
+    public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email, @RequestParam(name = "code")
+                                        String code) {
+        authService.verifyCode(email,code);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -5,6 +5,7 @@ import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.email.SendSignupEmailRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.dto.ReissueResponse;
 import cotato.csquiz.exception.AppException;
@@ -26,6 +27,7 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public void createLoginInfo(JoinRequest request) {
@@ -69,5 +71,13 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         jwtUtil.setBlackList(refreshToken);
+    }
+
+    public void sendSignUpEmail(SendSignupEmailRequest request) {
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail());
+    }
+
+    public void verifyCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
     }
 }
