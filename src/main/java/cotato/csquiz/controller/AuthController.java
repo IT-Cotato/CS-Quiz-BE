@@ -28,7 +28,7 @@ public class AuthController {
     @PostMapping("/join")
     public ResponseEntity<?> joinAuth(@RequestBody JoinRequest request) {
         authService.createLoginInfo(request);
-        log.info("[회원 가입 컨트롤러] : {}, {}, {}", request.getEmail(), request.getPassword(), request.getPassword());
+        log.info("[회원 가입 컨트롤러] : {}, {}, {}", request.getEmail(), request.getPassword(), request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
     }
 
