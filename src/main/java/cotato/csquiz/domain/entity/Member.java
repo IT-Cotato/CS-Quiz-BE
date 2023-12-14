@@ -58,10 +58,14 @@ public class Member {
     private Generation generation;
 
     @Builder
-    public Member(String email, String password, String name, String phoneNumber){
+    public Member(String email, String password, String name, String phoneNumber) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.phoneNumber = phoneNumber;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 }
