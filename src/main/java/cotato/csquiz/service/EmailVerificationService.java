@@ -15,7 +15,9 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.util.UUID;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class EmailVerificationService {
+
+    private static final int CODE_LENGTH = 6;
 
     private final JavaMailSender mailSender;
     private final VerificationCodeRedisRepository verificationCodeRedisRepository;
@@ -39,7 +43,16 @@ public class EmailVerificationService {
     }
 
     private String getVerificationCode() {
-        return UUID.randomUUID().toString();
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < CODE_LENGTH; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new AppException(ErrorCode.CREATE_VERIFY_CODE_FAIL);
+        }
     }
 
     private void sendEmailWithVerificationCode(String recipient, String verificationCode) {
