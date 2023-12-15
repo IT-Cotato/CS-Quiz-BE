@@ -38,10 +38,10 @@ public class SecurityConfig {
         http.csrf().disable()
                 .cors().disable()
                 .formLogin().disable()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager,jwtUtil, refreshTokenRepository))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenRepository))
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v1/api/member/**").hasRole("GENERAL")
+                        .requestMatchers("/v1/api/member/**").hasAnyRole("GENERAL", "MEMBER", "ADMIN", "EDUCATION")
                         .anyRequest().permitAll()
                 );
 
