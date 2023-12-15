@@ -9,10 +9,23 @@ public class EmailFormValidator {
 
     private static final String NAVER_REGEX = "^[a-zA-Z0-9]+@naver\\.com$";
     private static final String GMAIL_REGEX = "^[a-zA-Z0-9]+@gmail\\.com$";
+    private static final String ACADEMY_REGEX = "^[a-zA-Z0-9]+@[\\w.-]+\\.(ac\\.kr)$";
 
     public void validateEmailForm(String email) {
-        if (!email.matches(NAVER_REGEX) && !email.matches(GMAIL_REGEX)) {
+        if (!isNaver(email) && !isGoogle(email) && !isAcademy(email)) {
             throw new AppException(ErrorCode.EMAIL_TYPE_ERROR);
         }
+    }
+
+    private boolean isNaver(String email) {
+        return email.matches(NAVER_REGEX);
+    }
+
+    private boolean isGoogle(String email) {
+        return email.matches(GMAIL_REGEX);
+    }
+
+    private boolean isAcademy(String email) {
+        return email.matches(ACADEMY_REGEX);
     }
 }
