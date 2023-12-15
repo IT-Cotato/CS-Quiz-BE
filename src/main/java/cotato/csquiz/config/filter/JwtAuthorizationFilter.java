@@ -19,6 +19,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String AUTH_PATH = "/v1/api/auth";
     private static final String LOGIN_PATH = "/login";
+
     private final JwtUtil jwtUtil;
 
     public JwtAuthorizationFilter(JwtUtil jwtUtil) {
@@ -30,6 +31,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String accessToken = jwtUtil.resolveAccessToken(request);
         log.info("액세스토큰 반환 완료: {}", accessToken);
+
         if (!jwtUtil.validateToken(accessToken)) {
             setAuthentication(accessToken);
         }

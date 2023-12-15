@@ -27,13 +27,14 @@ public class MemberService {
         int numberLength = findMember.getPhoneNumber().length();
         String lastFourNumber = findMember.getPhoneNumber().substring(numberLength - 4);
         log.info("이름 + 번호 4자리: {}({})", findMember.getName(), lastFourNumber);
+
         return MemberInfoResponse.builder()
                 .id(findMember.getId())
                 .name(findMember.getName())
                 .backFourNumber(lastFourNumber)
                 .build();
     }
-
+  
     public void checkCorrectPassword(String accessToken, String password) {
         if (jwtUtil.isExpired(accessToken)) {
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
