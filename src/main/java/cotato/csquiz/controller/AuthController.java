@@ -56,4 +56,16 @@ public class AuthController {
         authService.verifySingUpCode(email, code);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping(value = "/verification", params = "type=find-password")
+    public ResponseEntity<?> sendFindPasswordVerificationCode(@RequestBody SendEmailRequest request) {
+        authService.sendFindPasswordEmail(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/verification", params = "type=find-password")
+    public ResponseEntity<?> verifyPasswordCode(@RequestParam(name = "email") String email,
+                                                @RequestParam(name = "code") String code) {
+        return ResponseEntity.ok().body(authService.verifyPasswordCode(email, code));
+    }
 }

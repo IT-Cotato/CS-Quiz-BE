@@ -83,4 +83,20 @@ public class AuthService {
     public void verifySingUpCode(String email, String code) {
         emailVerificationService.verifyCode(email, code);
     }
+
+    public void sendFindPasswordEmail(SendEmailRequest request) {
+        validateService.emailExist(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.PASSWORD_SUBJECT);
+    }
+
+    public FindPasswordResponse verifyPasswordCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
+        Member findMember = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+        String role = findMember.getRole().getKey();
+        Token token = jwtUtil.createToken(email, role);
+        return FindPasswordResponse.builder()
+                .accessToken(token.getAccessToken())
+                .build();
+    }
 }
