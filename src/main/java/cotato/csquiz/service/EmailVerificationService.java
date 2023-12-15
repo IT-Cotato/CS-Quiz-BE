@@ -1,10 +1,9 @@
 package cotato.csquiz.service;
 
-import static cotato.csquiz.domain.constant.SignUpEmailConstants.MESSAGE_PREFIX;
-import static cotato.csquiz.domain.constant.SignUpEmailConstants.MESSAGE_SUBJECT;
-import static cotato.csquiz.domain.constant.SignUpEmailConstants.MESSAGE_SUFFIX;
-import static cotato.csquiz.domain.constant.SignUpEmailConstants.SENDER_EMAIL;
-import static cotato.csquiz.domain.constant.SignUpEmailConstants.SENDER_PERSONAL;
+import static cotato.csquiz.domain.constant.EmailConstants.MESSAGE_PREFIX;
+import static cotato.csquiz.domain.constant.EmailConstants.MESSAGE_SUFFIX;
+import static cotato.csquiz.domain.constant.EmailConstants.SENDER_EMAIL;
+import static cotato.csquiz.domain.constant.EmailConstants.SENDER_PERSONAL;
 
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -34,12 +33,12 @@ public class EmailVerificationService {
     private final VerificationCodeRedisRepository verificationCodeRedisRepository;
     private final EmailFormValidator emailFormValidator;
 
-    public void sendVerificationCodeToEmail(String recipient) {
+    public void sendVerificationCodeToEmail(String recipient, String subject) {
         emailFormValidator.validateEmailForm(recipient);
         String verificationCode = getVerificationCode();
         log.info(verificationCode + " 인증 번호");
         verificationCodeRedisRepository.saveCodeWithEmail(recipient, verificationCode);
-        sendEmailWithVerificationCode(recipient, verificationCode);
+        sendEmailWithVerificationCode(recipient, verificationCode, subject);
     }
 
     private String getVerificationCode() {
@@ -55,12 +54,12 @@ public class EmailVerificationService {
         }
     }
 
-    private void sendEmailWithVerificationCode(String recipient, String verificationCode) {
+    private void sendEmailWithVerificationCode(String recipient, String verificationCode, String subject) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
 
             message.addRecipients(RecipientType.TO, recipient);
-            message.setSubject(MESSAGE_SUBJECT);
+            message.setSubject(subject);
             message.setText(getVerificationText(verificationCode), "utf-8", "html");
             message.setFrom(getInternetAddress());
             mailSender.send(message);

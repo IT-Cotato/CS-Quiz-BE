@@ -4,9 +4,11 @@ import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
+import cotato.csquiz.domain.constant.EmailConstants;
+import cotato.csquiz.domain.dto.auth.FindPasswordResponse;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
-import cotato.csquiz.domain.dto.email.SendSignupEmailRequest;
+import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -73,12 +75,12 @@ public class AuthService {
         jwtUtil.setBlackList(refreshToken);
     }
 
-    public void sendSignUpEmail(SendSignupEmailRequest request) {
+    public void sendSignUpEmail(SendEmailRequest request) {
         validateService.emailNotExist(request.getEmail());
-        emailVerificationService.sendVerificationCodeToEmail(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.SIGNUP_SUBJECT);
     }
 
-    public void verifyCode(String email, String code) {
+    public void verifySingUpCode(String email, String code) {
         emailVerificationService.verifyCode(email, code);
     }
 }

@@ -2,7 +2,7 @@ package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
-import cotato.csquiz.domain.dto.email.SendSignupEmailRequest;
+import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,15 +45,15 @@ public class AuthController {
     }
 
     @PostMapping(value = "/verification", params = "type=sign-up")
-    public ResponseEntity<?> sendVerificationCode(@Valid @RequestBody SendSignupEmailRequest request) {
+    public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
         authService.sendSignUpEmail(request);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/verification")
-    public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email, @RequestParam(name = "code")
-    String code) {
-        authService.verifyCode(email, code);
+    @GetMapping(value = "/verification", params = "type=sign-up")
+    public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email,
+                                        @RequestParam(name = "code") String code) {
+        authService.verifySingUpCode(email, code);
         return ResponseEntity.ok().build();
     }
 }
