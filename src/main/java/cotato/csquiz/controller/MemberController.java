@@ -42,7 +42,6 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-
     @PatchMapping("/update/password")
     public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
                                             @RequestBody UpdatePasswordRequest request) {
