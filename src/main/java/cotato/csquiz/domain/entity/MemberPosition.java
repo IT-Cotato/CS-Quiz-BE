@@ -6,6 +6,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public enum MemberPosition {
+    NONE("NONE"),
     BE("Back-end"),
     FE("Front-end"),
     Design("Design"),

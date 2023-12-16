@@ -12,3 +12,33 @@ spring:
       hibernate:
         format_sql: true
     show_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SENDER_EMAIL}
+    password: ${SENDER_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connection-timeout: 5000
+          timeout: 5000
+          write timeout: 5000
+    auth-code-expiration-millis: 1800000
+
+jwt:
+  secretKey: ${JWT_SECRET_KEY}
+  access:
+    expiration: 1800000
+
+  refresh:
+    expiration: 86400000
