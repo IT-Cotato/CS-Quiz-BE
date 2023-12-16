@@ -63,7 +63,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .orElseThrow()
                 .toString();
 
-        Token token = jwtUtil.createToken(principal.getUsername(),grantedAuthority);
+        Token token = jwtUtil.createToken(principal.getUsername(), grantedAuthority);
+
         String accessToken = token.getAccessToken();
         response.addHeader("accessToken", accessToken);
 

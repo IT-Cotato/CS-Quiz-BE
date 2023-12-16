@@ -4,9 +4,12 @@ import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
+import cotato.csquiz.domain.constant.EmailConstants;
+import cotato.csquiz.domain.dto.auth.FindPasswordResponse;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.auth.ReissueResponse;
+import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.dto.ReissueResponse;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.MemberRepository;
@@ -26,6 +29,7 @@ public class AuthService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public void createLoginInfo(JoinRequest request) {
@@ -69,5 +73,30 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         jwtUtil.setBlackList(refreshToken);
+    }
+
+    public void sendSignUpEmail(SendEmailRequest request) {
+        validateService.emailNotExist(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.SIGNUP_SUBJECT);
+    }
+
+    public void verifySingUpCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
+    }
+
+    public void sendFindPasswordEmail(SendEmailRequest request) {
+        validateService.emailExist(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.PASSWORD_SUBJECT);
+    }
+
+    public FindPasswordResponse verifyPasswordCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
+        Member findMember = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+        String role = findMember.getRole().getKey();
+        Token token = jwtUtil.createToken(email, role);
+        return FindPasswordResponse.builder()
+                .accessToken(token.getAccessToken())
+                .build();
     }
 }

@@ -7,7 +7,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -66,24 +65,24 @@ public class JwtUtil {
         return claims.get("role", String.class);
     }
 
-    public Token createToken(String email,String authority) {
+    public Token createToken(String email, String authority) {
         return Token.builder()
-                .accessToken(createAccessToken(email,authority))
-                .refreshToken(createRefreshToken(email,authority))
+                .accessToken(createAccessToken(email, authority))
+                .refreshToken(createRefreshToken(email, authority))
                 .build();
     }
 
-    public void setBlackList(String token){
+    public void setBlackList(String token) {
         String id = getEmail(token);
         RefreshToken findToken = refreshTokenRepository.findById(id)
-                        .orElseThrow();
+                .orElseThrow();
         refreshTokenRepository.delete(findToken);
     }
 
-    private String createAccessToken(String email,String authority) {
+    private String createAccessToken(String email, String authority) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
-        claims.put("role",authority);
+        claims.put("role", authority);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -95,7 +94,7 @@ public class JwtUtil {
     private String createRefreshToken(String email, String authority) {
         Claims claims = Jwts.claims();
         claims.put("email", email);
-        claims.put("role",authority);
+        claims.put("role", authority);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
