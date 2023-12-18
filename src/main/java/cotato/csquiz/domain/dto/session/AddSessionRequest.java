@@ -1,11 +1,13 @@
 package cotato.csquiz.domain.dto.session;
 
+import lombok.Data;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
-@Getter
+@Data
 public class AddSessionRequest {
     private int sessionNum;
     private long generationId;
-    private String photoURL;
+    private MultipartFile sessionImage;
     private String description;
 }

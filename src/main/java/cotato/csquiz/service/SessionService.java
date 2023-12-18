@@ -6,11 +6,14 @@ import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
-import cotato.csquiz.exception.ApplicationAppException;
+import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.exception.ImageException;
+import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,23 +22,29 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final GenerationRepository generationRepository;
+    private final S3Uploader s3Uploader;
 
-    public long addSession(AddSessionRequest request) {
+    public long addSession(AddSessionRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
-        //사진 S3로 하는법 해야함 TODO
+        String imageUrl = null;
+        if(!(request.getSessionImage().isEmpty())) {
+            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+        }
         Generation generation = getGeneration(request.getGenerationId());
 
         Session session = Session.builder()
                 .number(request.getSessionNum())
-                .photoUrl(request.getPhotoURL())
+                .photoUrl(imageUrl)
                 .description(request.getDescription())
                 .generation(generation)
                 .build();
         Session savedSession = sessionRepository.save(session);
+        log.info("세션 생성 완료");
         return savedSession.getId();
     }
     //차수 바꾸기
@@ -51,11 +60,14 @@ public class SessionService {
         return session.changeDescription(request.getDescription());
     }
     //사진 바꾸기
-    public long changePhotoUrl(SessionPhotoUrlRequest request) {
+    public long changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
-        //사진 S3를 이용해 바꿔야함 TODO
         Session session = getSession(request.getSessionId());
-        return session.changePhotoUrl(request.getPhotoUrl());
+        String imageUrl = null;
+        if(!(request.getSessionImage().isEmpty())) {
+            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+        }
+        return session.changePhotoUrl(imageUrl);
     }
     //기수에 해당하는 세션 가지고 오기
     public List<Session> getSessionsByGenerationId(long generationId) {
@@ -64,10 +76,10 @@ public class SessionService {
     }
     private Session getSession(long sessionId) {
         return sessionRepository.findById(sessionId).orElseThrow(
-                () -> new ApplicationAppException(ErrorCode.DATA_NOTFOUND, "해당 세션이 없습니다"));
+                () -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
     private Generation getGeneration(long generationId) {
         return generationRepository.findById(generationId).orElseThrow(
-                () -> new ApplicationAppException(ErrorCode.DATA_NOTFOUND, "해당 기수가 없습니다"));
+                () -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
 }
