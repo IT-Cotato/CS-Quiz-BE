@@ -5,6 +5,7 @@ import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.domain.entity.Session;
+import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,28 +24,28 @@ public class SessionController {
     private final SessionService sessionService;
 
     //세션 추가
-    @PostMapping("/add")
-    public ResponseEntity<Long> addSession(@RequestBody AddSessionRequest request){
+    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<Long> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
+        log.info(request.getDescription());
         long sessionId = sessionService.addSession(request);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(sessionId);
     }
 
     @PatchMapping("/sessionNum")
-    public ResponseEntity<Long> changeSessionNum(@RequestBody SessionNumRequest request){
+    public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request){
         long sessionNum = sessionService.changeSessionNum(request);
-        return ResponseEntity.status(HttpStatus.OK).body(sessionNum);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/description")
-    public ResponseEntity<Long> changeContent(@RequestBody SessionDescriptionRequest request){
+    public ResponseEntity<?> changeContent(@RequestBody SessionDescriptionRequest request){
         long sessionId = sessionService.changeDescription(request);
-        return ResponseEntity.status(HttpStatus.OK).body(sessionId);
+        return ResponseEntity.ok().build();
     }
-    @PatchMapping("/photoUrl")
-    public ResponseEntity<Long> changePhotoUrl(@RequestBody SessionPhotoUrlRequest request){
+    @PatchMapping(value = "/photoUrl", consumes = "multipart/form-data")
+    public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException{
         long sessionId = sessionService.changePhotoUrl(request);
-        return ResponseEntity.status(HttpStatus.OK).body(sessionId);
+        return ResponseEntity.ok().build();
     }
     @GetMapping("/{generationId}/sessions")
     public ResponseEntity<List<Session>> getSessions(@PathVariable long generationId){

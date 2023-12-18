@@ -22,19 +22,18 @@ public class GenerationController {
     @PostMapping("/add")
     public ResponseEntity<Long> addGeneration(@RequestBody AddGenerationRequest request){
         long generationId = generationService.addGeneration(request);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(generationId);
     }
 
     @PatchMapping("/recruiting")
-    public ResponseEntity<Long> changeRecruiting(@RequestBody ChangeRecruitingRequest request){
-        long generationId = generationService.changeRecruiting(request);
-        return ResponseEntity.status(HttpStatus.OK).body(generationId);
+    public ResponseEntity<?> changeRecruiting(@RequestBody ChangeRecruitingRequest request) {
+        generationService.changeRecruiting(request);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<Long> changePeriod(@RequestBody ChangePeriodRequest request){
-        long generationId = generationService.changePeriod(request);
-        return ResponseEntity.status(HttpStatus.OK).body(generationId);
+    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request){
+        generationService.changePeriod(request);
+        return ResponseEntity.ok().build();
     }
 }
