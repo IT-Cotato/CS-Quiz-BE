@@ -1,6 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
+import cotato.csquiz.domain.dto.generation.AddGenerationResponse;
 import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
 import cotato.csquiz.service.GenerationService;
@@ -20,9 +21,11 @@ public class GenerationController {
 
     //기수 추가
     @PostMapping("/add")
-    public ResponseEntity<Long> addGeneration(@RequestBody AddGenerationRequest request){
+    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request){
         long generationId = generationService.addGeneration(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(generationId);
+        AddGenerationResponse response = AddGenerationResponse.builder()
+                .generationId(generationId).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/recruiting")

@@ -1,9 +1,6 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.session.AddSessionRequest;
-import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
-import cotato.csquiz.domain.dto.session.SessionNumRequest;
-import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.domain.dto.session.*;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
@@ -25,10 +22,12 @@ public class SessionController {
 
     //세션 추가
     @PostMapping(value = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<Long> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
+    public ResponseEntity<?> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
         log.info(request.getDescription());
         long sessionId = sessionService.addSession(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(sessionId);
+        AddSessionResponse response = AddSessionResponse.builder()
+                .sessionId(sessionId).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/sessionNum")
