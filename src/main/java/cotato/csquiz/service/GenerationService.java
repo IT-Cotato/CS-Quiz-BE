@@ -28,6 +28,7 @@ public class GenerationService {
         //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
+        isPeriodValid(startDate, endDate);
         Generation generation = Generation.builder()
                 .name(request.getGenerationName())
                 .startDate(startDate)
@@ -49,10 +50,20 @@ public class GenerationService {
     public void changePeriod(ChangePeriodRequest request) {
         //해당 멤버가 운영진인지 확인 TODO
         //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
-        generationRepository.findById(request.getGenerationId()).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
+        isPeriodValid(startDate, endDate);
+        generationRepository.findById(request.getGenerationId()).orElseThrow(
+                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+
         log.info("change date "+startDate+ " " + endDate);
+    }
+
+    //시작 날짜가 끝나는 날짜보다 뒤면 오류 처리
+    private void isPeriodValid(LocalDate startDate, LocalDate endDate) {
+        if(endDate.isBefore(startDate)){
+            log.info("날짜 오류");
+            throw new AppException(ErrorCode.DATE_INVALID);
+        }
     }
 }
