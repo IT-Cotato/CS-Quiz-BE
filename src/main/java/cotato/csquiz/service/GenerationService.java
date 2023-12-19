@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,11 @@ public class GenerationService {
         log.info("change date "+startDate+ " " + endDate);
     }
 
+    //기수 목록 알려주기
+    public List<String> getGenerations(){
+        return generationRepository.findAllGenerationNames();
+    }
+
     //시작 날짜가 끝나는 날짜보다 뒤면 오류 처리
     private void isPeriodValid(LocalDate startDate, LocalDate endDate) {
         if(endDate.isBefore(startDate)){
@@ -65,4 +71,7 @@ public class GenerationService {
             throw new AppException(ErrorCode.DATE_INVALID);
         }
     }
+
+
+
 }
