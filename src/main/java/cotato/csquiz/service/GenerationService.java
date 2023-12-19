@@ -34,8 +34,8 @@ public class GenerationService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
-
         Generation savedGeneration = generationRepository.save(generation);
+
         return savedGeneration.getId();
     }
 
@@ -55,7 +55,6 @@ public class GenerationService {
         isPeriodValid(startDate, endDate);
         generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
-
         log.info("change date "+startDate+ " " + endDate);
     }
 

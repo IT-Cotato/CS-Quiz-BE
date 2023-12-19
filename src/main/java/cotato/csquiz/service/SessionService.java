@@ -36,7 +36,6 @@ public class SessionService {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
         }
         Generation generation = getGeneration(request.getGenerationId());
-
         Session session = Session.builder()
                 .number(request.getSessionNum())
                 .photoUrl(imageUrl)
@@ -45,18 +44,21 @@ public class SessionService {
                 .build();
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
+
         return savedSession.getId();
     }
     //차수 바꾸기
     public int changeSessionNum(SessionNumRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = getSession(request.getSessionId());
+
         return session.changeSessionNum(request.getSessionNum());
     }
     //한줄소개 바꾸기
     public long changeDescription(SessionDescriptionRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = getSession(request.getSessionId());
+
         return session.changeDescription(request.getDescription());
     }
     //사진 바꾸기
@@ -67,11 +69,13 @@ public class SessionService {
         if(!(request.getSessionImage().isEmpty())) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
         }
+
         return session.changePhotoUrl(imageUrl);
     }
     //기수에 해당하는 세션 가지고 오기
     public List<Session> getSessionsByGenerationId(long generationId) {
         Generation generation = getGeneration(generationId);
+
         return sessionRepository.findAllByGeneration(generation);
     }
     private Session getSession(long sessionId) {
