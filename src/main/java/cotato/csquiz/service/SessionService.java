@@ -32,7 +32,7 @@ public class SessionService {
     public long addSession(AddSessionRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
         String imageUrl = null;
-        if(!(request.getSessionImage().isEmpty())) {
+        if(request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
         }
         Generation generation = getGeneration(request.getGenerationId());

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +27,11 @@ public class GenerationService {
     //기수 추가
     public long addGeneration(AddGenerationRequest request) {
         //멤버가 운영진인지 확인 TODO
-        //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
-        isPeriodValid(startDate, endDate);
+        checkPeriodValid(startDate, endDate);
+        checkNameValid(request.getGenerationName());
+
         Generation generation = Generation.builder()
                 .name(request.getGenerationName())
                 .startDate(startDate)
@@ -53,7 +55,7 @@ public class GenerationService {
         //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
-        isPeriodValid(startDate, endDate);
+        checkPeriodValid(startDate, endDate);
         generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
         log.info("change date "+startDate+ " " + endDate);
@@ -65,10 +67,17 @@ public class GenerationService {
     }
 
     //시작 날짜가 끝나는 날짜보다 뒤면 오류 처리
-    private void isPeriodValid(LocalDate startDate, LocalDate endDate) {
+    private void checkPeriodValid(LocalDate startDate, LocalDate endDate) {
         if(endDate.isBefore(startDate)){
             log.info("날짜 오류");
             throw new AppException(ErrorCode.DATE_INVALID);
+        }
+    }
+
+    private void checkNameValid(String generationName) {
+        Optional<Generation> generation = generationRepository.findByName(generationName);
+        if(generation.isPresent()){
+            throw new AppException(ErrorCode.GENERATION_NAME_EXIST);
         }
     }
 

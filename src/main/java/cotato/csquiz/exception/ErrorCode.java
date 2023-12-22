@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    GENERATION_NAME_EXIST(HttpStatus.CONFLICT, "이미 이름이 있습니다"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"이미지 처리에 실패했습니다."),
     DATA_NOTFOUND(HttpStatus.NOT_FOUND, "데이터가 없습니다"),
     DATE_INVALID(HttpStatus.BAD_REQUEST, "시작날짜가 끝 날짜보다 뒤입니다"),
