@@ -52,7 +52,6 @@ public class GenerationService {
 
     public void changePeriod(ChangePeriodRequest request) {
         //해당 멤버가 운영진인지 확인 TODO
-        //추가해야할 것 같은거 시작시간이 끝나는 시간보다 더 뒤면 안되는거? TODO
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);
