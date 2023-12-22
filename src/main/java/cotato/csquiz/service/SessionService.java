@@ -50,21 +50,21 @@ public class SessionService {
     //차수 바꾸기
     public int changeSessionNum(SessionNumRequest request) {
         //운영진인지 확인하는 절차 TODO
-        Session session = getSession(request.getSessionId());
+        Session session = findSessionById(request.getSessionId());
 
         return session.changeSessionNum(request.getSessionNum());
     }
     //한줄소개 바꾸기
     public long changeDescription(SessionDescriptionRequest request) {
         //운영진인지 확인하는 절차 TODO
-        Session session = getSession(request.getSessionId());
+        Session session = findSessionById(request.getSessionId());
 
         return session.changeDescription(request.getDescription());
     }
     //사진 바꾸기
     public long changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
-        Session session = getSession(request.getSessionId());
+        Session session = findSessionById(request.getSessionId());
         String imageUrl = null;
         if(!(request.getSessionImage().isEmpty())) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
@@ -73,12 +73,13 @@ public class SessionService {
         return session.changePhotoUrl(imageUrl);
     }
     //기수에 해당하는 세션 가지고 오기
-    public List<Session> getSessionsByGenerationId(long generationId) {
+    public List<Session> findSessionsByGenerationId(long generationId) {
         Generation generation = getGeneration(generationId);
 
         return sessionRepository.findAllByGeneration(generation);
     }
-    private Session getSession(long sessionId) {
+
+    public Session findSessionById(long sessionId) {
         return sessionRepository.findById(sessionId).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
     }

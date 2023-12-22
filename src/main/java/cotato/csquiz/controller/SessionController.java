@@ -47,7 +47,7 @@ public class SessionController {
     }
     @GetMapping("/{generationId}")
     public ResponseEntity<List<Session>> getSessions(@PathVariable long generationId){
-        List<Session> sessions = sessionService.getSessionsByGenerationId(generationId);
+        List<Session> sessions = sessionService.findSessionsByGenerationId(generationId);
         return ResponseEntity.status(HttpStatus.OK).body(sessions);
     }
 }
