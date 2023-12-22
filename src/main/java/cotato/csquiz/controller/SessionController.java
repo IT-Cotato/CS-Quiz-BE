@@ -20,7 +20,6 @@ public class SessionController {
 
     private final SessionService sessionService;
 
-    //세션 추가
     @PostMapping(value = "/add", consumes = "multipart/form-data")
     public ResponseEntity<?> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
         log.info(request.getDescription());
@@ -30,7 +29,7 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PatchMapping("/sessionNum")
+    @PatchMapping("/number")
     public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request){
         long sessionNum = sessionService.changeSessionNum(request);
         return ResponseEntity.ok().build();
@@ -41,12 +40,12 @@ public class SessionController {
         long sessionId = sessionService.changeDescription(request);
         return ResponseEntity.ok().build();
     }
-    @PatchMapping(value = "/photoUrl", consumes = "multipart/form-data")
+    @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
     public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException{
         long sessionId = sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/{generationId}/sessions")
+    @GetMapping("/{generationId}")
     public ResponseEntity<List<Session>> getSessions(@PathVariable long generationId){
         List<Session> sessions = sessionService.getSessionsByGenerationId(generationId);
         return ResponseEntity.status(HttpStatus.OK).body(sessions);

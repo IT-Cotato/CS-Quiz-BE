@@ -19,13 +19,11 @@ public class GenerationController {
 
     private final GenerationService generationService;
 
-    //전체 기수 목록 가져오기
     @GetMapping("/generations")
     public ResponseEntity<?> getGenerations(){
         return ResponseEntity.ok().body(generationService.getGenerations());
     }
 
-    //기수 추가
     @PostMapping("/add")
     public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request){
         long generationId = generationService.addGeneration(request);
