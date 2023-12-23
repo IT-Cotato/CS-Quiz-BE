@@ -45,8 +45,9 @@ public class GenerationService {
     //모집 변경
     public void changeRecruiting(ChangeRecruitingRequest request) {
         //해당 멤버가 운영진인지 확인 TODO
-        generationRepository.findById(request.getGenerationId()).orElseThrow(
+        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        generation.changeRecruit(request.isStatement());
         log.info("changeRecruiting success");
     }
 
@@ -55,8 +56,9 @@ public class GenerationService {
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);
-        generationRepository.findById(request.getGenerationId()).orElseThrow(
+        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        generation.changePeriod(startDate, endDate);
         log.info("change date "+startDate+ " " + endDate);
     }
 

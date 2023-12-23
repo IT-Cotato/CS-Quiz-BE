@@ -44,38 +44,35 @@ public class SessionService {
                 .build();
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
-
         return savedSession.getId();
     }
     //차수 바꾸기
     public int changeSessionNum(SessionNumRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
-
-        return session.changeSessionNum(request.getSessionNum());
+        return session.changeSessionNum(session.getNumber());
     }
     //한줄소개 바꾸기
     public long changeDescription(SessionDescriptionRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
-
         return session.changeDescription(request.getDescription());
     }
     //사진 바꾸기
     public long changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
-        String imageUrl = null;
-        if(!(request.getSessionImage().isEmpty())) {
+        String imageUrl;
+        if(request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+        }else{
+            throw new ImageException(ErrorCode.IMAGE_NOT_FOUND);
         }
-
         return session.changePhotoUrl(imageUrl);
     }
     //기수에 해당하는 세션 가지고 오기
     public List<Session> findSessionsByGenerationId(long generationId) {
         Generation generation = getGeneration(generationId);
-
         return sessionRepository.findAllByGeneration(generation);
     }
 
