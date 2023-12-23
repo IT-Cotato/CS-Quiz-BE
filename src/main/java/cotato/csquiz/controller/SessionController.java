@@ -20,6 +20,12 @@ public class SessionController {
 
     private final SessionService sessionService;
 
+    @GetMapping("/{generationId}")
+    public ResponseEntity<List<Session>> getSessions(@PathVariable long generationId){
+        List<Session> sessions = sessionService.findSessionsByGenerationId(generationId);
+        return ResponseEntity.status(HttpStatus.OK).body(sessions);
+    }
+
     @PostMapping(value = "/add", consumes = "multipart/form-data")
     public ResponseEntity<?> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
         log.info(request.getDescription());
@@ -31,23 +37,18 @@ public class SessionController {
 
     @PatchMapping("/number")
     public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request){
-        long sessionNum = sessionService.changeSessionNum(request);
+        sessionService.changeSessionNum(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/description")
     public ResponseEntity<?> changeContent(@RequestBody SessionDescriptionRequest request){
-        long sessionId = sessionService.changeDescription(request);
+        sessionService.changeDescription(request);
         return ResponseEntity.ok().build();
     }
     @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
     public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException{
-        long sessionId = sessionService.changePhotoUrl(request);
+        sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
-    }
-    @GetMapping("/{generationId}")
-    public ResponseEntity<List<Session>> getSessions(@PathVariable long generationId){
-        List<Session> sessions = sessionService.findSessionsByGenerationId(generationId);
-        return ResponseEntity.status(HttpStatus.OK).body(sessions);
     }
 }
