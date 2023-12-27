@@ -79,7 +79,4 @@ public class GenerationService {
             throw new AppException(ErrorCode.GENERATION_NAME_EXIST);
         }
     }
-
-
-
 }
