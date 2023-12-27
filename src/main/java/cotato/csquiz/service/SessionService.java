@@ -46,18 +46,21 @@ public class SessionService {
         log.info("세션 생성 완료");
         return savedSession.getId();
     }
+
     //차수 바꾸기
     public void changeSessionNum(SessionNumRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeSessionNum(session.getNumber());
     }
+
     //한줄소개 바꾸기
     public void changeDescription(SessionDescriptionRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeDescription(request.getDescription());
     }
+
     //사진 바꾸기
     public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
@@ -70,6 +73,7 @@ public class SessionService {
         }
         session.changePhotoUrl(imageUrl);
     }
+
     //기수에 해당하는 세션 가지고 오기
     public List<Session> findSessionsByGenerationId(long generationId) {
         Generation generation = getGeneration(generationId);
@@ -80,6 +84,7 @@ public class SessionService {
         return sessionRepository.findById(sessionId).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
+
     private Generation getGeneration(long generationId) {
         return generationRepository.findById(generationId).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));

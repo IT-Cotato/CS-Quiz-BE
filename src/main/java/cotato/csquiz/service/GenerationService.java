@@ -31,14 +31,12 @@ public class GenerationService {
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);
         checkNameValid(request.getGenerationName());
-
         Generation generation = Generation.builder()
                 .name(request.getGenerationName())
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
         Generation savedGeneration = generationRepository.save(generation);
-
         return savedGeneration.getId();
     }
 

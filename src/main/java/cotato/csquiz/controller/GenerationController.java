@@ -19,7 +19,7 @@ public class GenerationController {
 
     private final GenerationService generationService;
 
-    @GetMapping("/generations")
+    @GetMapping("")
     public ResponseEntity<?> getGenerations(){
         return ResponseEntity.ok().body(generationService.getGenerations());
     }
