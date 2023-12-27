@@ -19,6 +19,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String AUTH_PATH = "/v1/api/auth";
     private static final String LOGIN_PATH = "/login";
+    private static final String GENERATION_PATH = "/v1/api/generation";
+    private static final String SESSION_GET_PATH = "/v1/api/session";
 
     private final JwtUtil jwtUtil;
 
@@ -52,6 +54,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return path.startsWith(AUTH_PATH) || path.startsWith(LOGIN_PATH);
+        log.info("진입한 path : {}", path);
+        return path.startsWith(AUTH_PATH) || path.startsWith(LOGIN_PATH) || path.equals(GENERATION_PATH) || path.equals(
+                SESSION_GET_PATH);
     }
 }

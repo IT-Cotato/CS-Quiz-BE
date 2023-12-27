@@ -20,6 +20,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private static final String[] WHITE_LIST = {
+            "/v1/api/generation",
+            "/v1/api/session"
+    };
+
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
@@ -42,6 +47,9 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/member/**").hasAnyRole("GENERAL", "MEMBER", "ADMIN", "EDUCATION")
+                        .requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers("/v1/api/generation/**").hasAnyRole("GENERAL", "ADMIN")
+                        .requestMatchers("/v1/api/session/**").hasAnyRole("GENERAL", "ADMIN")
                         .anyRequest().permitAll()
                 );
 
