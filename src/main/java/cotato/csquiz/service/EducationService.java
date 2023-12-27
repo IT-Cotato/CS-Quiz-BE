@@ -1,7 +1,9 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
+import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -42,5 +44,16 @@ public class EducationService {
         if (education.isPresent()) {
             throw new AppException(ErrorCode.EDUCATION_EXIST);
         }
+    }
+
+    //교육 상태(오픈여부) 가져오기
+    public EducationStatus getStatus(long educationId) {
+        Education education = findEducation(educationId);
+        return education.getStatus();
+    }
+
+    private Education findEducation(long educationId) {
+        return educationRepository.findById(educationId)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }
