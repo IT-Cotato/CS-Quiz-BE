@@ -59,6 +59,7 @@ public class SessionController {
 
     @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
     public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException {
+
         sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
     }
