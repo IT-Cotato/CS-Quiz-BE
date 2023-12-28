@@ -1,4 +1,4 @@
-package cotato.csquiz.dto;
+package cotato.csquiz.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
