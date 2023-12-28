@@ -18,7 +18,7 @@ public class AdminService {
     private final MemberService memberService;
 
     public List<MemberInfoResponse> getApplicantList() {
-        List<Member> applicantList = memberRepository.findAll(); // 필요에 따라 조건을 추가하여 신청자 리스트를 가져오세요.
+        List<Member> applicantList = memberRepository.findAll();
 
         return applicantList.stream()
                 .map(member -> MemberInfoResponse.builder()
@@ -33,7 +33,6 @@ public class AdminService {
     }
 
     public MemberInfoResponse getMemberInfo(String email) {
-        // MemberService의 getMemberInfo를 사용하여 개별 멤버의 정보를 가져옴
         return memberService.getMemberInfo(email);
     }
 }
