@@ -12,7 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "/v1/api/admin", method = RequestMethod.GET)
 public class AdminController {
-
     private final AdminService adminService;
 
     @GetMapping("/applicant-list")
