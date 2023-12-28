@@ -31,9 +31,5 @@ public class AdminService {
     private void logMemberInfo(MemberInfoResponse memberInfoResponse) {
         log.info("이름 + 번호 4자리: {}({})", memberInfoResponse.getName(), memberInfoResponse.getBackFourNumber());
     }
-
-    public MemberInfoResponse getMemberInfo(String email) {
-        return memberService.getMemberInfo(email);
-    }
 }
 
