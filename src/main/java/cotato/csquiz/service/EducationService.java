@@ -1,7 +1,6 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
-import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.domain.entity.Session;
