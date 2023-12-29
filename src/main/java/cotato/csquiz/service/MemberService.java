@@ -34,7 +34,7 @@ public class MemberService {
                 .backFourNumber(lastFourNumber)
                 .build();
     }
-  
+
     public void checkCorrectPassword(String accessToken, String password) {
         if (jwtUtil.isExpired(accessToken)) {
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
@@ -55,6 +55,13 @@ public class MemberService {
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        validateSamePassword(findMember.getPassword(), password);
         findMember.updatePassword(bCryptPasswordEncoder.encode(password));
+    }
+
+    private void validateSamePassword(String originPassword, String newPassword) {
+        if (bCryptPasswordEncoder.matches(newPassword, originPassword)) {
+            throw new AppException(ErrorCode.SAME_PASSWORD);
+        }
     }
 }
