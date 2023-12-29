@@ -19,6 +19,7 @@ public class AdminService {
 
         return applicantList.stream()
                 .map(member -> MemberInfoResponse.builder()
+                        .id(member.getId())
                         .name(member.getName())
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
                         .build())
