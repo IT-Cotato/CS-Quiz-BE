@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.entity.Member;
+import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,9 @@ public class AdminService {
         List<Member> applicantList = memberRepository.findAll();
 
         return applicantList.stream()
+                .filter(member -> member.getRole() == MemberRole.GENERAL)
                 .map(member -> MemberInfoResponse.builder()
+                        .id(member.getId())
                         .name(member.getName())
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
                         .build())
