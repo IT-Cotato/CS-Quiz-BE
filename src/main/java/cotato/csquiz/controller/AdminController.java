@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/api/admin")
+@RequestMapping("/v1/api/admin/check")
 public class AdminController {
     private final AdminService adminService;
 
