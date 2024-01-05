@@ -1,7 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
-import cotato.csquiz.dto.ReissueResponse;
+import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +35,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken){
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
-
 }
