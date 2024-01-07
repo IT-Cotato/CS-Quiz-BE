@@ -30,7 +30,6 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-
     private Member findMember(Long userId) {
         return memberRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
