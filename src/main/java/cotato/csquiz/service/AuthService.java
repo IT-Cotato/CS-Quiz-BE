@@ -4,8 +4,12 @@ import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
+import cotato.csquiz.domain.constant.EmailConstants;
+import cotato.csquiz.domain.dto.auth.FindPasswordResponse;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
+import cotato.csquiz.domain.dto.email.SendEmailRequest;
+import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -21,11 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final String EMAIL_DELIMITER = "@";
+    private static final int EXPOSED_LENGTH = 4;
+
     private final MemberRepository memberRepository;
     private final ValidateService validateService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final EmailVerificationService emailVerificationService;
 
     @Transactional
     public void createLoginInfo(JoinRequest request) {
@@ -69,5 +77,54 @@ public class AuthService {
 
     public void logout(String refreshToken) {
         jwtUtil.setBlackList(refreshToken);
+    }
+
+    public void sendSignUpEmail(SendEmailRequest request) {
+        validateService.emailNotExist(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.SIGNUP_SUBJECT);
+    }
+
+    public void verifySingUpCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
+    }
+
+    public void sendFindPasswordEmail(SendEmailRequest request) {
+        validateService.emailExist(request.getEmail());
+        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.PASSWORD_SUBJECT);
+    }
+
+    public FindPasswordResponse verifyPasswordCode(String email, String code) {
+        emailVerificationService.verifyCode(email, code);
+        Member findMember = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+        String role = findMember.getRole().getKey();
+        Token token = jwtUtil.createToken(email, role);
+        return FindPasswordResponse.builder()
+                .accessToken(token.getAccessToken())
+                .build();
+    }
+
+    public MemberEmailResponse findMemberEmail(String name, String phoneNumber) {
+        Member findMember = memberRepository.findByPhoneNumber(phoneNumber)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        validateMatchName(findMember.getName(), name);
+
+        String maskedId = getMaskId(findMember.getEmail());
+
+        return MemberEmailResponse.builder()
+                .email(maskedId)
+                .build();
+    }
+
+    private String getMaskId(String email) {
+        String originId = email.split(EMAIL_DELIMITER)[0];
+        String maskedPart = "*".repeat(EXPOSED_LENGTH);
+        return originId.substring(0, 4) + maskedPart + EMAIL_DELIMITER + email.split(EMAIL_DELIMITER)[1];
+    }
+
+    private void validateMatchName(String originName, String requestName) {
+        if (!originName.equals(requestName)) {
+            throw new AppException(ErrorCode.NAME_NOT_MATCH);
+        }
     }
 }
