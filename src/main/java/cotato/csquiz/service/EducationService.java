@@ -38,6 +38,13 @@ public class EducationService {
         return saveEducation.getId();
     }
 
+    //교육 상태(오픈여부) 바꾸기
+    public void patchStatus(PatchStatusRequest request) {
+        //교육팀인지 확인 TODO
+        Education education = findEducation(request.getEducationId());
+        education.changeStatus(request.isStatus());
+    }
+
     //교육이 이미 존재하면 예외 발생
     private void checkEducationExist(Session session) {
         Optional<Education> education = educationRepository.findEducationBySession(session);
@@ -51,7 +58,6 @@ public class EducationService {
         Education education = findEducation(educationId);
         return education.getStatus();
     }
-
     private Education findEducation(long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));

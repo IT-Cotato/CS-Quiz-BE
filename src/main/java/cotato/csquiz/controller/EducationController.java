@@ -36,4 +36,10 @@ public class EducationController {
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PatchMapping("/status")
+    public ResponseEntity<?> patchStatus(@RequestBody PatchStatusRequest request) {
+        educationService.patchStatus(request);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -52,4 +52,12 @@ public class Education {
         status = EducationStatus.CLOSED;
     }
 
+    public void changeStatus(boolean status) {
+        if (status) {
+            this.status = EducationStatus.ONGOING;
+        } else {
+            this.status = EducationStatus.CLOSED;
+        }
+    }
+
 }
