@@ -3,8 +3,9 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.exception.AppException;
+import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.MemberRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class AdminService {
 
     private Member findMember(Long userId) {
         return memberRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("해당 ID에 해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     public void approveApplicant(Long userId) {
