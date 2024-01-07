@@ -29,30 +29,29 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
+
+    private Member findMember(Long userId) {
+        return memberRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("해당 ID에 해당하는 회원을 찾을 수 없습니다."));
+    }
+
     public void approveApplicant(Long userId) {
-        Optional<Member> optionalMember = memberRepository.findById(userId);
+        Member member = findMember(userId);
 
-        if (optionalMember.isPresent()) {
-            Member member = optionalMember.get();
-
-            if (member.getRole() == MemberRole.GENERAL) {
-                member.updateRole(MemberRole.MEMBER);
-                memberRepository.save(member);
-            }
+        if (member.getRole() == MemberRole.GENERAL) {
+            member.updateRole(MemberRole.MEMBER);
+            memberRepository.save(member);
         }
     }
 
     public void rejectApplicant(Long userId) {
-        Optional<Member> optionalMember = memberRepository.findById(userId);
+        Member member = findMember(userId);
 
-        if (optionalMember.isPresent()) {
-            Member member = optionalMember.get();
-
-            if (member.getRole() == MemberRole.GENERAL) {
-                member.updateRole(MemberRole.REFUSED);
-                memberRepository.save(member);
-            }
+        if (member.getRole() == MemberRole.GENERAL) {
+            member.updateRole(MemberRole.REFUSED);
+            memberRepository.save(member);
         }
     }
+
 }
 
