@@ -65,6 +65,10 @@ public class Member {
         this.phoneNumber = phoneNumber;
     }
 
+    public void updateRole(MemberRole role) {
+        this.role = role;
+    }
+  
     public void updatePassword(String password) {
         this.password = password;
     }

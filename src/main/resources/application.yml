@@ -48,14 +48,12 @@ jwt:
   refresh:
     expiration: 86400000
 
-
 cloud:
   aws:
     s3:
       bucket: cotato
     stack.auto: false
-    region:
-      static: ap-northeast-2
+    region.static: ap-northeast-2
     credentials:
       accessKey: ${S3_ACCESS_KEY}
-      secretKey: ${S3_SECRET_KEY}
+      secretKey: ${S3_ACCESS_PASSWORD}

@@ -44,7 +44,7 @@ public class AuthController {
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
-
+  
     @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
         authService.sendSignUpEmail(request);
