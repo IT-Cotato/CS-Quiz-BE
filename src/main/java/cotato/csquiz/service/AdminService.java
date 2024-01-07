@@ -52,6 +52,5 @@ public class AdminService {
             memberRepository.save(member);
         }
     }
-
 }
 
