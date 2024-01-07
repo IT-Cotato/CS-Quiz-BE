@@ -24,14 +24,16 @@ public class AdminController {
         return ResponseEntity.ok().body(applicantList);
     }
 
-    @PatchMapping("/{userId}/approve")
-    public void approveApplicant(@PathVariable Long userId) {
+    @PatchMapping("/approve")
+    public ResponseEntity<?> approveApplicant(@RequestParam("userId") Long userId) {
+        log.info("가입자 승인 컨트롤러, 요청된 member id : {}", userId);
         adminService.approveApplicant(userId);
 
     }
 
-    @PatchMapping("/{userId}/reject")
-    public void rejectApplicant(@PathVariable Long userId) {
+    @PatchMapping("/reject")
+    public ResponseEntity<?> rejectApplicant(@RequestParam("userId") Long userId) {
+        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", userId);
         adminService.rejectApplicant(userId);
     }
 }
