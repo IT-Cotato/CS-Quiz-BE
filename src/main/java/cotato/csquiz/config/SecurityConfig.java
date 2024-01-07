@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,6 +28,7 @@ public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CorsFilter corsFilter;
 
     @Bean
     public BCryptPasswordEncoder encoder() {
@@ -45,6 +47,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenRepository))
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilter(corsFilter)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/member/**").hasAnyRole("GENERAL", "MEMBER", "ADMIN", "EDUCATION")
                         .requestMatchers(WHITE_LIST).permitAll()
