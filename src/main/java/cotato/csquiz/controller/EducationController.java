@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class EducationController {
     private final EducationService educationService;
 
-    @GetMapping("/{educationId}/status")
+    @GetMapping("/status")
     public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") long educationId) {
         EducationStatus status = educationService.getStatus(educationId);
         GetStatusResponse response = GetStatusResponse.builder()
@@ -29,12 +29,9 @@ public class EducationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addEducation(@RequestBody AddEducationRequest request) {
-        long educationId = educationService.addEducation(request);
-        AddEducationResponse response = AddEducationResponse.builder()
-                .educationId(educationId)
-                .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<AddEducationResponse> addEducation(@RequestBody AddEducationRequest request) {
+        AddEducationResponse response = educationService.addEducation(request);
+        return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/status")

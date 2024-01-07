@@ -1,6 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
+import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.EducationStatus;
@@ -25,7 +26,7 @@ public class EducationService {
     private final EducationRepository educationRepository;
 
     //교육 추가
-    public long addEducation(AddEducationRequest request) {
+    public AddEducationResponse addEducation(AddEducationRequest request) {
         //교원팀 권한인지 확인 TODO
         Session session = sessionService.findSessionById(request.getSessionId());
         checkEducationExist(session);
@@ -35,7 +36,9 @@ public class EducationService {
                 .educationNum(request.getEducationNum())
                 .build();
         Education saveEducation = educationRepository.save(education);
-        return saveEducation.getId();
+        return AddEducationResponse.builder()
+                .educationId(saveEducation.getId())
+                .build();
     }
 
     //교육 상태(오픈여부) 바꾸기
