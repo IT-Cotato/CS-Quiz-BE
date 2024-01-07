@@ -64,4 +64,8 @@ public class Member {
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
+
+    public void updateRole(MemberRole role) {
+        this.role = role;
+    }
 }
