@@ -32,6 +32,7 @@ public class MemberService {
                 .id(findMember.getId())
                 .name(findMember.getName())
                 .backFourNumber(lastFourNumber)
+                .role(findMember.getRole())
                 .build();
     }
 
