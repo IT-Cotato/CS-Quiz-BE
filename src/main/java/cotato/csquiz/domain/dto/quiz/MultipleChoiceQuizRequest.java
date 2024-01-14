@@ -13,6 +13,6 @@ public class MultipleChoiceQuizRequest {
 
     private int number;
     private String question;
-    private MultipartFile quizImage;
+    private MultipartFile image;
     private List<CreateChoiceRequest> choices;
 }

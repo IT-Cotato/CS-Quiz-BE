@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +39,15 @@ public class Choice {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "quiz_id")
     private MultipleQuiz multipleQuiz;
+
+    @Builder
+    public Choice(int choiceNumber, String content, ChoiceCorrect isCorrect) {
+        this.choiceNumber = choiceNumber;
+        this.content = content;
+        this.isCorrect = isCorrect;
+    }
+
+    public void matchMultipleQuiz(MultipleQuiz multipleQuiz) {
+        this.multipleQuiz = multipleQuiz;
+    }
 }
