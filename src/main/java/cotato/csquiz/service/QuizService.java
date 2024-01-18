@@ -3,11 +3,8 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
-import cotato.csquiz.domain.entity.Choice;
-import cotato.csquiz.domain.entity.Education;
-import cotato.csquiz.domain.entity.MultipleQuiz;
-import cotato.csquiz.domain.entity.ShortAnswer;
-import cotato.csquiz.domain.entity.ShortQuiz;
+import cotato.csquiz.domain.dto.quiz.QuizStatusResponse;
+import cotato.csquiz.domain.entity.*;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
@@ -130,5 +127,19 @@ public class QuizService {
         if (count != numbers.size()) {
             throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
         }
+    }
+
+    public QuizStatusResponse checkQuizStarted() {
+        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.ON);
+        log.info("by Status {}",byStatus);
+        if (byStatus.isEmpty()) {
+            return null;
+        }
+        Quiz quiz = byStatus.get(0);
+        return QuizStatusResponse.builder()
+                .quizNum(quiz.getId())
+                .status(quiz.getStatus())
+                .start(quiz.getStart())
+                .build();
     }
 }

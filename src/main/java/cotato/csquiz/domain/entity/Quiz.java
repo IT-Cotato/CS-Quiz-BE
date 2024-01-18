@@ -46,6 +46,11 @@ public class Quiz {
     @ColumnDefault(value = "'OFF'")
     private QuizStatus status;
 
+    @Column(name = "quiz_start")
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault(value = "'OFF'")
+    private QuizStatus start;
+
     @Column(name = "quiz_appear_second")
     private int appearSecond;
 
