@@ -79,5 +79,4 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.addCookie(cookie);
         log.info("로그인 성공, JWT 토큰 생성");
     }
-
 }
