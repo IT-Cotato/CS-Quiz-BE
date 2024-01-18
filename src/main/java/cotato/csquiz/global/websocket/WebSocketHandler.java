@@ -71,32 +71,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info(CLIENTS.toString());
     }
 
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info(session.toString());
-        String payload = message.getPayload();
-        JsonNode jsonNode = objectMapper.readTree(payload);
-        if(jsonNode.has("command")){
-            String command = jsonNode.get("command").asText();
-            if (command.equals("sendAll")) {
-                List<String> generations = generationService.getGenerations();
-                String json = objectMapper.writeValueAsString(generations);
-                TextMessage responseMessage = new TextMessage(json);
-                for (WebSocketSession client : CLIENTS.values()) {
-                    try {
-                        log.info(client.getId() + " "+System.currentTimeMillis());
-                        client.sendMessage(responseMessage);
-                    } catch (IOException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            if (command.equals("sendOne")) {
-                //특정 한 사람에게만
-            }
-        }
-    }
-
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
             // TODO: findROLE logic
