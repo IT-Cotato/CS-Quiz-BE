@@ -3,9 +3,12 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
+import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
+import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.QuizType;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
 import cotato.csquiz.exception.AppException;
@@ -130,5 +133,29 @@ public class QuizService {
         if (count != numbers.size()) {
             throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
         }
+    }
+
+    public List<QuizResponse> getAllQuizzes(Long educationId) {
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        return quizzes.stream()
+                .map(this::toQuizResponse)
+                .toList();
+    }
+
+    private QuizResponse toQuizResponse(Quiz quiz) {
+        return QuizResponse.builder()
+                .id(quiz.getId())
+                .type(getQuizType(quiz))
+                .question(quiz.getQuestion())
+                .number(quiz.getNumber())
+                .photoUrl(quiz.getPhotoUrl())
+                .build();
+    }
+
+    private QuizType getQuizType(Quiz quiz) {
+        if (quiz instanceof ShortQuiz) {
+            return QuizType.SHORT_ANSWER;
+        }
+        return QuizType.MULTIPLE_CHOICES;
     }
 }
