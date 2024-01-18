@@ -51,14 +51,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("checkQuizAlreadyStart Start");
         try {
             QuizStatusResponse response = quizService.checkQuizStarted();
-            if (response != null) {
-                String json = objectMapper.writeValueAsString(response);
-                TextMessage responseMessage = new TextMessage(json);
-                session.sendMessage(responseMessage);
-            } else {
-                log.info("there is no Started Quiz");
-                //TODO 아무것도 없을때도 뭔가를 넘겨줘야 할까 고민
-            }
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            session.sendMessage(responseMessage);
         } catch (IOException e) {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
         }

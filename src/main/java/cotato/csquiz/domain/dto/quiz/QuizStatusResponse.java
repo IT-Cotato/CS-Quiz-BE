@@ -11,4 +11,5 @@ public class QuizStatusResponse {
     private QuizStatus status;
     private QuizStatus start;
     private long quizNum;
+    private String command;
 }

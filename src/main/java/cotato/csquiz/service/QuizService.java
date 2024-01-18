@@ -133,10 +133,13 @@ public class QuizService {
         List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.ON);
         log.info("by Status {}",byStatus);
         if (byStatus.isEmpty()) {
-            return null;
+            return QuizStatusResponse.builder()
+                    .command("show")
+                    .build();
         }
         Quiz quiz = byStatus.get(0);
         return QuizStatusResponse.builder()
+                .command("show")
                 .quizNum(quiz.getId())
                 .status(quiz.getStatus())
                 .start(quiz.getStart())
