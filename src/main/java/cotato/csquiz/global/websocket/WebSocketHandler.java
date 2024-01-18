@@ -57,6 +57,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(responseMessage);
             } else {
                 log.info("there is no Started Quiz");
+                //TODO 아무것도 없을때도 뭔가를 넘겨줘야 할까 고민
             }
         } catch (IOException e) {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
@@ -69,6 +70,32 @@ public class WebSocketHandler extends TextWebSocketHandler {
         CLIENTS.remove(memberEmail);
         log.info("disconnect the session");
         log.info(CLIENTS.toString());
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        log.info(session.toString());
+        String payload = message.getPayload();
+        JsonNode jsonNode = objectMapper.readTree(payload);
+        if(jsonNode.has("command")){
+            String command = jsonNode.get("command").asText();
+            if (command.equals("sendAll")) {
+                List<String> generations = generationService.getGenerations();
+                String json = objectMapper.writeValueAsString(generations);
+                TextMessage responseMessage = new TextMessage(json);
+                for (WebSocketSession client : CLIENTS.values()) {
+                    try {
+                        log.info(client.getId() + " "+System.currentTimeMillis());
+                        client.sendMessage(responseMessage);
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (command.equals("sendOne")) {
+                //특정 한 사람에게만
+            }
+        }
     }
 
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
@@ -88,7 +115,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 updateManagerSession(memberEmail, session);
                 yield false;
             }
-            case GENERAL -> {
+            case MEMBER -> {
                 updateClientSession(memberEmail, session);
                 yield true;
             }
@@ -102,7 +129,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static MemberRole findRoleForMember(String memberEmail) {
         // TODO: 실제로 사용할 MemberRole 찾는 로직을 구현
         if (memberEmail.equals("gikhoon@naver.com")) {
-            return MemberRole.GENERAL;
+            return MemberRole.MEMBER;
         }
         return MemberRole.EDUCATION; // TODO: 실제로 사용할 MemberRole 찾는 로직을 구현
     }
