@@ -1,14 +1,18 @@
 package cotato.csquiz.domain.dto.quiz;
 
 import cotato.csquiz.domain.entity.QuizType;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Builder
-public record QuizResponse(
-        Long id,
-        QuizType type,
-        int number,
-        String question,
-        String photoUrl
-) {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class QuizResponse {
+
+    private Long id;
+    private int number;
+    private QuizType type;
+    private String question;
+    private String photoUrl;
 }

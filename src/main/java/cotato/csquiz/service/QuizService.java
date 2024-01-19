@@ -1,9 +1,13 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
+import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
-import cotato.csquiz.domain.dto.quiz.QuizResponse;
+import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
+import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
@@ -135,27 +139,67 @@ public class QuizService {
         }
     }
 
-    public List<QuizResponse> getAllQuizzes(Long educationId) {
+    public AllQuizzesResponse getAllQuizzes(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
-        return quizzes.stream()
-                .map(this::toQuizResponse)
+        List<MultipleQuizResponse> multiples = quizzes.stream()
+                .filter(quiz -> quiz instanceof MultipleQuiz)
+                .map(this::toMultipleQuizResponse)
                 .toList();
-    }
 
-    private QuizResponse toQuizResponse(Quiz quiz) {
-        return QuizResponse.builder()
-                .id(quiz.getId())
-                .type(getQuizType(quiz))
-                .question(quiz.getQuestion())
-                .number(quiz.getNumber())
-                .photoUrl(quiz.getPhotoUrl())
+        List<ShortQuizResponse> shortQuizzes = quizzes.stream()
+                .filter(quiz -> quiz instanceof ShortQuiz)
+                .map(this::toShortQuizResponse)
+                .toList();
+
+        return AllQuizzesResponse.builder()
+                .multiples(multiples)
+                .shortQuizzes(shortQuizzes)
                 .build();
     }
 
-    private QuizType getQuizType(Quiz quiz) {
-        if (quiz instanceof ShortQuiz) {
-            return QuizType.SHORT_ANSWER;
+    private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
+        List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+        List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
+                .map(shortAnswer -> ShortAnswerResponse.builder()
+                        .answer(shortAnswer.getContent())
+                        .build())
+                .toList();
+
+        ShortQuizResponse response = ShortQuizResponse.builder()
+                .id(quiz.getId())
+                .type(QuizType.SHORT_QUIZ)
+                .number(quiz.getNumber())
+                .question(quiz.getQuestion())
+                .photoUrl(quiz.getPhotoUrl())
+                .build();
+        for (ShortAnswerResponse shortAnswerResponse : shortAnswerResponses) {
+            response.addShortAnswers(shortAnswerResponse);
         }
-        return QuizType.MULTIPLE_CHOICES;
+
+        return response;
+    }
+
+    private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
+        List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+        List<ChoiceResponse> choiceResponses = choices.stream()
+                .map(choice -> ChoiceResponse.builder()
+                        .choiceId(choice.getId())
+                        .number(choice.getChoiceNumber())
+                        .content(choice.getContent())
+                        .isCorrect(choice.getIsCorrect())
+                        .build())
+                .toList();
+
+        MultipleQuizResponse response = MultipleQuizResponse.builder()
+                .id(quiz.getId())
+                .type(QuizType.MULTIPLE_QUIZ)
+                .number(quiz.getNumber())
+                .question(quiz.getQuestion())
+                .photoUrl(quiz.getPhotoUrl())
+                .build();
+        for (ChoiceResponse choiceResponse : choiceResponses) {
+            response.addChoice(choiceResponse);
+        }
+        return response;
     }
 }
