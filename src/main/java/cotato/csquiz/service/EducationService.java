@@ -3,6 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
+import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.domain.entity.Session;
@@ -64,5 +65,20 @@ public class EducationService {
     private Education findEducation(long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public void patchSubject(PatchSubjectRequest request) {
+        validateSubject(request.getNewSubject());
+
+        Education education = educationRepository.findById(request.getEducationId())
+                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+        education.setSubject(request.getNewSubject());
+        educationRepository.save(education);
+    }
+
+    private void validateSubject(String newSubject) {
+        Optional.ofNullable(newSubject)
+                .filter(subject -> !subject.trim().isEmpty())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 }

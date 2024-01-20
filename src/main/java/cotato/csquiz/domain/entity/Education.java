@@ -59,4 +59,8 @@ public class Education {
             this.status = EducationStatus.CLOSED;
         }
     }
+
+    public void setSubject(String newSubject) {
+        this.subject = newSubject;
+    }
 }
