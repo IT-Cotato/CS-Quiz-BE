@@ -1,13 +1,15 @@
 package cotato.csquiz.domain.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
 public enum QuizStatus {
-    ON("ON"),
-    OFF("OFF");
+    QUIZ_ON("ON"),
+    QUIZ_OFF("OFF");
 
     private final String status;
+
+    QuizStatus(String status) {
+        this.status = status;
+    }
 }
