@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
+import cotato.csquiz.domain.dto.education.EducationListResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
@@ -10,6 +11,7 @@ import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,5 +82,12 @@ public class EducationService {
         Optional.ofNullable(newSubject)
                 .filter(subject -> !subject.trim().isEmpty())
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
+    }
+
+    public EducationListResponse getEducationsByGenerationId(long generationId) {
+        List<Education> educations = educationRepository.findAllByGenerationId(generationId);
+        return EducationListResponse.builder()
+                .educations(educations)
+                .build();
     }
 }
