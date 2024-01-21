@@ -11,5 +11,6 @@ import lombok.Data;
 @AllArgsConstructor
 @Builder
 public class EducationListResponse {
-    private final List<Education> educations;
+
+    private final List<EducationResponse> educations;
 }
