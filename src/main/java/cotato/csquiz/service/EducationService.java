@@ -70,7 +70,7 @@ public class EducationService {
     }
 
     public void patchSubject(PatchSubjectRequest request) {
-        validateSubject(request.getNewSubject());
+        validateNotEmpty(request.getNewSubject());
 
         Education education = educationRepository.findById(request.getEducationId())
                 .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
@@ -78,7 +78,7 @@ public class EducationService {
         educationRepository.save(education);
     }
 
-    private void validateSubject(String newSubject) {
+    private void validateNotEmpty(String newSubject) {
         Optional.ofNullable(newSubject)
                 .filter(subject -> !subject.trim().isEmpty())
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
