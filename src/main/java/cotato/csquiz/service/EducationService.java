@@ -74,7 +74,7 @@ public class EducationService {
 
         Education education = educationRepository.findById(request.getEducationId())
                 .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
-        education.setSubject(request.getNewSubject());
+        education.updateSubject(request.getNewSubject());
         educationRepository.save(education);
     }
 

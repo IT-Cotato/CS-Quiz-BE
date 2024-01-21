@@ -64,7 +64,7 @@ public class Education {
         }
     }
 
-    public void setSubject(String newSubject) {
+    public void updateSubject(String newSubject) {
         this.subject = newSubject;
     }
 }
