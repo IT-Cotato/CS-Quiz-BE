@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     GENERATION_NAME_EXIST(HttpStatus.CONFLICT, "이미 이름이 있습니다"),
     EDUCATION_EXIST(HttpStatus.CONFLICT, "이미 교육이 존재합니다"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
