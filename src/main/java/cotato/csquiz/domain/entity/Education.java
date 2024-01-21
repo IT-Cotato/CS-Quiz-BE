@@ -67,4 +67,8 @@ public class Education {
     public void updateSubject(String newSubject) {
         this.subject = newSubject;
     }
+
+    public int getEducationNum() {
+        return this.number;
+    }
 }
