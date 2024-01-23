@@ -89,6 +89,6 @@ public class EducationService {
         List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
         return educationList.stream()
                 .map(EducationDto::convertFromEducation)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

@@ -9,13 +9,13 @@ import lombok.Getter;
 public class EducationDto {
     private Long educationId;
     private String subject;
-    private int educationNum;
+    private int educationNumber;
 
     public static EducationDto convertFromEducation(Education education) {
         return EducationDto.builder()
                 .educationId(education.getId())
                 .subject(education.getSubject())
-                .educationNum(education.getNumber())
+                .educationNumber(education.getNumber())
                 .build();
     }
 }
