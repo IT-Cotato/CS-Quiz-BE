@@ -55,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/v1/api/generation/**").hasAnyRole("GENERAL", "ADMIN")
                         .requestMatchers("/v1/api/session/**").hasAnyRole("GENERAL", "ADMIN")
+                        .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION","ADMIN")
                         .anyRequest().permitAll()
                 );
 

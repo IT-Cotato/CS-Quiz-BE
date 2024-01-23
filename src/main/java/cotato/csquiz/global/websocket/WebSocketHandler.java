@@ -26,13 +26,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final GenerationService generationService; //추후 변경
-
     private final QuizService quizService;
 
     @Autowired
-    public WebSocketHandler(GenerationService generationService, QuizService quizService) {
-        this.generationService = generationService;
+    public WebSocketHandler(QuizService quizService) {
         this.quizService = quizService;
     }
 
@@ -64,7 +61,19 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     public void accessQuiz(long quizId) {
-
+        try {
+            QuizStatusResponse response = QuizStatusResponse.builder()
+                    .quizNum(quizId)
+                    .command("show")
+                    .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
     }
 
     @Override
@@ -74,33 +83,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("disconnect the session");
         log.info(CLIENTS.toString());
     }
-
-    @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        log.info(session.toString());
-        String payload = message.getPayload();
-        JsonNode jsonNode = objectMapper.readTree(payload);
-        if(jsonNode.has("command")){
-            String command = jsonNode.get("command").asText();
-            if (command.equals("sendAll")) {
-                List<String> generations = generationService.getGenerations();
-                String json = objectMapper.writeValueAsString(generations);
-                TextMessage responseMessage = new TextMessage(json);
-                for (WebSocketSession client : CLIENTS.values()) {
-                    try {
-                        log.info(client.getId() + " "+System.currentTimeMillis());
-                        client.sendMessage(responseMessage);
-                    } catch (IOException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-            if (command.equals("sendOne")) {
-                //특정 한 사람에게만
-            }
-        }
-    }
-
 
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {

@@ -65,4 +65,12 @@ public class Quiz {
         this.education = education;
         this.appearSecond = appearSecond;
     }
+
+    public void updateStatus(boolean status) {
+        if (status) {
+            this.status = QuizStatus.ON;
+        }else{
+            this.status = QuizStatus.OFF;
+        }
+    }
 }
