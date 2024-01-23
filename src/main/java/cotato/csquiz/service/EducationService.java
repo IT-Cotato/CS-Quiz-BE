@@ -1,9 +1,8 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.EducationDto;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
-import cotato.csquiz.domain.dto.education.EducationListResponse;
-import cotato.csquiz.domain.dto.education.EducationResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
@@ -86,20 +85,10 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-    public EducationListResponse getEducationsByGenerationId(long generationId) {
-        List<Education> educations = educationRepository.findAllByGenerationId(generationId);
-
-        List<EducationResponse> educationResponses = educations
-                .stream()
-                .map(education -> EducationResponse.builder()
-                        .educationId(education.getId())
-                        .generationId(education.getSession().getGeneration().getId())
-                        .educationNumber(education.getEducationNum())
-                        .build())
+    public List<EducationDto> getEducationListByGeneration(Long generationId) {
+        List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
+        return educationList.stream()
+                .map(EducationDto::convertFromEducation)
                 .collect(Collectors.toList());
-
-        return EducationListResponse.builder()
-                .educations(educationResponses)
-                .build();
     }
 }

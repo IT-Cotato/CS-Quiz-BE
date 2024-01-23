@@ -11,5 +11,6 @@ import java.util.Optional;
 @Repository
 public interface EducationRepository extends JpaRepository<Education, Long> {
     Optional<Education> findEducationBySession(Session session);
-    List<Education> findAllByGenerationId(long generationId);
+    List<Education> findBySession_Generation_Id(Long generationId);
+
 }

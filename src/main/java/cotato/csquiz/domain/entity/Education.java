@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,9 +32,6 @@ public class Education {
     @Column(name = "education_subject")
     private String subject;
 
-    @Column(name = "generation_id")
-    private Long generationId;
-
     @Column(name = "education_status")
     @Enumerated(EnumType.STRING)
     private EducationStatus status;
@@ -49,7 +45,7 @@ public class Education {
     private Session session;
 
     @Builder
-    public Education(String subject, int educationNum ,Session session) {
+    public Education(String subject, int educationNum, Session session) {
         this.subject = subject;
         this.number = educationNum;
         this.session = session;
@@ -66,9 +62,5 @@ public class Education {
 
     public void updateSubject(String newSubject) {
         this.subject = newSubject;
-    }
-
-    public int getEducationNum() {
-        return this.number;
     }
 }
