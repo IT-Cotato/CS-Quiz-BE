@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -25,6 +27,8 @@ public class SocketService {
     private final QuizRepository quizRepository;
 
     public void accessQuiz(AccessQuizRequest request) {
+        quizRepository.findByStatus(QuizStatus.ON)
+                .forEach(quiz -> quiz.updateStatus(false));
         Quiz quiz = findQuizById(request.getQuizId());
         quiz.updateStatus(true);
         webSocketHandler.accessQuiz(quiz.getId());
