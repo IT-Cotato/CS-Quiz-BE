@@ -53,5 +53,4 @@ public class EducationController {
         List<EducationDto> educationList = educationService.getEducationListByGeneration(generationId);
         return ResponseEntity.ok().body(educationList);
     }
-
 }
