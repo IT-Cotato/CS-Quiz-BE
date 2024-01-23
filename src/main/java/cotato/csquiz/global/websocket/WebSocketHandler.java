@@ -38,7 +38,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String memberEmail = (String) session.getAttributes().get("member");
+        String memberEmail = (String) session.getAttributes().get("email");
         log.info(memberEmail);
         boolean isGeneral = connectSession(session, memberEmail); //true : 일반 회원 false : 관리자
         if (isGeneral) {
@@ -61,7 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberEmail = (String) session.getAttributes().get("member");
+        String memberEmail = (String) session.getAttributes().get("email");
         CLIENTS.remove(memberEmail);
         log.info("disconnect the session");
         log.info(CLIENTS.toString());
@@ -70,8 +70,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
-            // TODO: findROLE logic
-            MemberRole role = findRoleForMember(memberEmail); // TODO: 실제로 사용할 MemberRole 찾는 로직으로 대체
+            String roleString = (String) session.getAttributes().get("role");
+            log.info("roleString {}",roleString);
+            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
+            log.info("role role {}",role);
             return updateSession(session, memberEmail, role);
         } else {
             log.warn("Email is null in session {}.", session.getId());
@@ -94,14 +96,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 throw new AppException(ErrorCode.MEMBER_NOT_FOUND);
             }
         };
-    }
-
-    private static MemberRole findRoleForMember(String memberEmail) {
-        // TODO: 실제로 사용할 MemberRole 찾는 로직을 구현
-        if (memberEmail.equals("gikhoon@naver.com")) {
-            return MemberRole.MEMBER;
-        }
-        return MemberRole.EDUCATION; // TODO: 실제로 사용할 MemberRole 찾는 로직을 구현
     }
 
     private static void updateManagerSession(String memberEmail, WebSocketSession session) {

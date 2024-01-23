@@ -1,5 +1,7 @@
 package cotato.csquiz.global.websocket;
 
+import cotato.csquiz.config.jwt.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -8,11 +10,18 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
+
+    private final JwtUtil jwtUtil;
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        List<String> memberList = request.getHeaders().get("member"); //JWT로 email을 찾을 수 있으면 바꾸기 TODO
-        attributes.put("member", memberList != null ? memberList.get(0) : null);
+        String bearerToken = request.getHeaders().getFirst("Authorization");
+        String token = jwtUtil.getBearer(bearerToken);
+        String role = jwtUtil.getRole(token);
+        String email = jwtUtil.getEmail(token);
+        attributes.put("email", email);
+        attributes.put("role", role);
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }
 }
