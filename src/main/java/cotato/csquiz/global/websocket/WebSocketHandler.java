@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.service.QuizService;
@@ -55,6 +56,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             QuizStatusResponse response = QuizStatusResponse.builder()
                     .quizNum(quizId)
                     .command("show")
+                    .status(QuizStatus.ON)
                     .build();
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
@@ -65,7 +67,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
         }
     }
-
 
     public void startQuiz(Long quizId) {
         try {
