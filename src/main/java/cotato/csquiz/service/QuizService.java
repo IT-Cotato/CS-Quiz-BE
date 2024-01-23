@@ -3,7 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
-import cotato.csquiz.domain.dto.quiz.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.*;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;

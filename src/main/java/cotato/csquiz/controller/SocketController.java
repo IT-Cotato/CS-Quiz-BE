@@ -1,6 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.socket.AccessQuizRequest;
+import cotato.csquiz.domain.dto.socket.StartQuizRequest;
 import cotato.csquiz.global.websocket.WebSocketHandler;
 import cotato.csquiz.service.SocketService;
 import lombok.RequiredArgsConstructor;
@@ -29,4 +30,9 @@ public class SocketController {
         return ResponseEntity.ok().build();
     }
     //퀴즈 풀기 시작
+    @PostMapping("/start")
+    public ResponseEntity<?> startQuiz(@RequestBody StartQuizRequest request) {
+        socketService.startQuiz(request);
+        return ResponseEntity.ok().build();
+    }
 }

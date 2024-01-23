@@ -30,7 +30,8 @@ public enum ErrorCode {
     NAME_NOT_MATCH(HttpStatus.NOT_FOUND, "해당 유저의 전화번호와 이름이 일치하지 않습니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요."),
     EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 교육을 찾을 수 없습니다."),
-    QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다.");
+    QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."), 
+    Quiz_OFF(HttpStatus.BAD_REQUEST,"해당 문제는 접근이 불가능한 상태입니다. 접근을 허용해주십시오");
 
     private final HttpStatus httpStatus;
     private final String message;

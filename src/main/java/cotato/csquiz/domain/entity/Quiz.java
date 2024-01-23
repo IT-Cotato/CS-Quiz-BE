@@ -73,4 +73,12 @@ public class Quiz {
             this.status = QuizStatus.OFF;
         }
     }
+
+    public void updateStart(boolean status) {
+        if (status) {
+            this.start = QuizStatus.ON;
+        }else{
+            this.start = QuizStatus.OFF;
+        }
+    }
 }

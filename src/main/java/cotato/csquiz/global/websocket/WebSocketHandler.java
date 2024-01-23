@@ -1,12 +1,11 @@
 package cotato.csquiz.global.websocket;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cotato.csquiz.domain.dto.quiz.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
-import cotato.csquiz.service.GenerationService;
 import cotato.csquiz.service.QuizService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -57,6 +55,23 @@ public class WebSocketHandler extends TextWebSocketHandler {
             QuizStatusResponse response = QuizStatusResponse.builder()
                     .quizNum(quizId)
                     .command("show")
+                    .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+
+    public void startQuiz(Long quizId) {
+        try {
+            QuizStartResponse response = QuizStartResponse.builder()
+                    .quizNum(quizId)
+                    .command("start")
                     .build();
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
