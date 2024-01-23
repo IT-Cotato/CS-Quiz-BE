@@ -44,20 +44,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
     }
 
-    private static String findAttributeByToken(WebSocketSession session, String key) {
-        return (String) session.getAttributes().get(key);
-    }
-
-    private void checkQuizAlreadyStart(WebSocketSession session) {
-        log.info("checkQuizAlreadyStart Start");
-        try {
-            QuizStatusResponse response = quizService.checkQuizStarted();
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-            session.sendMessage(responseMessage);
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
-        }
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        String memberEmail = findAttributeByToken(session, "email");
+        CLIENTS.remove(memberEmail);
+        log.info("disconnect the session");
+        log.info(CLIENTS.toString());
     }
 
     public void accessQuiz(long quizId) {
@@ -74,14 +66,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
         } catch (IOException e) {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
         }
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberEmail = findAttributeByToken(session, "email");
-        CLIENTS.remove(memberEmail);
-        log.info("disconnect the session");
-        log.info(CLIENTS.toString());
     }
 
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
@@ -124,5 +108,21 @@ public class WebSocketHandler extends TextWebSocketHandler {
         CLIENTS.remove(memberEmail);
         CLIENTS.put(memberEmail, session);
         log.info("{} connect with Session {} in CLIENTS", memberEmail, session);
+    }
+
+    private static String findAttributeByToken(WebSocketSession session, String key) {
+        return (String) session.getAttributes().get(key);
+    }
+
+    private void checkQuizAlreadyStart(WebSocketSession session) {
+        log.info("checkQuizAlreadyStart Start");
+        try {
+            QuizStatusResponse response = quizService.checkQuizStarted();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            session.sendMessage(responseMessage);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
     }
 }
