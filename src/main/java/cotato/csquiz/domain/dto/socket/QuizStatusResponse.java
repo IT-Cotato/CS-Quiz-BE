@@ -1,11 +1,11 @@
-package cotato.csquiz.domain.dto.quiz;
+package cotato.csquiz.domain.dto.socket;
 
 import cotato.csquiz.domain.entity.QuizStatus;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-@Data
+@Getter
 @Builder
 public class QuizStatusResponse {
     private QuizStatus status;
