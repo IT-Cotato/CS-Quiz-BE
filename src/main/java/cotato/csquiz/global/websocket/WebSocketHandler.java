@@ -38,13 +38,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String memberEmail = (String) session.getAttributes().get("email");
+        String memberEmail = findAttributeByToken(session, "email");
         log.info(memberEmail);
         boolean isGeneral = connectSession(session, memberEmail); //true : 일반 회원 false : 관리자
         if (isGeneral) {
             checkQuizAlreadyStart(session);
         }
         log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
+    }
+
+    private static String findAttributeByToken(WebSocketSession session, String key) {
+        return (String) session.getAttributes().get(key);
     }
 
     private void checkQuizAlreadyStart(WebSocketSession session) {
@@ -59,18 +63,48 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    public void accessQuiz(long quizId) {
+
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberEmail = (String) session.getAttributes().get("email");
+        String memberEmail = findAttributeByToken(session, "email");
         CLIENTS.remove(memberEmail);
         log.info("disconnect the session");
         log.info(CLIENTS.toString());
     }
 
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        log.info(session.toString());
+        String payload = message.getPayload();
+        JsonNode jsonNode = objectMapper.readTree(payload);
+        if(jsonNode.has("command")){
+            String command = jsonNode.get("command").asText();
+            if (command.equals("sendAll")) {
+                List<String> generations = generationService.getGenerations();
+                String json = objectMapper.writeValueAsString(generations);
+                TextMessage responseMessage = new TextMessage(json);
+                for (WebSocketSession client : CLIENTS.values()) {
+                    try {
+                        log.info(client.getId() + " "+System.currentTimeMillis());
+                        client.sendMessage(responseMessage);
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (command.equals("sendOne")) {
+                //특정 한 사람에게만
+            }
+        }
+    }
+
 
     private static boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
-            String roleString = (String) session.getAttributes().get("role");
+            String roleString = findAttributeByToken(session, "role");
             log.info("roleString {}",roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
             log.info("role role {}",role);
