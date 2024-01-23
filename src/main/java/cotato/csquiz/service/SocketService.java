@@ -1,8 +1,6 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.dto.socket.AccessQuizRequest;
-import cotato.csquiz.domain.dto.socket.StartQuizRequest;
+import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
@@ -14,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -26,7 +22,7 @@ public class SocketService {
 
     private final QuizRepository quizRepository;
 
-    public void accessQuiz(AccessQuizRequest request) {
+    public void accessQuiz(QuizSocketRequest request) {
         quizRepository.findByStatus(QuizStatus.ON)
                 .forEach(quiz -> quiz.updateStatus(false));
         Quiz quiz = findQuizById(request.getQuizId());
@@ -34,7 +30,7 @@ public class SocketService {
         webSocketHandler.accessQuiz(quiz.getId());
     }
 
-    public void startQuiz(StartQuizRequest request) {
+    public void startQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         isQuizStatusTrue(quiz);
         quiz.updateStart(true);

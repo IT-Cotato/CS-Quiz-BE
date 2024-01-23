@@ -3,6 +3,6 @@ package cotato.csquiz.domain.dto.socket;
 import lombok.Getter;
 
 @Getter
-public class StartQuizRequest {
+public class QuizSocketRequest {
     private long quizId;
 }
