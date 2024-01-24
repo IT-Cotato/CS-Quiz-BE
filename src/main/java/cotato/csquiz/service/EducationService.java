@@ -65,6 +65,7 @@ public class EducationService {
         Education education = findEducation(educationId);
         return education.getStatus();
     }
+
     private Education findEducation(long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));

@@ -1,5 +1,6 @@
 package cotato.csquiz.domain.dto.auth;
 
+import cotato.csquiz.domain.entity.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class MemberInfoResponse {
     private Long id;
     private String name;
     private String backFourNumber;
+    private MemberRole role;
 }

@@ -3,6 +3,7 @@ package cotato.csquiz.controller;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendEmailRequest;
+import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +44,7 @@ public class AuthController {
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
-
+  
     @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
         authService.sendSignUpEmail(request);
@@ -67,5 +68,13 @@ public class AuthController {
     public ResponseEntity<?> verifyPasswordCode(@RequestParam(name = "email") String email,
                                                 @RequestParam(name = "code") String code) {
         return ResponseEntity.ok().body(authService.verifyPasswordCode(email, code));
+    }
+
+    @GetMapping("/email")
+    public ResponseEntity<?> findEmail(@RequestParam(name = "name") String name,
+                                       @RequestParam("phone") String phoneNumber) {
+        MemberEmailResponse memberEmail = authService.findMemberEmail(name, phoneNumber);
+        log.info("아이디 찾기 컨트롤러: {}", name);
+        return ResponseEntity.ok(memberEmail);
     }
 }

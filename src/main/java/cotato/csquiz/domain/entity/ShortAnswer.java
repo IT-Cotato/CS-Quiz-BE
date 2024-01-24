@@ -9,8 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ShortAnswer {
 
     @Id
@@ -23,6 +29,14 @@ public class ShortAnswer {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "quiz_id")
-    private Quiz quiz;
+    private ShortQuiz shortQuiz;
 
+    public void matchShortQuiz(ShortQuiz shortQuiz) {
+        this.shortQuiz = shortQuiz;
+    }
+
+    @Builder
+    public ShortAnswer(String content) {
+        this.content = content;
+    }
 }

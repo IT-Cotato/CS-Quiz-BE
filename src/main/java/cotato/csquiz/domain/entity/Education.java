@@ -46,6 +46,7 @@ public class Education {
 
     @Builder
     public Education(String subject, int educationNum, Session session) {
+
         this.subject = subject;
         this.number = educationNum;
         this.session = session;
