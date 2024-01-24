@@ -109,19 +109,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }
             default -> {
                 log.warn("Unknown role for member {}.", memberEmail);
-                throw new AppException(ErrorCode.MEMBER_NOT_FOUND);
+                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
             }
         };
     }
 
     private static void updateManagerSession(String memberEmail, WebSocketSession session) {
-        MANAGERS.remove(memberEmail);
         MANAGERS.put(memberEmail, session);
         log.info("{} connect with Session {} in MANAGER", memberEmail, session);
     }
 
     private static void updateClientSession(String memberEmail, WebSocketSession session) {
-        CLIENTS.remove(memberEmail);
         CLIENTS.put(memberEmail, session);
         log.info("{} connect with Session {} in CLIENTS", memberEmail, session);
     }
