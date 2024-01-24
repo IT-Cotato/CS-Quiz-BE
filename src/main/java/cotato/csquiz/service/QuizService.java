@@ -6,6 +6,7 @@ import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.entity.Choice;
@@ -201,5 +202,14 @@ public class QuizService {
             response.addChoice(choiceResponse);
         }
         return response;
+    }
+
+    public QuizResponse getQuiz(Long quizId) {
+        Quiz findQuiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        if (findQuiz instanceof MultipleQuiz) {
+            return toMultipleQuizResponse(findQuiz);
+        }
+        return toShortQuizResponse(findQuiz);
     }
 }
