@@ -140,6 +140,7 @@ public class QuizService {
         }
     }
 
+    @Transactional
     public AllQuizzesResponse getAllQuizzes(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
         List<MultipleQuizResponse> multiples = quizzes.stream()
@@ -204,6 +205,7 @@ public class QuizService {
         return response;
     }
 
+    @Transactional
     public QuizResponse getQuiz(Long quizId) {
         Quiz findQuiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
