@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class QuizStartResponse {
-    private long quizNum;
+    private long quizNumber;
     private String command;
 }
