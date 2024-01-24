@@ -10,6 +10,6 @@ import lombok.Getter;
 public class QuizStatusResponse {
     private QuizStatus status;
     private QuizStatus start;
-    private long quizNumber;
+    private long quizId;
     private String command;
 }
