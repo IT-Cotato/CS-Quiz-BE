@@ -32,9 +32,23 @@ public class SocketController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/deny")
     //문제 접근 차단
-    public ResponseEntity<?> closeQuiz(@RequestBody QuizSocketRequest request) {
-        socketService.accessQuiz(request);
+    public ResponseEntity<?> denyQuiz(@RequestBody QuizSocketRequest request) {
+        socketService.denyQuiz(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/stop")
+    //퀴즈 풀기 닫기
+    public ResponseEntity<?> stopQuiz(@RequestBody QuizSocketRequest request) {
+        socketService.stopQuiz(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/stopAll")
+    public ResponseEntity<?> stopAllQuiz() {
+        socketService.stopAllQuiz();
         return ResponseEntity.ok().build();
     }
 }
