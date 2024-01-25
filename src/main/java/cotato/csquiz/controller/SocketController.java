@@ -1,5 +1,6 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.service.SocketService;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +48,8 @@ public class SocketController {
     }
 
     @PostMapping("/stopAll")
-    public ResponseEntity<?> stopAllQuiz() {
-        socketService.stopAllQuiz();
+    public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
+        socketService.stopAllQuiz(request);
         return ResponseEntity.ok().build();
     }
 }

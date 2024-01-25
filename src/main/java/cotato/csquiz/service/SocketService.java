@@ -1,11 +1,14 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.global.websocket.WebSocketHandler;
+import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,8 @@ public class SocketService {
     private final WebSocketHandler webSocketHandler;
 
     private final QuizRepository quizRepository;
+
+    private final EducationRepository educationRepository;
 
     public void accessQuiz(QuizSocketRequest request) {
         makeAllStatusFalse();
@@ -47,9 +52,11 @@ public class SocketService {
         quiz.updateStart(false);
     }
 
-    public void stopAllQuiz() {
+    public void stopAllQuiz(QuizCloseRequest request) {
         makeAllStatusFalse();
         makeAllStartFalse();
+        Education education = findEducationById(request);
+        education.changeStatus(0);
     }
 
     private void makeAllStatusFalse() {
@@ -71,5 +78,10 @@ public class SocketService {
     private Quiz findQuizById(long quizId) {
         return quizRepository.findById(quizId).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
+    }
+
+    private Education findEducationById(QuizCloseRequest request) {
+        return educationRepository.findById(request.getEducationId()).orElseThrow(
+                () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
     }
 }
