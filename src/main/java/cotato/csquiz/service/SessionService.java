@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class SessionService {
 
@@ -29,8 +29,8 @@ public class SessionService {
     private final GenerationRepository generationRepository;
     private final S3Uploader s3Uploader;
 
+    @Transactional
     public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
-        //운영진인지 확인하는 절차 TODO
         String imageUrl = null;
         if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
@@ -60,21 +60,21 @@ public class SessionService {
                 .orElse(0);
     }
 
-    //차수 바꾸기
+    @Transactional
     public void changeSessionNum(SessionNumRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeSessionNum(session.getNumber());
     }
 
-    //한줄소개 바꾸기
+    @Transactional
     public void changeDescription(SessionDescriptionRequest request) {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeDescription(request.getDescription());
     }
 
-    //사진 바꾸기
+    @Transactional
     public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
