@@ -1,6 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
+import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Quiz;
@@ -26,6 +27,11 @@ public class SocketService {
     private final QuizRepository quizRepository;
 
     private final EducationRepository educationRepository;
+
+    public void openCSQuiz(QuizOpenRequest request) {
+        Education education = findEducationById(request.getEducationId());
+        education.changeStatus(1);
+    }
 
     public void accessQuiz(QuizSocketRequest request) {
         makeAllStatusFalse();
@@ -55,7 +61,7 @@ public class SocketService {
     public void stopAllQuiz(QuizCloseRequest request) {
         makeAllStatusFalse();
         makeAllStartFalse();
-        Education education = findEducationById(request);
+        Education education = findEducationById(request.getEducationId());
         education.changeStatus(0);
     }
 
@@ -80,8 +86,8 @@ public class SocketService {
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
 
-    private Education findEducationById(QuizCloseRequest request) {
-        return educationRepository.findById(request.getEducationId()).orElseThrow(
+    private Education findEducationById(long educationId) {
+        return educationRepository.findById(educationId).orElseThrow(
                 () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
     }
 }

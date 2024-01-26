@@ -1,6 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
+import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.service.SocketService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocketController {
 
     private final SocketService socketService;
+
+    @PostMapping("/openCSQuiz")
+    public ResponseEntity<?> openCSQuiz(@RequestBody QuizOpenRequest request) {
+        socketService.openCSQuiz(request);
+        return ResponseEntity.ok().build();
+    }
 
     //문제 접근 허용
     @PostMapping("/access")
