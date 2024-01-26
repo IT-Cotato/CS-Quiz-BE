@@ -29,7 +29,7 @@ public class Session {
     @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "session_num")
+    @Column(name = "session_number")
     private int number;
 
     @Column(name = "session_photo_url")
@@ -65,8 +65,8 @@ public class Session {
         this.generation = generation;
     }
 
-    public int changeSessionNum(int sessionNum) {
-        this.number = sessionNum;
+    public int changeSessionNum(int sessionNumber) {
+        this.number = sessionNumber;
         return this.number;
     }
 

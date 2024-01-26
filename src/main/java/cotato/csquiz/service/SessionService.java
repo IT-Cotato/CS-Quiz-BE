@@ -1,6 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
+import cotato.csquiz.domain.dto.session.AddSessionResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
@@ -12,12 +13,11 @@ import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.SessionRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,22 +29,35 @@ public class SessionService {
     private final GenerationRepository generationRepository;
     private final S3Uploader s3Uploader;
 
-    public long addSession(AddSessionRequest request) throws ImageException {
+    public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
         //운영진인지 확인하는 절차 TODO
         String imageUrl = null;
-        if(request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
+        if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
         }
-        Generation generation = getGeneration(request.getGenerationId());
+        Generation findGeneration = getGeneration(request.getGenerationId());
+
+        int sessionNumber = calculateLastSessionNumber(findGeneration);
+        log.info("해당 기수에 추가된 마지막 세션 : {}", sessionNumber);
         Session session = Session.builder()
-                .number(request.getSessionNum())
+                .number(sessionNumber + 1)
                 .photoUrl(imageUrl)
                 .description(request.getDescription())
-                .generation(generation)
+                .generation(findGeneration)
                 .build();
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
-        return savedSession.getId();
+
+        return AddSessionResponse.builder()
+                .sessionId(savedSession.getId())
+                .sessionNumber(session.getNumber())
+                .build();
+    }
+
+    private int calculateLastSessionNumber(Generation generation) {
+        List<Session> allSession = sessionRepository.findAllByGeneration(generation);
+        return allSession.stream().mapToInt(Session::getNumber).max()
+                .orElse(0);
     }
 
     //차수 바꾸기
@@ -66,9 +79,9 @@ public class SessionService {
         //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         String imageUrl;
-        if(request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
+        if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
-        }else{
+        } else {
             throw new ImageException(ErrorCode.IMAGE_NOT_FOUND);
         }
         session.changePhotoUrl(imageUrl);
@@ -81,12 +94,10 @@ public class SessionService {
     }
 
     public Session findSessionById(long sessionId) {
-        return sessionRepository.findById(sessionId).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        return sessionRepository.findById(sessionId).orElseThrow(() -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
 
     private Generation getGeneration(long generationId) {
-        return generationRepository.findById(generationId).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        return generationRepository.findById(generationId).orElseThrow(() -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
 }
