@@ -50,8 +50,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectApplicant(Long userId) {
-        Member member = findMember(userId);
+    public void rejectApplicant(MemberApproveDto memberApproveDto) {
+        Member member = findMember(memberApproveDto.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.REFUSED);

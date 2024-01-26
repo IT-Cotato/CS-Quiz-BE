@@ -37,9 +37,9 @@ public class AdminController {
     }
 
     @PatchMapping("/reject")
-    public ResponseEntity<?> rejectApplicant(@RequestParam("userId") Long userId) {
-        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", userId);
-        adminService.rejectApplicant(userId);
+    public ResponseEntity<?> rejectApplicant(@RequestBody MemberApproveDto memberApproveDto) {
+        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberApproveDto.getUserId());
+        adminService.rejectApplicant(memberApproveDto);
         return ResponseEntity.ok().build();
     }
 }
