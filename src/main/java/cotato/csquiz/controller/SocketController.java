@@ -40,20 +40,21 @@ public class SocketController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/deny")
     //문제 접근 차단
+    @PatchMapping("/deny")
     public ResponseEntity<?> denyQuiz(@RequestBody QuizSocketRequest request) {
         socketService.denyQuiz(request);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/stop")
     //퀴즈 풀기 닫기
+    @PatchMapping("/stop")
     public ResponseEntity<?> stopQuiz(@RequestBody QuizSocketRequest request) {
         socketService.stopQuiz(request);
         return ResponseEntity.ok().build();
     }
 
+    //전체 문제 끄기
     @PatchMapping("/stopAll")
     public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
         socketService.stopAllQuiz(request);
