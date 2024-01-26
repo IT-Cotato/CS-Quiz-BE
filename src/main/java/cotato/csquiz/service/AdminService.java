@@ -1,12 +1,17 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberApproveDto;
+import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
+import cotato.csquiz.domain.entity.MemberPosition;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminService {
     private final MemberRepository memberRepository;
+    private final GenerationRepository generationRepository;
 
     public List<MemberInfoResponse> getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
@@ -31,11 +37,14 @@ public class AdminService {
     }
 
     @Transactional
-    public void approveApplicant(Long userId) {
-        Member member = findMember(userId);
+    public void approveApplicant(MemberApproveDto memberApproveDto) {
+        Member member = findMember(memberApproveDto.getUserId());
+        Optional<Generation> generation = generationRepository.findByName(memberApproveDto.getGenerationName());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
+            member.updateGeneration(generation.get());
+            member.updatePosition(MemberPosition.valueOf(memberApproveDto.getPosition()));
             memberRepository.save(member);
         }
     }
