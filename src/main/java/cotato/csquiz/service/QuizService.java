@@ -140,7 +140,7 @@ public class QuizService {
         Quiz quiz = byStatus.get(0);
         return QuizStatusResponse.builder()
                 .command("show")
-                .quizNum(quiz.getId())
+                .quizId(quiz.getId())
                 .status(quiz.getStatus())
                 .start(quiz.getStart())
                 .build();

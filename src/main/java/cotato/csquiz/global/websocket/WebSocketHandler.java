@@ -54,7 +54,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void accessQuiz(long quizId) {
         try {
             QuizStatusResponse response = QuizStatusResponse.builder()
-                    .quizNum(quizId)
+                    .quizId(quizId)
                     .command("show")
                     .status(QuizStatus.ON)
                     .build();
@@ -71,7 +71,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void startQuiz(Long quizId) {
         try {
             QuizStartResponse response = QuizStartResponse.builder()
-                    .quizNum(quizId)
+                    .quizId(quizId)
                     .command("start")
                     .build();
             String json = objectMapper.writeValueAsString(response);
