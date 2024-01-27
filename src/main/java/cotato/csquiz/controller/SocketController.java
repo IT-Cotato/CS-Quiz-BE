@@ -55,7 +55,7 @@ public class SocketController {
     }
 
     //전체 문제 끄기
-    @PatchMapping("/stopAll")
+    @PatchMapping("/closeCSQuiz")
     public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
         socketService.stopAllQuiz(request);
         return ResponseEntity.ok().build();
