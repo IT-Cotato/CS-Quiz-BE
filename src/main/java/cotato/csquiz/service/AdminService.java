@@ -4,7 +4,6 @@ import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.entity.MemberPosition;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -39,13 +38,13 @@ public class AdminService {
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getUserId());
-        Generation findGeneration = generationRepository.findByName(memberApproveRequest.getGenerationName())
+        Generation findGeneration = generationRepository.findById(memberApproveRequest.getGenerationId())
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
             member.updateGeneration(findGeneration);
-            member.updatePosition(MemberPosition.valueOf(memberApproveRequest.getPosition()));
+            member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
         }
     }
