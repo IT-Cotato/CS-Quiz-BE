@@ -83,8 +83,8 @@ public class SocketService {
     }
 
     private Quiz findQuizById(long quizId) {
-        return quizRepository.findById(quizId).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.DATA_NOTFOUND));
     }
 
     private Education findEducationById(long educationId) {

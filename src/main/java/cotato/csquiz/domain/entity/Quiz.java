@@ -46,7 +46,7 @@ public class Quiz {
 
     @Column(name = "quiz_start")
     @Enumerated(EnumType.STRING)
-    @ColumnDefault(value = "'OFF'")
+    @ColumnDefault(value = "'QUIZ_OFF'")
     private QuizStatus start;
 
     @Column(name = "quiz_appear_second")
