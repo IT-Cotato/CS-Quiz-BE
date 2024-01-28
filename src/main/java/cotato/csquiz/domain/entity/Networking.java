@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum Networking {
 
     NW_ON("NETWORKING_ON"),
-    NW_OFF("NETWORKING_FF");
+    NW_OFF("NETWORKING_OFF");
 
     private final String networking;
 
