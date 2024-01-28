@@ -5,6 +5,7 @@ import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
@@ -12,6 +13,7 @@ import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.domain.entity.QuizType;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
@@ -137,6 +139,23 @@ public class QuizService {
         if (count != numbers.size()) {
             throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
         }
+    }
+
+    public QuizStatusResponse checkQuizStarted() {
+        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.ON);
+        log.info("by Status {}",byStatus);
+        if (byStatus.isEmpty()) {
+            return QuizStatusResponse.builder()
+                    .command("show")
+                    .build();
+        }
+        Quiz quiz = byStatus.get(0);
+        return QuizStatusResponse.builder()
+                .command("show")
+                .quizId(quiz.getId())
+                .status(quiz.getStatus())
+                .start(quiz.getStart())
+                .build();
     }
 
     public AllQuizzesResponse getAllQuizzes(Long educationId) {

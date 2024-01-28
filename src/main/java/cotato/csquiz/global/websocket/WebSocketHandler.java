@@ -1,12 +1,13 @@
 package cotato.csquiz.global.websocket;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
-import cotato.csquiz.service.GenerationService;
-import cotato.csquiz.service.MemberService;
-import lombok.RequiredArgsConstructor;
+import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.service.QuizService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -25,71 +25,137 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final GenerationService generationService; //추후 변경
+    private final QuizService quizService;
 
     @Autowired
-    public WebSocketHandler(GenerationService generationService) {
-        this.generationService = generationService;
+    public WebSocketHandler(QuizService quizService) {
+        this.quizService = quizService;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String memberEmail = (String) session.getAttributes().get("member");
+        String memberEmail = findAttributeByToken(session, "email");
         log.info(memberEmail);
-        connectSession(session, memberEmail);
-        //현재 진행중인 문제가 있는지 확인
-
+        boolean isGeneral = connectSession(session, memberEmail); //true : 일반 회원 false : 관리자
+        if (isGeneral) {
+            checkQuizAlreadyStart(session);
+        }
+        log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberEmail = (String) session.getAttributes().get("member");
-        CLIENTS.remove(memberEmail);
+        String memberEmail = findAttributeByToken(session, "email");
+        if (memberEmail != null) {
+            String roleString = findAttributeByToken(session, "role");
+            log.info("roleString {}",roleString);
+            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
+            disconnectSession(memberEmail, role);
+        }
         log.info("disconnect the session");
-        log.info(CLIENTS.toString());
+        log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
     }
 
-    private static void connectSession(WebSocketSession session, String memberEmail) {
+    public void accessQuiz(long quizId) {
+        try {
+            QuizStatusResponse response = QuizStatusResponse.builder()
+                    .quizId(quizId)
+                    .command("show")
+                    .status(QuizStatus.ON)
+                    .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    public void startQuiz(Long quizId) {
+        try {
+            QuizStartResponse response = QuizStartResponse.builder()
+                    .quizId(quizId)
+                    .command("start")
+                    .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    private boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
-            // TODO: findROLE logic
-            MemberRole role = findRoleForMember(memberEmail); // TODO: 실제로 사용할 MemberRole을 찾는 로직으로 대체
-            updateSession(session, memberEmail, role);
-            log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
+            String roleString = findAttributeByToken(session, "role");
+            log.info("roleString {}",roleString);
+            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
+            log.info("role role {}",role);
+            return updateSession(session, memberEmail, role);
         } else {
             log.warn("Email is null in session {}.", session.getId());
+            throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
         }
     }
 
-    private static void updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
-        switch (role) {
-            case EDUCATION, ADMIN:
+    private boolean updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
+        return switch (role) {
+            case EDUCATION, ADMIN -> {
                 updateManagerSession(memberEmail, session);
-                break;
-            case GENERAL:
+                yield false;
+            }
+            case MEMBER -> {
                 updateClientSession(memberEmail, session);
-                break;
-            default:
+                yield true;
+            }
+            default -> {
                 log.warn("Unknown role for member {}.", memberEmail);
-        }
+                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
+            }
+        };
     }
 
-    private static MemberRole findRoleForMember(String memberEmail) {
-        // TODO: 실제로 사용할 MemberRole을 찾는 로직을 구현
-        if (memberEmail.equals("gikhoon@naver.com")) {
-            return MemberRole.GENERAL;
-        }
-        return MemberRole.EDUCATION; // TODO: 실제로 사용할 MemberRole을 찾는 로직을 구현
-    }
-
-    private static void updateManagerSession(String memberEmail, WebSocketSession session) {
-        MANAGERS.remove(memberEmail);
+    private void updateManagerSession(String memberEmail, WebSocketSession session) {
         MANAGERS.put(memberEmail, session);
         log.info("{} connect with Session {} in MANAGER", memberEmail, session);
     }
 
-    private static void updateClientSession(String memberEmail, WebSocketSession session) {
-        CLIENTS.remove(memberEmail);
+    private void updateClientSession(String memberEmail, WebSocketSession session) {
         CLIENTS.put(memberEmail, session);
         log.info("{} connect with Session {} in CLIENTS", memberEmail, session);
+    }
+
+    private String findAttributeByToken(WebSocketSession session, String key) {
+        return (String) session.getAttributes().get(key);
+    }
+
+    private void checkQuizAlreadyStart(WebSocketSession session) {
+        log.info("checkQuizAlreadyStart Start");
+        try {
+            QuizStatusResponse response = quizService.checkQuizStarted();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            session.sendMessage(responseMessage);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    private void disconnectSession(String memberEmail, MemberRole role) {
+        switch (role) {
+            case ADMIN, EDUCATION -> {
+                MANAGERS.remove(memberEmail);
+            }
+            case MEMBER -> {
+                CLIENTS.remove(memberEmail);
+            }
+            default -> {
+                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
+            }
+        }
     }
 }
