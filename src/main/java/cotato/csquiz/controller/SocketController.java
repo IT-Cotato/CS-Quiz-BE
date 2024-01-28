@@ -20,7 +20,7 @@ public class SocketController {
 
     private final SocketService socketService;
 
-    @PatchMapping("/openCSQuiz")
+    @PatchMapping("/start/csquiz")
     public ResponseEntity<?> openCSQuiz(@RequestBody QuizOpenRequest request) {
         socketService.openCSQuiz(request);
         return ResponseEntity.ok().build();
@@ -55,7 +55,7 @@ public class SocketController {
     }
 
     //전체 문제 끄기
-    @PatchMapping("/closeCSQuiz")
+    @PatchMapping("/close/csquiz")
     public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
         socketService.stopAllQuiz(request);
         return ResponseEntity.ok().build();
