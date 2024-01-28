@@ -50,13 +50,11 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(corsFilter)
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/v1/api/member/**").hasRole("GENERAL")
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/v1/api/member/**").hasAnyRole("GENERAL", "MEMBER", "ADMIN", "EDUCATION")
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/v1/api/generation/**").hasAnyRole("GENERAL", "ADMIN")
                         .requestMatchers("/v1/api/session/**").hasAnyRole("GENERAL", "ADMIN")
-                        .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION","ADMIN")
+                        .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION", "ADMIN")
                         .anyRequest().permitAll()
                 );
 
