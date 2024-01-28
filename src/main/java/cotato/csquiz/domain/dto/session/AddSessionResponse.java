@@ -7,4 +7,5 @@ import lombok.Data;
 @Builder
 public class AddSessionResponse {
     private long sessionId;
+    private int sessionNumber;
 }

@@ -25,12 +25,12 @@ public class GenerationController {
     private final GenerationService generationService;
 
     @GetMapping("")
-    public ResponseEntity<?> getGenerations() {
+    public ResponseEntity<?> getGenerations(){
         return ResponseEntity.ok().body(generationService.getGenerations());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request) {
+    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request){
         long generationId = generationService.addGeneration(request);
         AddGenerationResponse response = AddGenerationResponse.builder()
                 .generationId(generationId).build();
@@ -44,7 +44,7 @@ public class GenerationController {
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request) {
+    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request){
         generationService.changePeriod(request);
         return ResponseEntity.ok().build();
     }

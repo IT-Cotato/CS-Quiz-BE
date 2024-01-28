@@ -72,4 +72,12 @@ public class Member {
     public void updatePassword(String password) {
         this.password = password;
     }
+
+    public void updateGeneration(Generation generation){
+        this.generation = generation;
+    }
+
+    public void updatePosition(MemberPosition position){
+        this.position = position;
+    }
 }

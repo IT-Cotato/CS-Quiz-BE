@@ -44,6 +44,11 @@ public class Quiz {
     @ColumnDefault(value = "'QUIZ_OFF'")
     private QuizStatus status;
 
+    @Column(name = "quiz_start")
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault(value = "'OFF'")
+    private QuizStatus start;
+
     @Column(name = "quiz_appear_second")
     private int appearSecond;
 
@@ -57,5 +62,17 @@ public class Quiz {
         this.photoUrl = photoUrl;
         this.education = education;
         this.appearSecond = appearSecond;
+    }
+
+    public void updateStatus(QuizStatus status) {
+        this.status = status;
+    }
+
+    public void updateStart(boolean status) {
+        if (status) {
+            this.start = QuizStatus.ON;
+        }else{
+            this.start = QuizStatus.OFF;
+        }
     }
 }

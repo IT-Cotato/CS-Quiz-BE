@@ -1,10 +1,13 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberApproveRequest;
+import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminService {
     private final MemberRepository memberRepository;
+    private final GenerationRepository generationRepository;
 
     public List<MemberInfoResponse> getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
@@ -26,23 +30,28 @@ public class AdminService {
                         .id(member.getId())
                         .name(member.getName())
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
+                        .role(member.getRole())
                         .build())
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void approveApplicant(Long userId) {
-        Member member = findMember(userId);
+    public void approveApplicant(MemberApproveRequest memberApproveRequest) {
+        Member member = findMember(memberApproveRequest.getUserId());
+        Generation findGeneration = generationRepository.findById(memberApproveRequest.getGenerationId())
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
+            member.updateGeneration(findGeneration);
+            member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
         }
     }
 
     @Transactional
-    public void rejectApplicant(Long userId) {
-        Member member = findMember(userId);
+    public void rejectApplicant(MemberApproveRequest memberApproveRequest) {
+        Member member = findMember(memberApproveRequest.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.REFUSED);
