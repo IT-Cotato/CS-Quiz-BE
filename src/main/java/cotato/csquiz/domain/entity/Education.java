@@ -55,4 +55,8 @@ public class Education {
     public void changeStatus(EducationStatus status) {
         this.status = status;
     }
+
+    public void updateSubject(String newSubject) {
+        this.subject = newSubject;
+    }
 }
