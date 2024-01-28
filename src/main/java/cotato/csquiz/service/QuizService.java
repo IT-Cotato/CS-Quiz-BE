@@ -7,6 +7,7 @@ import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.entity.Choice;
@@ -141,6 +142,7 @@ public class QuizService {
         }
     }
 
+    @Transactional
     public QuizStatusResponse checkQuizStarted() {
         List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.ON);
         log.info("by Status {}",byStatus);
@@ -158,6 +160,7 @@ public class QuizService {
                 .build();
     }
 
+    @Transactional
     public AllQuizzesResponse getAllQuizzes(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
         List<MultipleQuizResponse> multiples = quizzes.stream()
@@ -220,5 +223,15 @@ public class QuizService {
             response.addChoice(choiceResponse);
         }
         return response;
+    }
+
+    @Transactional
+    public QuizResponse getQuiz(Long quizId) {
+        Quiz findQuiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        if (findQuiz instanceof MultipleQuiz) {
+            return toMultipleQuizResponse(findQuiz);
+        }
+        return toShortQuizResponse(findQuiz);
     }
 }
