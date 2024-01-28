@@ -46,19 +46,14 @@ public class Education {
 
     @Builder
     public Education(String subject, int educationNum, Session session) {
-
         this.subject = subject;
         this.number = educationNum;
         this.session = session;
         status = EducationStatus.CLOSED;
     }
 
-    public void changeStatus(boolean status) {
-        if (status) {
-            this.status = EducationStatus.ONGOING;
-        } else {
-            this.status = EducationStatus.CLOSED;
-        }
+    public void changeStatus(EducationStatus status) {
+        this.status = status;
     }
 
     public void updateSubject(String newSubject) {

@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.EducationDto;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
+import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
@@ -64,6 +65,11 @@ public class EducationService {
     public EducationStatus getStatus(long educationId) {
         Education education = findEducation(educationId);
         return education.getStatus();
+    }
+
+    public void patchEducationStatus(PatchEducationRequest request) {
+        Education education = findEducation(request.getEducationId());
+        education.changeStatus(request.getStatus());
     }
 
     private Education findEducation(long educationId) {

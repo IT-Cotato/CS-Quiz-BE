@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.EducationDto;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
+import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.EducationStatus;
@@ -59,5 +60,11 @@ public class EducationController {
     public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") long generationId) {
         List<EducationDto> educationList = educationService.getEducationListByGeneration(generationId);
         return ResponseEntity.ok().body(educationList);
+    }
+
+    @PatchMapping("/status")
+    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
+        educationService.patchEducationStatus(request);
+        return ResponseEntity.ok().build();
     }
 }
