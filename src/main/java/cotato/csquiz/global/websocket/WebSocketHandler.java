@@ -53,7 +53,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             disconnectSession(memberEmail, role);
         }
         log.info("disconnect the session");
-        log.info(CLIENTS.toString());
+        log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
     }
 
     public void accessQuiz(long quizId) {
