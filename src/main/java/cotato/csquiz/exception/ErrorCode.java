@@ -29,6 +29,7 @@ public enum ErrorCode {
     SUBJECT_INVALID(HttpStatus.BAD_REQUEST, "교육 주제는 NULL이거나 비어있을 수 없습니다."),
     NAME_NOT_MATCH(HttpStatus.NOT_FOUND, "해당 유저의 전화번호와 이름이 일치하지 않습니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요."),
+    GENERATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Generation을 찾을 수 없습니다."),
     EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 교육을 찾을 수 없습니다."),
     QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다.");
 
