@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberApproveDto {
+public class MemberApproveRequest {
 
     Long userId;
     String position;
