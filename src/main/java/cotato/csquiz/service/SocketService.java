@@ -36,7 +36,7 @@ public class SocketService {
     public void accessQuiz(QuizSocketRequest request) {
         makeAllStatusFalse();
         Quiz quiz = findQuizById(request.getQuizId());
-        quiz.updateStatus(true);
+        quiz.updateStatus(QuizStatus.ON);
         webSocketHandler.accessQuiz(quiz.getId());
     }
 
@@ -49,7 +49,7 @@ public class SocketService {
 
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
-        quiz.updateStatus(false);
+        quiz.updateStatus(QuizStatus.OFF);
         quiz.updateStart(false);
     }
 
@@ -67,7 +67,7 @@ public class SocketService {
 
     private void makeAllStatusFalse() {
         quizRepository.findByStatus(QuizStatus.ON)
-                .forEach(quiz -> quiz.updateStatus(false));
+                .forEach(quiz -> quiz.updateStatus(QuizStatus.OFF));
     }
 
     private void makeAllStartFalse() {

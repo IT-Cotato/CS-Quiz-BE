@@ -46,7 +46,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String memberEmail = findAttributeByToken(session, "email");
-        CLIENTS.remove(memberEmail);
+        if (memberEmail != null) {
+            String roleString = findAttributeByToken(session, "role");
+            log.info("roleString {}",roleString);
+            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
+            disconnectSession(memberEmail, role);
+        }
         log.info("disconnect the session");
         log.info(CLIENTS.toString());
     }
@@ -84,7 +89,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private static boolean connectSession(WebSocketSession session, String memberEmail) {
+    private boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
             String roleString = findAttributeByToken(session, "role");
             log.info("roleString {}",roleString);
@@ -97,7 +102,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private static boolean updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
+    private boolean updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
         return switch (role) {
             case EDUCATION, ADMIN -> {
                 updateManagerSession(memberEmail, session);
@@ -114,17 +119,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
         };
     }
 
-    private static void updateManagerSession(String memberEmail, WebSocketSession session) {
+    private void updateManagerSession(String memberEmail, WebSocketSession session) {
         MANAGERS.put(memberEmail, session);
         log.info("{} connect with Session {} in MANAGER", memberEmail, session);
     }
 
-    private static void updateClientSession(String memberEmail, WebSocketSession session) {
+    private void updateClientSession(String memberEmail, WebSocketSession session) {
         CLIENTS.put(memberEmail, session);
         log.info("{} connect with Session {} in CLIENTS", memberEmail, session);
     }
 
-    private static String findAttributeByToken(WebSocketSession session, String key) {
+    private String findAttributeByToken(WebSocketSession session, String key) {
         return (String) session.getAttributes().get(key);
     }
 
@@ -137,6 +142,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
             session.sendMessage(responseMessage);
         } catch (IOException e) {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    private void disconnectSession(String memberEmail, MemberRole role) {
+        switch (role) {
+            case ADMIN, EDUCATION -> {
+                MANAGERS.remove(memberEmail);
+            }
+            case MEMBER -> {
+                CLIENTS.remove(memberEmail);
+            }
+            default -> {
+                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
+            }
         }
     }
 }

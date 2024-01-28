@@ -66,12 +66,8 @@ public class Quiz {
         this.appearSecond = appearSecond;
     }
 
-    public void updateStatus(boolean status) {
-        if (status) {
-            this.status = QuizStatus.ON;
-        }else{
-            this.status = QuizStatus.OFF;
-        }
+    public void updateStatus(QuizStatus status) {
+        this.status = status;
     }
 
     public void updateStart(boolean status) {
