@@ -2,9 +2,8 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.EducationDto;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
-import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
-import cotato.csquiz.domain.dto.education.PatchStatusRequest;
+import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.EducationStatus;
@@ -13,13 +12,11 @@ import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,13 +41,6 @@ public class EducationService {
         return AddEducationResponse.builder()
                 .educationId(saveEducation.getId())
                 .build();
-    }
-
-    //교육 상태(오픈여부) 바꾸기
-    public void patchStatus(PatchStatusRequest request) {
-        //교육팀인지 확인 TODO
-        Education education = findEducation(request.getEducationId());
-        education.changeStatus(request.isStatus());
     }
 
     //교육이 이미 존재하면 예외 발생

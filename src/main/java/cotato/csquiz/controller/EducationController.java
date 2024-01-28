@@ -5,7 +5,6 @@ import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
-import cotato.csquiz.domain.dto.education.PatchStatusRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.service.EducationService;
@@ -42,12 +41,6 @@ public class EducationController {
     public ResponseEntity<AddEducationResponse> addEducation(@RequestBody AddEducationRequest request) {
         AddEducationResponse response = educationService.addEducation(request);
         return ResponseEntity.ok().body(response);
-    }
-
-    @PatchMapping("/status")
-    public ResponseEntity<?> patchStatus(@RequestBody PatchStatusRequest request) {
-        educationService.patchStatus(request);
-        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/subject")

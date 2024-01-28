@@ -5,11 +5,11 @@ import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
-import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
@@ -144,8 +144,8 @@ public class QuizService {
 
     @Transactional
     public QuizStatusResponse checkQuizStarted() {
-        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.ON);
-        log.info("by Status {}",byStatus);
+        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.QUIZ_ON);
+        log.info("by Status {}", byStatus);
         if (byStatus.isEmpty()) {
             return QuizStatusResponse.builder()
                     .command("show")

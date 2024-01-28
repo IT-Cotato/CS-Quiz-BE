@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
@@ -30,13 +31,13 @@ public class SocketService {
 
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.getEducationId());
-        education.changeStatus(1);
+        education.changeStatus(EducationStatus.ONGOING);
     }
 
     public void accessQuiz(QuizSocketRequest request) {
         makeAllStatusFalse();
         Quiz quiz = findQuizById(request.getQuizId());
-        quiz.updateStatus(QuizStatus.ON);
+        quiz.updateStatus(QuizStatus.QUIZ_ON);
         webSocketHandler.accessQuiz(quiz.getId());
     }
 
@@ -49,7 +50,7 @@ public class SocketService {
 
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
-        quiz.updateStatus(QuizStatus.OFF);
+        quiz.updateStatus(QuizStatus.QUIZ_OFF);
         quiz.updateStart(false);
     }
 
@@ -62,22 +63,22 @@ public class SocketService {
         makeAllStatusFalse();
         makeAllStartFalse();
         Education education = findEducationById(request.getEducationId());
-        education.changeStatus(0);
+        education.changeStatus(EducationStatus.CLOSED);
     }
 
     private void makeAllStatusFalse() {
-        quizRepository.findByStatus(QuizStatus.ON)
-                .forEach(quiz -> quiz.updateStatus(QuizStatus.OFF));
+        quizRepository.findByStatus(QuizStatus.QUIZ_ON)
+                .forEach(quiz -> quiz.updateStatus(QuizStatus.QUIZ_OFF));
     }
 
     private void makeAllStartFalse() {
-        quizRepository.findByStart(QuizStatus.ON)
+        quizRepository.findByStart(QuizStatus.QUIZ_ON)
                 .forEach(quiz -> quiz.updateStart(false));
     }
 
     private void isQuizStatusTrue(Quiz quiz) {
-        if (quiz.getStatus().equals(QuizStatus.OFF)) {
-            throw new AppException(ErrorCode.Quiz_OFF);
+        if (quiz.getStatus().equals(QuizStatus.QUIZ_OFF)) {
+            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
         }
     }
 

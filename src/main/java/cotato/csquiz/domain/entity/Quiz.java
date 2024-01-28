@@ -70,9 +70,9 @@ public class Quiz {
 
     public void updateStart(boolean status) {
         if (status) {
-            this.start = QuizStatus.ON;
-        }else{
-            this.start = QuizStatus.OFF;
+            this.start = QuizStatus.QUIZ_ON;
+        } else {
+            this.start = QuizStatus.QUIZ_OFF;
         }
     }
 }

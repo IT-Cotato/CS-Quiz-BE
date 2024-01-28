@@ -1,13 +1,15 @@
 package cotato.csquiz.global.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.dto.socket.QuizStartResponse;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.service.QuizService;
+import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,9 +17,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
@@ -48,7 +47,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String memberEmail = findAttributeByToken(session, "email");
         if (memberEmail != null) {
             String roleString = findAttributeByToken(session, "role");
-            log.info("roleString {}",roleString);
+            log.info("roleString {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
             disconnectSession(memberEmail, role);
         }
@@ -61,7 +60,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
             QuizStatusResponse response = QuizStatusResponse.builder()
                     .quizId(quizId)
                     .command("show")
-                    .status(QuizStatus.ON)
+                    .status(QuizStatus.QUIZ_ON)
                     .build();
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
@@ -92,9 +91,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private boolean connectSession(WebSocketSession session, String memberEmail) {
         if (memberEmail != null) {
             String roleString = findAttributeByToken(session, "role");
-            log.info("roleString {}",roleString);
+            log.info("roleString {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
-            log.info("role role {}",role);
+            log.info("role role {}", role);
             return updateSession(session, memberEmail, role);
         } else {
             log.warn("Email is null in session {}.", session.getId());
