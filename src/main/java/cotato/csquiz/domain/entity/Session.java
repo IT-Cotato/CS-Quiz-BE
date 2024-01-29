@@ -2,6 +2,9 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.enums.CSEducation;
+import cotato.csquiz.domain.enums.ItIssue;
+import cotato.csquiz.domain.enums.Networking;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

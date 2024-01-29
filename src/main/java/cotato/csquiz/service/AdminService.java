@@ -4,7 +4,7 @@ import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;

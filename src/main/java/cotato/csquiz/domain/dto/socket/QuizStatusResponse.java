@@ -1,8 +1,7 @@
 package cotato.csquiz.domain.dto.socket;
 
-import cotato.csquiz.domain.entity.QuizStatus;
+import cotato.csquiz.domain.enums.QuizStatus;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

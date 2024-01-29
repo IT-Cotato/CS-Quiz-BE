@@ -1,4 +1,4 @@
-package cotato.csquiz.domain.entity;
+package cotato.csquiz.domain.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

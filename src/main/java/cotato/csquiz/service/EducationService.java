@@ -6,7 +6,7 @@ import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
-import cotato.csquiz.domain.entity.EducationStatus;
+import cotato.csquiz.domain.enums.EducationStatus;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;

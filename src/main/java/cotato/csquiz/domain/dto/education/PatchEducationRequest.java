@@ -1,6 +1,6 @@
 package cotato.csquiz.domain.dto.education;
 
-import cotato.csquiz.domain.entity.EducationStatus;
+import cotato.csquiz.domain.enums.EducationStatus;
 import lombok.Data;
 
 @Data

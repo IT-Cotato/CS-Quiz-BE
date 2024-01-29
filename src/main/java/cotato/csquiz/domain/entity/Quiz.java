@@ -2,6 +2,7 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.enums.QuizStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

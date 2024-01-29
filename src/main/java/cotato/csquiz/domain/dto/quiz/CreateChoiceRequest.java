@@ -1,6 +1,6 @@
 package cotato.csquiz.domain.dto.quiz;
 
-import cotato.csquiz.domain.entity.ChoiceCorrect;
+import cotato.csquiz.domain.enums.ChoiceCorrect;
 import lombok.Data;
 
 @Data

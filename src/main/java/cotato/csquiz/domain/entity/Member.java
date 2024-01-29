@@ -2,6 +2,8 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.enums.MemberPosition;
+import cotato.csquiz.domain.enums.MemberRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -68,16 +70,16 @@ public class Member {
     public void updateRole(MemberRole role) {
         this.role = role;
     }
-  
+
     public void updatePassword(String password) {
         this.password = password;
     }
 
-    public void updateGeneration(Generation generation){
+    public void updateGeneration(Generation generation) {
         this.generation = generation;
     }
 
-    public void updatePosition(MemberPosition position){
+    public void updatePosition(MemberPosition position) {
         this.position = position;
     }
 }
