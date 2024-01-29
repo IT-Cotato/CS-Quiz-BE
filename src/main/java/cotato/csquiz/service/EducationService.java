@@ -1,6 +1,6 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.EducationDto;
+import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchStatusRequest;
@@ -12,7 +12,6 @@ import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -86,10 +85,10 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-    public List<EducationDto> getEducationListByGeneration(Long generationId) {
+    public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
         List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
         return educationList.stream()
-                .map(EducationDto::convertFromEducation)
+                .map(AllEducationResponse::convertFromEducation)
                 .toList();
     }
 }
