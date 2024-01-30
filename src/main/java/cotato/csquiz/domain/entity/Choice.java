@@ -3,6 +3,7 @@ package cotato.csquiz.domain.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import cotato.csquiz.domain.enums.ChoiceCorrect;
+import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Choice {
+public class Choice extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

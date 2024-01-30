@@ -6,6 +6,7 @@ import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> joinAuth(@RequestBody JoinRequest request) {
+    public ResponseEntity<?> joinAuth(@RequestBody @Valid JoinRequest request) {
+        log.info("컨트롤러 코드 진입 시간 : {}", LocalDateTime.now());
         authService.createLoginInfo(request);
         log.info("[회원 가입 컨트롤러] : {}, {}, {}", request.getEmail(), request.getPassword(), request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
@@ -44,7 +46,7 @@ public class AuthController {
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
-  
+
     @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
         authService.sendSignUpEmail(request);

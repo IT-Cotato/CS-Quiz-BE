@@ -32,7 +32,7 @@ public class Session {
     @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "session_number")
+    @Column(name = "session_number", unique = true, nullable = false)
     private int number;
 
     @Column(name = "session_photo_url")

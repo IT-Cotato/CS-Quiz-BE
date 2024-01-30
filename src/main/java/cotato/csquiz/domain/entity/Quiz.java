@@ -3,6 +3,7 @@ package cotato.csquiz.domain.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import cotato.csquiz.domain.enums.QuizStatus;
+import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,7 +25,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Quiz {
+public class Quiz extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
