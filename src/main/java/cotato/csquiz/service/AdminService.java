@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberRole;
@@ -50,8 +51,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getUserId());
+    public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
+        Member member = findMember(memberRejectRequest.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.REFUSED);
