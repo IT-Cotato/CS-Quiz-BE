@@ -1,6 +1,6 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.EducationDto;
+import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
@@ -82,10 +82,10 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-    public List<EducationDto> getEducationListByGeneration(Long generationId) {
+    public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
         List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
         return educationList.stream()
-                .map(EducationDto::convertFromEducation)
+                .map(AllEducationResponse::convertFromEducation)
                 .toList();
     }
 }
