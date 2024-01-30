@@ -6,12 +6,15 @@ import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
+import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.QuizStatus;
 import cotato.csquiz.domain.entity.QuizType;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
@@ -139,6 +142,25 @@ public class QuizService {
         }
     }
 
+    @Transactional
+    public QuizStatusResponse checkQuizStarted() {
+        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.QUIZ_ON);
+        log.info("by Status {}", byStatus);
+        if (byStatus.isEmpty()) {
+            return QuizStatusResponse.builder()
+                    .command("show")
+                    .build();
+        }
+        Quiz quiz = byStatus.get(0);
+        return QuizStatusResponse.builder()
+                .command("show")
+                .quizId(quiz.getId())
+                .status(quiz.getStatus())
+                .start(quiz.getStart())
+                .build();
+    }
+
+    @Transactional
     public AllQuizzesResponse getAllQuizzes(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
         List<MultipleQuizResponse> multiples = quizzes.stream()
@@ -201,5 +223,15 @@ public class QuizService {
             response.addChoice(choiceResponse);
         }
         return response;
+    }
+
+    @Transactional
+    public QuizResponse getQuiz(Long quizId) {
+        Quiz findQuiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        if (findQuiz instanceof MultipleQuiz) {
+            return toMultipleQuizResponse(findQuiz);
+        }
+        return toShortQuizResponse(findQuiz);
     }
 }

@@ -1,10 +1,10 @@
 package cotato.csquiz.domain.dto.education;
 
 import cotato.csquiz.domain.entity.EducationStatus;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
-public class PatchStatusRequest {
+@Data
+public class PatchEducationRequest {
     private long educationId;
     private EducationStatus status;
 }

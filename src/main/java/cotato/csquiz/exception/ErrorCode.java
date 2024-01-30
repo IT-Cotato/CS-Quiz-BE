@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     GENERATION_NAME_EXIST(HttpStatus.CONFLICT, "이미 이름이 있습니다"),
     EDUCATION_EXIST(HttpStatus.CONFLICT, "이미 교육이 존재합니다"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
@@ -29,8 +30,12 @@ public enum ErrorCode {
     SUBJECT_INVALID(HttpStatus.BAD_REQUEST, "교육 주제는 NULL이거나 비어있을 수 없습니다."),
     NAME_NOT_MATCH(HttpStatus.NOT_FOUND, "해당 유저의 전화번호와 이름이 일치하지 않습니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요."),
+    GENERATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Generation을 찾을 수 없습니다."),
     EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 교육을 찾을 수 없습니다."),
-    QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다.");
+    QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."),
+    QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 퀴즈를 찾을 수 없습니다."),
+    QUIZ_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "해당 문제는 접근이 불가능한 상태입니다. 접근을 허용해주십시오"),
+    MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final String message;

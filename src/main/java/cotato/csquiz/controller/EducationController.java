@@ -43,12 +43,6 @@ public class EducationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/status")
-    public ResponseEntity<?> patchStatus(@RequestBody PatchStatusRequest request) {
-        educationService.patchStatus(request);
-        return ResponseEntity.ok().build();
-    }
-
     @PatchMapping("/subject")
     public ResponseEntity<?> patchSubject(@RequestBody PatchSubjectRequest request) {
         educationService.patchSubject(request);
@@ -59,5 +53,11 @@ public class EducationController {
     public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") long generationId) {
         List<AllEducationResponse> educationList = educationService.getEducationListByGeneration(generationId);
         return ResponseEntity.ok().body(educationList);
+    }
+
+    @PatchMapping("/status")
+    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
+        educationService.patchEducationStatus(request);
+        return ResponseEntity.ok().build();
     }
 }
