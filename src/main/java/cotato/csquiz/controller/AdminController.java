@@ -2,6 +2,7 @@ package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.service.AdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +37,9 @@ public class AdminController {
     }
 
     @PatchMapping("/reject")
-    public ResponseEntity<?> rejectApplicant(@RequestBody MemberApproveRequest memberApproveRequest) {
-        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberApproveRequest.getUserId());
-        adminService.rejectApplicant(memberApproveRequest);
+    public ResponseEntity<?> rejectApplicant(@RequestBody MemberRejectRequest memberRejectRequest) {
+        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberRejectRequest.getUserId());
+        adminService.rejectApplicant(memberRejectRequest);
         return ResponseEntity.ok().build();
     }
 }
