@@ -93,9 +93,8 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getUserId());
-        if (member.getRole() == MemberRole.OLD_MEMBER) {
-            member.updateRole(MemberRole.REFUSED);
-            memberRepository.save(member);
+        if (member.getRole() != MemberRole.MEMBER) {
+            throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(MemberRole.valueOf(updateActiveMemberRoleRequest.getRole()));
         memberRepository.save(member);
