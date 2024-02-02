@@ -96,7 +96,7 @@ public class AdminService {
         if (member.getRole() != MemberRole.MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
-        member.updateRole(MemberRole.valueOf(updateActiveMemberRoleRequest.getRole()));
+        member.updateRole(updateActiveMemberRoleRequest.getRole());
         memberRepository.save(member);
     }
 
