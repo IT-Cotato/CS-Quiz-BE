@@ -78,13 +78,14 @@ public class AdminService {
 
         return activeMembers.stream()
                 .map(member -> {
-                    Generation generation = member.getGeneration();
-                    return ActiveMemberInfoResponse.builder()
+                    ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
                             .id(member.getId())
                             .name(member.getName())
-                            .position(member.getPosition())
-                            .generationName(generation != null ? generation.getName() : null)
-                            .build();
+                            .position(member.getPosition());
+                    if (member.getGeneration() != null) {
+                        builder.generationName(member.getGeneration().getName());
+                    }
+                    return builder.build();
                 })
                 .collect(Collectors.toList());
     }
@@ -104,12 +105,16 @@ public class AdminService {
         List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
 
         return oldMembers.stream()
-                .map(member -> ActiveMemberInfoResponse.builder()
-                        .id(member.getId())
-                        .name(member.getName())
-                        .position(member.getPosition())
-                        .generationName(member.getGeneration() != null ? member.getGeneration().getName() : null)
-                        .build())
+                .map(member -> {
+                    ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
+                            .id(member.getId())
+                            .name(member.getName())
+                            .position(member.getPosition());
+                    if (member.getGeneration() != null) {
+                        builder.generationName(member.getGeneration().getName());
+                    }
+                    return builder.build();
+                })
                 .collect(Collectors.toList());
     }
 
