@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberPosition;
@@ -113,8 +114,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateOldMemberToActiveGeneration(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+    public void updateOldMemberToActiveGeneration(UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
+        Member member = findMember(updateOldMemberRoleRequest.getUserId());
         validateIsOldMember(member);
         if (member.getRole() == MemberRole.OLD_MEMBER) {
             member.updateRole(MemberRole.MEMBER);

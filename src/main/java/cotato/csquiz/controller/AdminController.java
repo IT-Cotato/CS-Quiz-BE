@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.service.AdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -66,9 +67,9 @@ public class AdminController {
     }
 
     @PatchMapping("/old-members/update-role")
-    public ResponseEntity<?> updateOldMemberToActiveGeneration(@RequestBody UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        log.info("OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}", updateActiveMemberRoleRequest.getUserId());
-        adminService.updateOldMemberToActiveGeneration(updateActiveMemberRoleRequest);
+    public ResponseEntity<?> updateOldMemberToActiveGeneration(@RequestBody UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
+        log.info("OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}", updateOldMemberRoleRequest.getUserId());
+        adminService.updateOldMemberToActiveGeneration(updateOldMemberRoleRequest);
         return ResponseEntity.ok().build();
     }
 
