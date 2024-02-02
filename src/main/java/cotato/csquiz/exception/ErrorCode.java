@@ -27,7 +27,8 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     CREATE_VERIFY_CODE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "코드 생성에 실패했습니다."),
     NAME_NOT_MATCH(HttpStatus.NOT_FOUND, "해당 유저의 전화번호와 이름이 일치하지 않습니다."),
-    SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요.");
+    SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요."),
+    ROLE_IS_NOT_OLD_MEMBER(HttpStatus.BAD_REQUEST, "해당 회원의 ROLE은 OLD_MEMBER가 아닙니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

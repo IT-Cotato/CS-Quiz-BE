@@ -91,6 +91,10 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+        if (member.getRole() == MemberRole.OLD_MEMBER) {
+            member.updateRole(MemberRole.REFUSED);
+            memberRepository.save(member);
+        }
         member.updateRole(MemberRole.valueOf(updateActiveMemberRoleRequest.getRole()));
         memberRepository.save(member);
     }
@@ -106,6 +110,22 @@ public class AdminService {
                         .generationName(member.getGeneration() != null ? member.getGeneration().getName() : null)
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateOldMemberToActiveGeneration(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+        validateIsOldMember(member);
+        if (member.getRole() == MemberRole.OLD_MEMBER) {
+            member.updateRole(MemberRole.MEMBER);
+            memberRepository.save(member);
+        }
+    }
+
+    private void validateIsOldMember(Member member) {
+        if (member.getRole() != MemberRole.OLD_MEMBER) {
+            throw new AppException(ErrorCode.ROLE_IS_NOT_OLD_MEMBER);
+        }
     }
 }
 

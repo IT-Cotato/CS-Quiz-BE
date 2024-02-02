@@ -64,4 +64,12 @@ public class AdminController {
         List<ActiveMemberInfoResponse> oldMembersList = adminService.getOldMembersList();
         return ResponseEntity.ok().body(oldMembersList);
     }
+
+    @PatchMapping("/old-members/update-role")
+    public ResponseEntity<?> updateOldMemberToActiveGeneration(@RequestBody UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        log.info("OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}", updateActiveMemberRoleRequest.getUserId());
+        adminService.updateOldMemberToActiveGeneration(updateActiveMemberRoleRequest);
+        return ResponseEntity.ok().build();
+    }
+
 }
