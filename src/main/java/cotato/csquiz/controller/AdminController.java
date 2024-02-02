@@ -1,8 +1,9 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.auth.ActiveMemberInfoResponse;
+import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
+import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleDto;
 import cotato.csquiz.service.AdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,12 @@ public class AdminController {
         log.info("현재 활동 중인 부원 목록 조회 컨트롤러");
         List<ActiveMemberInfoResponse> activeMembers = adminService.getCurrentActiveMembers();
         return ResponseEntity.ok().body(activeMembers);
+    }
+
+    @PatchMapping("/active-members/update-role")
+    public ResponseEntity<?> updateActiveMemberRole(@RequestBody UpdateActiveMemberRoleDto updateActiveMemberRoleDto) {
+        log.info("현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member id : {}", updateActiveMemberRoleDto.getUserId());
+        adminService.updateActiveMemberRole(updateActiveMemberRoleDto);
+        return ResponseEntity.ok().build();
     }
 }
