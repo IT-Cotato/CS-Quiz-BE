@@ -25,7 +25,7 @@ public class GenerationController {
     private final GenerationService generationService;
 
     @GetMapping("")
-    public ResponseEntity<?> getGenerations(){
+    public ResponseEntity<?> getGenerations() {
         return ResponseEntity.ok().body(generationService.getGenerations());
     }
 
@@ -44,7 +44,7 @@ public class GenerationController {
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request){
+    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request) {
         generationService.changePeriod(request);
         return ResponseEntity.ok().build();
     }

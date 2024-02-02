@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ChangeRecruitingRequest {
-    private long generationId;
+
+    private Long generationId;
     private boolean statement;
 }

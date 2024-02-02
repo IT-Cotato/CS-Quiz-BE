@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GenerationInfo {
-    private long generationId;
+
+    private Long generationId;
     private String generationName;
 }

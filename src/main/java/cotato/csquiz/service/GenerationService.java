@@ -1,6 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
+import cotato.csquiz.domain.dto.generation.AddGenerationResponse;
 import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
 import cotato.csquiz.domain.dto.generation.GenerationInfo;
@@ -26,8 +27,7 @@ public class GenerationService {
     private final GenerationRepository generationRepository;
 
     //기수 추가
-    public long addGeneration(AddGenerationRequest request) {
-        //멤버가 운영진인지 확인 TODO
+    public AddGenerationResponse addGeneration(AddGenerationRequest request) {
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);
@@ -38,7 +38,9 @@ public class GenerationService {
                 .endDate(endDate)
                 .build();
         Generation savedGeneration = generationRepository.save(generation);
-        return savedGeneration.getId();
+        return AddGenerationResponse.builder()
+                .generationId(savedGeneration.getId())
+                .build();
     }
 
     //모집 변경
@@ -51,7 +53,6 @@ public class GenerationService {
     }
 
     public void changePeriod(ChangePeriodRequest request) {
-        //해당 멤버가 운영진인지 확인 TODO
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);

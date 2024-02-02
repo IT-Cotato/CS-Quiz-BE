@@ -3,10 +3,10 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
+import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
-import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -52,9 +52,11 @@ public class EducationService {
     }
 
     //교육 상태(오픈여부) 가져오기
-    public EducationStatus getStatus(long educationId) {
+    public GetStatusResponse getStatus(long educationId) {
         Education education = findEducation(educationId);
-        return education.getStatus();
+        return GetStatusResponse.builder()
+                .status(education.getStatus())
+                .build();
     }
 
     public void patchEducationStatus(PatchEducationRequest request) {
