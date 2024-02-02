@@ -3,7 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
-import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleDto;
+import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberPosition;
@@ -89,9 +89,9 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateActiveMemberRole(UpdateActiveMemberRoleDto updateActiveMemberRoleDto) {
-        Member member = findMember(updateActiveMemberRoleDto.getUserId());
-        member.updateRole(MemberRole.valueOf(updateActiveMemberRoleDto.getRole()));
+    public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+        member.updateRole(MemberRole.valueOf(updateActiveMemberRoleRequest.getRole()));
         memberRepository.save(member);
     }
 }

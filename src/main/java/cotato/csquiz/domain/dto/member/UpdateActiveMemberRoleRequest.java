@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateActiveMemberRoleDto {
+public class UpdateActiveMemberRoleRequest {
 
     private Long userId;
     private String role;
