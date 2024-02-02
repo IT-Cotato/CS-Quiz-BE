@@ -1,5 +1,6 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.auth.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
 import cotato.csquiz.domain.entity.Generation;
@@ -68,6 +69,22 @@ public class AdminService {
         if (member.getRole() != MemberRole.GENERAL) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
+    }
+
+    public List<ActiveMemberInfoResponse> getCurrentActiveMembers() {
+        Optional<Member> activeMembers = memberRepository.findByRole(MemberRole.GENERAL);
+
+        return activeMembers.stream()
+                .map(member -> {
+                    Generation generation = member.getGeneration();
+                    return ActiveMemberInfoResponse.builder()
+                            .id(member.getId())
+                            .name(member.getName())
+                            .position(member.getPosition())
+                            .generationName(generation != null ? generation.getName() : null)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
 

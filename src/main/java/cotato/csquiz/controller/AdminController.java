@@ -1,5 +1,6 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.domain.dto.auth.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
 import cotato.csquiz.service.AdminService;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -41,5 +41,12 @@ public class AdminController {
         log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberApproveDto.getUserId());
         adminService.rejectApplicant(memberApproveDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/active-members")
+    public ResponseEntity<List<ActiveMemberInfoResponse>> getCurrentActiveMembers() {
+        log.info("현재 활동 중인 부원 목록 조회 컨트롤러");
+        List<ActiveMemberInfoResponse> activeMembers = adminService.getCurrentActiveMembers();
+        return ResponseEntity.ok().body(activeMembers);
     }
 }
