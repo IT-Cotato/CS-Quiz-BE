@@ -73,7 +73,7 @@ public class AdminService {
     }
 
     public List<ActiveMemberInfoResponse> getCurrentActiveMembers() {
-        Optional<Member> activeMembers = memberRepository.findByRole(MemberRole.MEMBER);
+        Optional<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
 
         return activeMembers.stream()
                 .map(member -> {
