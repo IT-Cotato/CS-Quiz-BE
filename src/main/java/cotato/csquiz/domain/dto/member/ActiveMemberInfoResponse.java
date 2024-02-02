@@ -1,4 +1,4 @@
-package cotato.csquiz.domain.dto.auth;
+package cotato.csquiz.domain.dto.member;
 
 import cotato.csquiz.domain.entity.MemberPosition;
 import lombok.AllArgsConstructor;
