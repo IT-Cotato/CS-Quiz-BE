@@ -30,10 +30,8 @@ public class GenerationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request){
-        long generationId = generationService.addGeneration(request);
-        AddGenerationResponse response = AddGenerationResponse.builder()
-                .generationId(generationId).build();
+    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request) {
+        AddGenerationResponse response = generationService.addGeneration(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

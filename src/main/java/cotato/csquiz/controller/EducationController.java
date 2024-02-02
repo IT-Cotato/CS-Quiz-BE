@@ -28,11 +28,8 @@ public class EducationController {
     private final EducationService educationService;
 
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") long educationId) {
-        EducationStatus status = educationService.getStatus(educationId);
-        GetStatusResponse response = GetStatusResponse.builder()
-                .status(status)
-                .build();
+    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") Long educationId) {
+        GetStatusResponse response = educationService.getStatus(educationId);
         return ResponseEntity.ok().body(response);
     }
 
