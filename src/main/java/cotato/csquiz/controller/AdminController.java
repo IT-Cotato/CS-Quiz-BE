@@ -57,4 +57,11 @@ public class AdminController {
         adminService.updateActiveMemberRole(updateActiveMemberRoleRequest);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/old-members")
+    public ResponseEntity<List<ActiveMemberInfoResponse>> getOldMembersList() {
+        log.info("OM 목록 조회 컨트롤러");
+        List<ActiveMemberInfoResponse> oldMembersList = adminService.getOldMembersList();
+        return ResponseEntity.ok().body(oldMembersList);
+    }
 }

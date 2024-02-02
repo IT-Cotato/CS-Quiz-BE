@@ -73,7 +73,7 @@ public class AdminService {
     }
 
     public List<ActiveMemberInfoResponse> getCurrentActiveMembers() {
-        Optional<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
+        List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
 
         return activeMembers.stream()
                 .map(member -> {
@@ -94,5 +94,19 @@ public class AdminService {
         member.updateRole(MemberRole.valueOf(updateActiveMemberRoleRequest.getRole()));
         memberRepository.save(member);
     }
+
+    public List<ActiveMemberInfoResponse> getOldMembersList() {
+        List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
+
+        return oldMembers.stream()
+                .map(member -> ActiveMemberInfoResponse.builder()
+                        .id(member.getId())
+                        .name(member.getName())
+                        .position(member.getPosition())
+                        .generationName(member.getGeneration() != null ? member.getGeneration().getName() : null)
+                        .build())
+                .collect(Collectors.toList());
+    }
+
 }
 
