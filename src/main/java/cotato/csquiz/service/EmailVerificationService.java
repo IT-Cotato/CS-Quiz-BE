@@ -21,18 +21,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmailVerificationService {
 
     private static final int CODE_LENGTH = 6;
+    private static final int CODE_BOUNDARY = 10;
 
     private final JavaMailSender mailSender;
     private final VerificationCodeRedisRepository verificationCodeRedisRepository;
     private final EmailFormValidator emailFormValidator;
 
+    @Transactional
     public void sendVerificationCodeToEmail(String recipient, String subject) {
         emailFormValidator.validateEmailForm(recipient);
         String verificationCode = getVerificationCode();
@@ -46,7 +50,7 @@ public class EmailVerificationService {
             Random random = SecureRandom.getInstanceStrong();
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < CODE_LENGTH; i++) {
-                builder.append(random.nextInt(10));
+                builder.append(random.nextInt(CODE_BOUNDARY));
             }
             return builder.toString();
         } catch (NoSuchAlgorithmException e) {
@@ -84,6 +88,7 @@ public class EmailVerificationService {
         }
     }
 
+    @Transactional
     public void verifyCode(String email, String code) {
         String savedVerificationCode = verificationCodeRedisRepository.getByEmail(email);
         validateEmailCodeMatching(savedVerificationCode, code);
