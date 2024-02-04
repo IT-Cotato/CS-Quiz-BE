@@ -72,5 +72,4 @@ public class AdminController {
         adminService.updateOldMemberToActiveGeneration(updateOldMemberRoleRequest);
         return ResponseEntity.ok().build();
     }
-
 }
