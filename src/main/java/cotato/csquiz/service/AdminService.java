@@ -15,7 +15,6 @@ import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +35,7 @@ public class AdminService {
                         .name(member.getName())
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -75,19 +74,20 @@ public class AdminService {
 
     public List<ActiveMemberInfoResponse> getCurrentActiveMembers() {
         List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
-
         return activeMembers.stream()
-                .map(member -> {
-                    ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
-                            .id(member.getId())
-                            .name(member.getName())
-                            .position(member.getPosition());
-                    if (member.getGeneration() != null) {
-                        builder.generationName(member.getGeneration().getName());
-                    }
-                    return builder.build();
-                })
-                .collect(Collectors.toList());
+                .map(this::buildActiveMemberInfoResponse)
+                .toList();
+    }
+
+    private ActiveMemberInfoResponse buildActiveMemberInfoResponse(Member member) {
+        ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
+                .id(member.getId())
+                .name(member.getName())
+                .position(member.getPosition());
+        if (member.getGeneration() != null) {
+            builder.generationName(member.getGeneration().getName());
+        }
+        return builder.build();
     }
 
     @Transactional
@@ -102,19 +102,9 @@ public class AdminService {
 
     public List<ActiveMemberInfoResponse> getOldMembersList() {
         List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
-
         return oldMembers.stream()
-                .map(member -> {
-                    ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
-                            .id(member.getId())
-                            .name(member.getName())
-                            .position(member.getPosition());
-                    if (member.getGeneration() != null) {
-                        builder.generationName(member.getGeneration().getName());
-                    }
-                    return builder.build();
-                })
-                .collect(Collectors.toList());
+                .map(this::buildActiveMemberInfoResponse)
+                .toList();
     }
 
     @Transactional
