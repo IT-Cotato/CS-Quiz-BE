@@ -1,5 +1,7 @@
 package cotato.csquiz.service;
 
+import static cotato.csquiz.domain.entity.MemberRole.REFUSED;
+
 import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
@@ -64,7 +66,7 @@ public class AdminService {
         Member member = findMember(memberApproveDto.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
-            member.updateRole(MemberRole.REFUSED);
+            member.updateRole(REFUSED);
             memberRepository.save(member);
         }
     }
@@ -101,7 +103,7 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getUserId());
-        if (member.getRole() != MemberRole.MEMBER) {
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == MemberRole.REFUSED ) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());
