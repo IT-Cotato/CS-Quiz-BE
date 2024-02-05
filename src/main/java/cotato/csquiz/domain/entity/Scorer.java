@@ -13,6 +13,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -34,4 +35,14 @@ public class Scorer extends BaseTimeEntity {
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
+
+    @Builder
+    public Scorer(Member member, Quiz quiz) {
+        this.member = member;
+        this.quiz = quiz;
+    }
+
+    public static Scorer of(Member member, Quiz quiz) {
+        return new Scorer(member, quiz);
+    }
 }

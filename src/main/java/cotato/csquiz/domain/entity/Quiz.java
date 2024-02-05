@@ -77,4 +77,12 @@ public class Quiz extends BaseTimeEntity {
             this.start = QuizStatus.QUIZ_OFF;
         }
     }
+
+    public boolean isOff() {
+        return status == QuizStatus.QUIZ_OFF;
+    }
+
+    public boolean isStart() {
+        return start == QuizStatus.QUIZ_ON;
+    }
 }

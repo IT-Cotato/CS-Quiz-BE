@@ -3,6 +3,7 @@ package cotato.csquiz.controller;
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.service.RecordService;
 import cotato.csquiz.service.SocketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocketController {
 
     private final SocketService socketService;
+    private final RecordService recordService;
 
     @PatchMapping("/start/csquiz")
     public ResponseEntity<?> openCSQuiz(@RequestBody QuizOpenRequest request) {
         socketService.openCSQuiz(request);
+        recordService.saveAnswers(request);
         return ResponseEntity.ok().build();
     }
 
