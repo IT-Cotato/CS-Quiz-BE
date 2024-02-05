@@ -13,6 +13,7 @@ import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
+import io.micrometer.common.util.StringUtils;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -43,11 +44,18 @@ public class AdminService {
         Member member = findMember(memberApproveDto.getUserId());
         Optional<Generation> generation = generationRepository.findByName(memberApproveDto.getGenerationName());
         validateIsGeneral(member);
+        validatePosition(memberApproveDto.getPosition());
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
             member.updateGeneration(generation.get());
             member.updatePosition(MemberPosition.valueOf(memberApproveDto.getPosition()));
             memberRepository.save(member);
+        }
+    }
+
+    private void validatePosition(String position){
+        if(StringUtils.isBlank(position)){
+            throw new AppException(ErrorCode.INVALID_POSITION);
         }
     }
 
