@@ -55,8 +55,8 @@ public class AdminService {
         }
     }
 
-    private void validatePosition(String position){
-        if(StringUtils.isBlank(position)){
+    private void validatePosition(String position) {
+        if (StringUtils.isBlank(position)) {
             throw new AppException(ErrorCode.INVALID_POSITION);
         }
     }
@@ -85,25 +85,14 @@ public class AdminService {
     public List<MemberEnrollInfoResponse> getCurrentActiveMembers() {
         List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
         return activeMembers.stream()
-                .map(this::buildActiveMemberInfoResponse)
+                .map(MemberEnrollInfoResponse::from)
                 .toList();
-    }
-
-    private ActiveMemberInfoResponse buildActiveMemberInfoResponse(Member member) {
-        ActiveMemberInfoResponse.ActiveMemberInfoResponseBuilder builder = ActiveMemberInfoResponse.builder()
-                .id(member.getId())
-                .name(member.getName())
-                .position(member.getPosition());
-        if (member.getGeneration() != null) {
-            builder.generationName(member.getGeneration().getName());
-        }
-        return builder.build();
     }
 
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getUserId());
-        if (member.getRole() == MemberRole.GENERAL || member.getRole() == MemberRole.REFUSED ) {
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == MemberRole.REFUSED) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());
@@ -113,7 +102,7 @@ public class AdminService {
     public List<MemberEnrollInfoResponse> getOldMembersList() {
         List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
         return oldMembers.stream()
-                .map(this::buildActiveMemberInfoResponse)
+                .map(MemberEnrollInfoResponse::from)
                 .toList();
     }
 
