@@ -1,5 +1,6 @@
 package cotato.csquiz.domain.dto.member;
 
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberPosition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActiveMemberInfoResponse {
+public class MemberEnrollInfoResponse {
 
     private Long id;
     private String name;

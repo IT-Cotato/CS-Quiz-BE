@@ -2,9 +2,9 @@ package cotato.csquiz.service;
 
 import static cotato.csquiz.domain.entity.MemberRole.REFUSED;
 
-import cotato.csquiz.domain.dto.member.ActiveMemberInfoResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveDto;
+import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
@@ -82,7 +82,7 @@ public class AdminService {
         }
     }
 
-    public List<ActiveMemberInfoResponse> getCurrentActiveMembers() {
+    public List<MemberEnrollInfoResponse> getCurrentActiveMembers() {
         List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
         return activeMembers.stream()
                 .map(this::buildActiveMemberInfoResponse)
@@ -110,7 +110,7 @@ public class AdminService {
         memberRepository.save(member);
     }
 
-    public List<ActiveMemberInfoResponse> getOldMembersList() {
+    public List<MemberEnrollInfoResponse> getOldMembersList() {
         List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
         return oldMembers.stream()
                 .map(this::buildActiveMemberInfoResponse)
