@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class SessionPhotoUrlRequest {
-    private long sessionId;
+
+    private Long sessionId;
     private MultipartFile sessionImage;
 }

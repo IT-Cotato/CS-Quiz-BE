@@ -6,5 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class AddGenerationResponse {
-    private long generationId;
+
+    private Long generationId;
 }

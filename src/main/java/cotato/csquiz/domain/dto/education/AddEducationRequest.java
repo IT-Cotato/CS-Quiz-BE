@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class AddEducationRequest {
+
     private String subject;
-    private long sessionId;
+    private Long sessionId;
     private int educationNum;
 
 }

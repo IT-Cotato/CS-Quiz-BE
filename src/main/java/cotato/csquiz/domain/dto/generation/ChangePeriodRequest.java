@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class ChangePeriodRequest {
-    private long generationId;
+
+    private Long generationId;
+
     private int startYear;
     private int startMonth;
     private int startDay;

@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class SessionDescriptionRequest {
-    private long sessionId;
+
+    private Long sessionId;
     private String description;
 }

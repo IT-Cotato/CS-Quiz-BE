@@ -11,6 +11,6 @@ import lombok.Data;
 @Builder
 public class AllQuizzesResponse {
 
-    private List<MultipleQuizResponse> multiples = new ArrayList<>();
-    private List<ShortQuizResponse> shortQuizzes = new ArrayList<>();
+    private List<MultipleQuizResponse> multiples;
+    private List<ShortQuizResponse> shortQuizzes;
 }

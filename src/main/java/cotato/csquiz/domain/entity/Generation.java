@@ -42,12 +42,12 @@ public class Generation {
         isRecruit=false;
     }
 
-    public long changeRecruit(boolean isRecruit){
+    public Long changeRecruit(boolean isRecruit){
         this.isRecruit = isRecruit;
         return this.getId();
     }
 
-    public long changePeriod(LocalDate startDate, LocalDate endDate) {
+    public Long changePeriod(LocalDate startDate, LocalDate endDate) {
         this.startDate=startDate;
         this.endDate = endDate;
         return this.getId();

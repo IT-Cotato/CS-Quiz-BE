@@ -31,7 +31,7 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping("")
-    public ResponseEntity<List<Session>> getSessions(@RequestParam long generationId) {
+    public ResponseEntity<List<Session>> getSessions(@RequestParam Long generationId) {
         List<Session> sessions = sessionService.findSessionsByGenerationId(generationId);
         return ResponseEntity.status(HttpStatus.OK).body(sessions);
     }

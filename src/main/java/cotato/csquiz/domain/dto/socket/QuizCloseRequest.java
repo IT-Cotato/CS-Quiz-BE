@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class QuizCloseRequest {
-    private long educationId;
+
+    private Long educationId;
 }

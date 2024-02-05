@@ -4,9 +4,8 @@ import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.PatchStatusRequest;
+import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
-import cotato.csquiz.domain.entity.EducationStatus;
 import cotato.csquiz.service.EducationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +28,8 @@ public class EducationController {
     private final EducationService educationService;
 
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") long educationId) {
-        EducationStatus status = educationService.getStatus(educationId);
-        GetStatusResponse response = GetStatusResponse.builder()
-                .status(status)
-                .build();
+    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") Long educationId) {
+        GetStatusResponse response = educationService.getStatus(educationId);
         return ResponseEntity.ok().body(response);
     }
 
@@ -50,7 +46,7 @@ public class EducationController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") long generationId) {
+    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") Long generationId) {
         List<AllEducationResponse> educationList = educationService.getEducationListByGeneration(generationId);
         return ResponseEntity.ok().body(educationList);
     }

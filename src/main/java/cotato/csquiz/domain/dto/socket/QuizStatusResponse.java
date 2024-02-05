@@ -8,8 +8,9 @@ import lombok.Getter;
 @Getter
 @Builder
 public class QuizStatusResponse {
+
     private QuizStatus status;
     private QuizStatus start;
-    private long quizId;
+    private Long quizId;
     private String command;
 }

@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class AddSessionRequest {
 
-    private long generationId;
+    private Long generationId;
     private MultipartFile sessionImage;
     private String description;
     private ItIssue itIssue;
