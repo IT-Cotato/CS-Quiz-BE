@@ -3,13 +3,13 @@ package cotato.csquiz.service;
 import static cotato.csquiz.domain.entity.MemberRole.REFUSED;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
-import cotato.csquiz.domain.dto.member.MemberApproveDto;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
+import cotato.csquiz.domain.dto.member.MemberApproveRequest;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.entity.MemberPosition;
 import cotato.csquiz.domain.entity.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -17,7 +17,7 @@ import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import io.micrometer.common.util.StringUtils;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +37,22 @@ public class AdminService {
                         .id(member.getId())
                         .name(member.getName())
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
+                        .role(member.getRole())
                         .build())
                 .toList();
     }
 
     @Transactional
-    public void approveApplicant(MemberApproveDto memberApproveDto) {
-        Member member = findMember(memberApproveDto.getUserId());
-        Optional<Generation> generation = generationRepository.findByName(memberApproveDto.getGenerationName());
+    public void approveApplicant(MemberApproveRequest memberApproveRequest) {
+        Member member = findMember(memberApproveRequest.getUserId());
+        Generation findGeneration = generationRepository.findById(memberApproveRequest.getGenerationId())
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
         validateIsGeneral(member);
         validatePosition(memberApproveDto.getPosition());
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
-            member.updateGeneration(generation.get());
-            member.updatePosition(MemberPosition.valueOf(memberApproveDto.getPosition()));
+            member.updateGeneration(findGeneration);
+            member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
         }
     }
@@ -62,8 +64,8 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectApplicant(MemberApproveDto memberApproveDto) {
-        Member member = findMember(memberApproveDto.getUserId());
+    public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
+        Member member = findMember(memberRejectRequest.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(REFUSED);

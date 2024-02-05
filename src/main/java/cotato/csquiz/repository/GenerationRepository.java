@@ -8,9 +8,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GenerationRepository extends JpaRepository<Generation, Long> {
-    @Query("SELECT g.name FROM Generation g")
-    List<String> findAllGenerationNames();
-
     Optional<Generation> findByName(String name);
-
 }

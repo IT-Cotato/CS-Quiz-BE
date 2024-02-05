@@ -3,6 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
 import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
+import cotato.csquiz.domain.dto.generation.GenerationInfo;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -61,8 +62,10 @@ public class GenerationService {
     }
 
     //기수 목록 알려주기
-    public List<String> getGenerations(){
-        return generationRepository.findAllGenerationNames();
+    public List<GenerationInfo> getGenerations(){
+        List<Generation> generations = generationRepository.findAll();
+        return generations.stream()
+                .map(this::buildGenerationInfo).toList();
     }
 
     //시작 날짜가 끝나는 날짜보다 뒤면 오류 처리
@@ -78,5 +81,12 @@ public class GenerationService {
         if(generation.isPresent()){
             throw new AppException(ErrorCode.GENERATION_NAME_EXIST);
         }
+    }
+
+    private GenerationInfo buildGenerationInfo(Generation generation) {
+        return GenerationInfo.builder()
+                .generationId(generation.getId())
+                .generationName(generation.getName())
+                .build();
     }
 }

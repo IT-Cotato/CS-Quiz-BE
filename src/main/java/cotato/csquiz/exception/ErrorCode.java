@@ -8,9 +8,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
+    WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     GENERATION_NAME_EXIST(HttpStatus.CONFLICT, "이미 이름이 있습니다"),
     EDUCATION_EXIST(HttpStatus.CONFLICT, "이미 교육이 존재합니다"),
-    IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"이미지 처리에 실패했습니다."),
+    IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "변경할 이미지가 없습니다"),
     DATA_NOTFOUND(HttpStatus.NOT_FOUND, "데이터가 없습니다"),
     DATE_INVALID(HttpStatus.BAD_REQUEST, "시작날짜가 끝 날짜보다 뒤입니다"),
@@ -26,10 +27,17 @@ public enum ErrorCode {
     EMAIL_TYPE_ERROR(HttpStatus.BAD_REQUEST, "구글, 네이버 형식으로 입력해주세요"),
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     CREATE_VERIFY_CODE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "코드 생성에 실패했습니다."),
+    SUBJECT_INVALID(HttpStatus.BAD_REQUEST, "교육 주제는 NULL이거나 비어있을 수 없습니다."),
     NAME_NOT_MATCH(HttpStatus.NOT_FOUND, "해당 유저의 전화번호와 이름이 일치하지 않습니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 다른 비밀번호로 변경해주세요."),
     ROLE_IS_NOT_OLD_MEMBER(HttpStatus.BAD_REQUEST, "해당 회원의 ROLE은 OLD_MEMBER가 아닙니다."),
-    INVALID_POSITION(HttpStatus.BAD_REQUEST, "포지션을 선택해주세요.");
+    INVALID_POSITION(HttpStatus.BAD_REQUEST, "포지션을 선택해주세요."),
+    GENERATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Generation을 찾을 수 없습니다."),
+    EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 교육을 찾을 수 없습니다."),
+    QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."),
+    QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 퀴즈를 찾을 수 없습니다."),
+    QUIZ_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "해당 문제는 접근이 불가능한 상태입니다. 접근을 허용해주십시오"),
+    MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다");
 
     private final HttpStatus httpStatus;
     private final String message;

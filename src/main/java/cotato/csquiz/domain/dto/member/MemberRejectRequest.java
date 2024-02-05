@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberApproveDto {
+public class MemberRejectRequest {
 
-    Long userId;
-    String position;
-    String generationName;
+    private Long userId;
 }

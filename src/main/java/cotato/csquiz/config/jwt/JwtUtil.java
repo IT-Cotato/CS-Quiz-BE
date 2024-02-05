@@ -27,7 +27,7 @@ public class JwtUtil {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public boolean validateToken(String accessToken) {
-        if (accessToken.isEmpty()) {
+        if (accessToken.isEmpty() || accessToken == null) {
             throw new AppException(ErrorCode.JWT_NOT_EXISTS);
         }
         return isExpired(accessToken);

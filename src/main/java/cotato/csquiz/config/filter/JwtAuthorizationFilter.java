@@ -21,6 +21,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static final String LOGIN_PATH = "/login";
     private static final String GENERATION_PATH = "/v1/api/generation";
     private static final String SESSION_GET_PATH = "/v1/api/session";
+    private static final String SWAGGER_PATH = "/swagger-ui";
+    private static final String SWAGGER_PATH_3 = "/v3/api-docs";
 
     private final JwtUtil jwtUtil;
 
@@ -56,6 +58,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         log.info("진입한 path : {}", path);
         return path.startsWith(AUTH_PATH) || path.startsWith(LOGIN_PATH) || path.equals(GENERATION_PATH) || path.equals(
-                SESSION_GET_PATH);
+                SESSION_GET_PATH) || path.startsWith(SWAGGER_PATH) || path.startsWith(SWAGGER_PATH_3);
     }
 }
