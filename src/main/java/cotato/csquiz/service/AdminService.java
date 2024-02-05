@@ -3,11 +3,11 @@ package cotato.csquiz.service;
 import static cotato.csquiz.domain.entity.MemberRole.REFUSED;
 
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
-import cotato.csquiz.domain.dto.member.MemberApproveRequest;
-import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MemberRole;
@@ -15,9 +15,7 @@ import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
-import io.micrometer.common.util.StringUtils;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +28,6 @@ public class AdminService {
 
     public List<MemberInfoResponse> getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
-
         return applicantList.stream()
                 .filter(member -> member.getRole() == MemberRole.GENERAL)
                 .map(member -> MemberInfoResponse.builder()
@@ -48,18 +45,11 @@ public class AdminService {
         Generation findGeneration = generationRepository.findById(memberApproveRequest.getGenerationId())
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
         validateIsGeneral(member);
-        validatePosition(memberApproveDto.getPosition());
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
-        }
-    }
-
-    private void validatePosition(String position) {
-        if (StringUtils.isBlank(position)) {
-            throw new AppException(ErrorCode.INVALID_POSITION);
         }
     }
 
