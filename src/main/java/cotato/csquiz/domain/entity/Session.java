@@ -2,6 +2,9 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.enums.CSEducation;
+import cotato.csquiz.domain.enums.ItIssue;
+import cotato.csquiz.domain.enums.Networking;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,7 +32,7 @@ public class Session {
     @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "session_number")
+    @Column(name = "session_number", unique = true, nullable = false)
     private int number;
 
     @Column(name = "session_photo_url")

@@ -1,4 +1,4 @@
-package cotato.csquiz.domain.entity;
+package cotato.csquiz.domain.enums;
 
 import lombok.Getter;
 

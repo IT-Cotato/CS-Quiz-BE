@@ -1,21 +1,21 @@
 package cotato.csquiz.domain.entity;
 
+import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Generation {
+public class Generation extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,11 +35,11 @@ public class Generation {
     private Boolean isRecruit;
 
     @Builder
-    public Generation(String name, LocalDate startDate, LocalDate endDate){
-        this.name=name;
-        this.startDate=startDate;
-        this.endDate=endDate;
-        isRecruit=false;
+    public Generation(String name, LocalDate startDate, LocalDate endDate) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        isRecruit = false;
     }
 
     public Long changeRecruit(boolean isRecruit){

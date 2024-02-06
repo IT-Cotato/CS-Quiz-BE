@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class MultipleQuiz extends Quiz {
 
     @OneToMany(mappedBy = "multipleQuiz", cascade = CascadeType.ALL)

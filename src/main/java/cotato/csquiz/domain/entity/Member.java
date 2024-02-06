@@ -2,6 +2,9 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.enums.MemberPosition;
+import cotato.csquiz.domain.enums.MemberRole;
+import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,7 +26,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,16 +71,16 @@ public class Member {
     public void updateRole(MemberRole role) {
         this.role = role;
     }
-  
+
     public void updatePassword(String password) {
         this.password = password;
     }
 
-    public void updateGeneration(Generation generation){
+    public void updateGeneration(Generation generation) {
         this.generation = generation;
     }
 
-    public void updatePosition(MemberPosition position){
+    public void updatePosition(MemberPosition position) {
         this.position = position;
     }
 }

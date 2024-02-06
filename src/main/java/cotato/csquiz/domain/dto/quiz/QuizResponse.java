@@ -1,6 +1,6 @@
 package cotato.csquiz.domain.dto.quiz;
 
-import cotato.csquiz.domain.entity.QuizType;
+import cotato.csquiz.domain.enums.QuizType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
