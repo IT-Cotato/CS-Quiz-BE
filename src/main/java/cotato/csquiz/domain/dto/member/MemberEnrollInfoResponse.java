@@ -1,7 +1,7 @@
 package cotato.csquiz.domain.dto.member;
 
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.entity.MemberPosition;
+import cotato.csquiz.domain.enums.MemberPosition;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

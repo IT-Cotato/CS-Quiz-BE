@@ -1,7 +1,7 @@
 package cotato.csquiz.repository;
 
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.domain.enums.MemberRole;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
