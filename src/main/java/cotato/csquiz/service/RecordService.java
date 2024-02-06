@@ -57,10 +57,7 @@ public class RecordService {
     }
 
     private void validateQuizOpen(Quiz findQuiz) {
-        if (findQuiz.isOff()) {
-            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
-        }
-        if (!findQuiz.isStart()) {
+        if (findQuiz.isOff() || !findQuiz.isStart()) {
             throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
         }
     }
