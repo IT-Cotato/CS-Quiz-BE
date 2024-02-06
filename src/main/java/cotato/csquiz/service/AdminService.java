@@ -1,7 +1,13 @@
 package cotato.csquiz.service;
 
+import static cotato.csquiz.domain.entity.MemberRole.REFUSED;
+
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
+import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
+import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.enums.MemberRole;
@@ -10,12 +16,12 @@ import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AdminService {
     private final MemberRepository memberRepository;
@@ -23,7 +29,6 @@ public class AdminService {
 
     public List<MemberInfoResponse> getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
-
         return applicantList.stream()
                 .filter(member -> member.getRole() == MemberRole.GENERAL)
                 .map(member -> MemberInfoResponse.builder()
@@ -32,7 +37,7 @@ public class AdminService {
                         .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
                         .role(member.getRole())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -50,11 +55,11 @@ public class AdminService {
     }
 
     @Transactional
-    public void rejectApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getUserId());
+    public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
+        Member member = findMember(memberRejectRequest.getUserId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
-            member.updateRole(MemberRole.REFUSED);
+            member.updateRole(REFUSED);
             memberRepository.save(member);
         }
     }
@@ -67,6 +72,46 @@ public class AdminService {
     private void validateIsGeneral(Member member) {
         if (member.getRole() != MemberRole.GENERAL) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
+        }
+    }
+
+    public List<MemberEnrollInfoResponse> getCurrentActiveMembers() {
+        List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
+        return activeMembers.stream()
+                .map(MemberEnrollInfoResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == MemberRole.REFUSED) {
+            throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
+        }
+        member.updateRole(updateActiveMemberRoleRequest.getRole());
+        memberRepository.save(member);
+    }
+
+    public List<MemberEnrollInfoResponse> getOldMembersList() {
+        List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
+        return oldMembers.stream()
+                .map(MemberEnrollInfoResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void updateOldMemberToActiveGeneration(UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
+        Member member = findMember(updateOldMemberRoleRequest.getUserId());
+        validateIsOldMember(member);
+        if (member.getRole() == MemberRole.OLD_MEMBER) {
+            member.updateRole(MemberRole.MEMBER);
+            memberRepository.save(member);
+        }
+    }
+
+    private void validateIsOldMember(Member member) {
+        if (member.getRole() != MemberRole.OLD_MEMBER) {
+            throw new AppException(ErrorCode.ROLE_IS_NOT_OLD_MEMBER);
         }
     }
 }

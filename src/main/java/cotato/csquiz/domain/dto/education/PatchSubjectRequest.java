@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class PatchSubjectRequest {
-    private long educationId;
+    private Long educationId;
     private String newSubject;
 }

@@ -1,6 +1,6 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.EducationDto;
+import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
@@ -29,11 +29,8 @@ public class EducationController {
     private final EducationService educationService;
 
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") long educationId) {
-        EducationStatus status = educationService.getStatus(educationId);
-        GetStatusResponse response = GetStatusResponse.builder()
-                .status(status)
-                .build();
+    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") Long educationId) {
+        GetStatusResponse response = educationService.getStatus(educationId);
         return ResponseEntity.ok().body(response);
     }
 
@@ -50,8 +47,8 @@ public class EducationController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") long generationId) {
-        List<EducationDto> educationList = educationService.getEducationListByGeneration(generationId);
+    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") Long generationId) {
+        List<AllEducationResponse> educationList = educationService.getEducationListByGeneration(generationId);
         return ResponseEntity.ok().body(educationList);
     }
 

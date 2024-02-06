@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class PatchEducationRequest {
-    private long educationId;
+
+    private Long educationId;
     private EducationStatus status;
 }

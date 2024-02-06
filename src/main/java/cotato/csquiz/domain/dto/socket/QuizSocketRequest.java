@@ -4,5 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class QuizSocketRequest {
-    private long quizId;
+
+    private Long quizId;
 }

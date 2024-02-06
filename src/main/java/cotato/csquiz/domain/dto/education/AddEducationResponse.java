@@ -8,5 +8,6 @@ import java.util.Locale;
 @Data
 @Builder
 public class AddEducationResponse {
-    long educationId;
+
+    private Long educationId;
 }

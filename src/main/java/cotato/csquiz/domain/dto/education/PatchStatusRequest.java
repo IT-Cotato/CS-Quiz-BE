@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class PatchStatusRequest {
-    private long educationId;
+    private Long educationId;
     private EducationStatus status;
 }

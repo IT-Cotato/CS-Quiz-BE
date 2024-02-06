@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 @Builder
 public class GetStatusResponse {
+
     private EducationStatus status;
 }

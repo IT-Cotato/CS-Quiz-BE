@@ -1,8 +1,9 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.EducationDto;
+import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
+import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
 import cotato.csquiz.domain.entity.Education;
@@ -52,9 +53,11 @@ public class EducationService {
     }
 
     //교육 상태(오픈여부) 가져오기
-    public EducationStatus getStatus(long educationId) {
+    public GetStatusResponse getStatus(long educationId) {
         Education education = findEducation(educationId);
-        return education.getStatus();
+        return GetStatusResponse.builder()
+                .status(education.getStatus())
+                .build();
     }
 
     public void patchEducationStatus(PatchEducationRequest request) {
@@ -82,10 +85,10 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-    public List<EducationDto> getEducationListByGeneration(Long generationId) {
+    public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
         List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
         return educationList.stream()
-                .map(EducationDto::convertFromEducation)
+                .map(AllEducationResponse::convertFromEducation)
                 .toList();
     }
 }
