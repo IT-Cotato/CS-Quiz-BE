@@ -1,6 +1,6 @@
 package cotato.csquiz.domain.dto.member;
 
-import cotato.csquiz.domain.entity.MemberRole;
+import cotato.csquiz.domain.enums.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
