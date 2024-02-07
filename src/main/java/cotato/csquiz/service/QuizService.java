@@ -25,8 +25,11 @@ import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuizService {
 
+    private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
     private final ShortAnswerRepository shortAnswerRepository;
@@ -61,11 +65,14 @@ public class QuizService {
                 createMultipleQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
+            } catch (NoSuchAlgorithmException e) {
+                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
-    private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request) throws ImageException {
+    private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
+            throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
@@ -75,6 +82,7 @@ public class QuizService {
                 .number(request.getNumber())
                 .question(request.getQuestion())
                 .photoUrl(imageUrl)
+                .appearSecond(generateRandomTime())
                 .build();
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
@@ -96,11 +104,14 @@ public class QuizService {
                 createShortQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
+            } catch (NoSuchAlgorithmException e) {
+                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
-    private void createShortQuiz(Education findEducation, CreateShortQuizRequest request) throws ImageException {
+    private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
+            throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (!request.getImage().isEmpty() && request.getImage() != null) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
@@ -110,6 +121,7 @@ public class QuizService {
                 .question(request.getQuestion())
                 .number(request.getNumber())
                 .photoUrl(imageUrl)
+                .appearSecond(generateRandomTime())
                 .build();
         log.info("주관식 문제 생성 : 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);
@@ -121,6 +133,11 @@ public class QuizService {
         shortAnswerRepository.saveAll(shortAnswers);
         log.info("주관식 정답 생성 : {}개", shortAnswers.size());
         createdShortQuiz.addShortAnswers(shortAnswers);
+    }
+
+    private int generateRandomTime() throws NoSuchAlgorithmException {
+        Random random = SecureRandom.getInstanceStrong();
+        return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
     }
 
     private void validateDuplicateNumber(CreateQuizzesRequest request) {

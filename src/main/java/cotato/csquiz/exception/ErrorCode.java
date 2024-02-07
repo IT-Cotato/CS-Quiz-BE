@@ -37,7 +37,8 @@ public enum ErrorCode {
     QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."),
     QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 퀴즈를 찾을 수 없습니다."),
     QUIZ_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "해당 문제는 접근이 불가능한 상태입니다. 접근을 허용해주십시오"),
-    MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다");
+    MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다"),
+    RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패");
 
     private final HttpStatus httpStatus;
     private final String message;
