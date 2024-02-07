@@ -223,7 +223,7 @@ public class QuizService {
                         .choiceId(choice.getId())
                         .number(choice.getChoiceNumber())
                         .content(choice.getContent())
-                        .isCorrect(choice.getIsCorrect())
+                        .isAnswer(choice.getIsCorrect())
                         .build())
                 .toList();
 
