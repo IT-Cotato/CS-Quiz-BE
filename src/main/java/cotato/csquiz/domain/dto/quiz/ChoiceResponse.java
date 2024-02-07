@@ -11,5 +11,5 @@ public class ChoiceResponse {
     private Long choiceId;
     private int number;
     private String content;
-    private ChoiceCorrect isCorrect;
+    private ChoiceCorrect isAnswer;
 }
