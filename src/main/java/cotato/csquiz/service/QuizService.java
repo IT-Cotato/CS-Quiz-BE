@@ -14,10 +14,9 @@ import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
-import cotato.csquiz.domain.enums.QuizStatus;
-import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
+import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
@@ -189,10 +188,9 @@ public class QuizService {
 
         ShortQuizResponse response = ShortQuizResponse.builder()
                 .id(quiz.getId())
-                .type(QuizType.SHORT_QUIZ)
                 .number(quiz.getNumber())
                 .question(quiz.getQuestion())
-                .photoUrl(quiz.getPhotoUrl())
+                .image(quiz.getPhotoUrl())
                 .build();
         for (ShortAnswerResponse shortAnswerResponse : shortAnswerResponses) {
             response.addShortAnswers(shortAnswerResponse);
@@ -214,10 +212,9 @@ public class QuizService {
 
         MultipleQuizResponse response = MultipleQuizResponse.builder()
                 .id(quiz.getId())
-                .type(QuizType.MULTIPLE_QUIZ)
                 .number(quiz.getNumber())
                 .question(quiz.getQuestion())
-                .photoUrl(quiz.getPhotoUrl())
+                .image(quiz.getPhotoUrl())
                 .build();
         for (ChoiceResponse choiceResponse : choiceResponses) {
             response.addChoice(choiceResponse);
