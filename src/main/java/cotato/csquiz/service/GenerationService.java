@@ -77,8 +77,7 @@ public class GenerationService {
     }
 
     private void checkNumberValid(int generationNumber) {
-        Optional<Generation> generation = generationRepository.findByNumber(generationNumber);
-        if(generation.isPresent()){
+        if (generationRepository.findByNumber(generationNumber).isPresent()) {
             throw new AppException(ErrorCode.GENERATION_NUMBER_EXIST);
         }
     }
