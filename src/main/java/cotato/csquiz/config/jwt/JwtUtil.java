@@ -1,7 +1,5 @@
 package cotato.csquiz.config.jwt;
 
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,13 +23,6 @@ public class JwtUtil {
     Long refreshExpiration;
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    public boolean validateToken(String accessToken) {
-        if (accessToken.isEmpty() || accessToken == null) {
-            throw new AppException(ErrorCode.JWT_NOT_EXISTS);
-        }
-        return isExpired(accessToken);
-    }
 
     public boolean isExpired(String token) {
         return Jwts.parser()

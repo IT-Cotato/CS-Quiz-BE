@@ -2,6 +2,7 @@ package cotato.csquiz.config;
 
 import cotato.csquiz.config.filter.JwtAuthenticationFilter;
 import cotato.csquiz.config.filter.JwtAuthorizationFilter;
+import cotato.csquiz.config.filter.JwtExceptionFilter;
 import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenRepository))
                 .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilter(corsFilter)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
@@ -57,7 +59,6 @@ public class SecurityConfig {
                         .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION", "ADMIN")
                         .anyRequest().permitAll()
                 );
-
         return http.build();
     }
 }
