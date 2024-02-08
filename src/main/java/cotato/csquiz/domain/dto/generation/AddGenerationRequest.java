@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class AddGenerationRequest {
-    private String generationName;
+    private int generationNumber;
     private int startYear;
     private int startMonth;
     private int startDay;
