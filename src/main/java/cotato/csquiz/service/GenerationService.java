@@ -31,9 +31,9 @@ public class GenerationService {
         LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
         LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
         checkPeriodValid(startDate, endDate);
-        checkNameValid(request.getGenerationName());
+        checkNumberValid(request.getGenerationNumber());
         Generation generation = Generation.builder()
-                .name(request.getGenerationName())
+                .number(request.getGenerationNumber())
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
@@ -77,17 +77,17 @@ public class GenerationService {
         }
     }
 
-    private void checkNameValid(String generationName) {
-        Optional<Generation> generation = generationRepository.findByName(generationName);
+    private void checkNumberValid(int generationNumber) {
+        Optional<Generation> generation = generationRepository.findByNumber(generationNumber);
         if(generation.isPresent()){
-            throw new AppException(ErrorCode.GENERATION_NAME_EXIST);
+            throw new AppException(ErrorCode.GENERATION_NUMBER_EXIST);
         }
     }
 
     private GenerationInfo buildGenerationInfo(Generation generation) {
         return GenerationInfo.builder()
                 .generationId(generation.getId())
-                .generationName(generation.getName())
+                .generationNumber(generation.getNumber())
                 .build();
     }
 }

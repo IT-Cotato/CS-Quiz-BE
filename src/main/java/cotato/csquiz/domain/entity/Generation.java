@@ -22,8 +22,8 @@ public class Generation extends BaseTimeEntity {
     @Column(name = "generation_id")
     private Long id;
 
-    @Column(name = "generation_name", unique = true, nullable = false)
-    private String name;
+    @Column(name = "generation_number", unique = true, nullable = false)
+    private int number;
 
     @Column(name = "generation_start_date")
     private LocalDate startDate;
@@ -35,8 +35,8 @@ public class Generation extends BaseTimeEntity {
     private Boolean isRecruit;
 
     @Builder
-    public Generation(String name, LocalDate startDate, LocalDate endDate) {
-        this.name = name;
+    public Generation(int number, LocalDate startDate, LocalDate endDate) {
+        this.number = number;
         this.startDate = startDate;
         this.endDate = endDate;
         isRecruit = false;

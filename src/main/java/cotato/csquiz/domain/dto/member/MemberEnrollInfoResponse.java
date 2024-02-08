@@ -16,14 +16,14 @@ public class MemberEnrollInfoResponse {
     private Long id;
     private String name;
     private MemberPosition position;
-    private String generationName;
+    private int generationNumber;
 
     public static MemberEnrollInfoResponse from(Member member) {
         return new MemberEnrollInfoResponse(
                 member.getId(),
                 member.getName(),
                 member.getPosition(),
-                member.getGeneration().getName()
+                member.getGeneration().getNumber()
         );
     }
 }

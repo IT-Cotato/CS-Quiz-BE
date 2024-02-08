@@ -8,5 +8,5 @@ import lombok.Getter;
 public class GenerationInfo {
 
     private Long generationId;
-    private String generationName;
+    private int generationNumber;
 }
