@@ -4,19 +4,17 @@ import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
 import cotato.csquiz.domain.dto.generation.AddGenerationResponse;
 import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
-import cotato.csquiz.domain.dto.generation.GenerationInfo;
+import cotato.csquiz.domain.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,19 +57,20 @@ public class GenerationService {
         Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
         generation.changePeriod(startDate, endDate);
-        log.info("change date "+startDate+ " " + endDate);
+        log.info("change date " + startDate + " " + endDate);
     }
 
     //기수 목록 알려주기
-    public List<GenerationInfo> getGenerations(){
+    public List<GenerationInfoResponse> getGenerations() {
         List<Generation> generations = generationRepository.findAll();
         return generations.stream()
-                .map(this::buildGenerationInfo).toList();
+                .map(GenerationInfoResponse::from)
+                .toList();
     }
 
     //시작 날짜가 끝나는 날짜보다 뒤면 오류 처리
     private void checkPeriodValid(LocalDate startDate, LocalDate endDate) {
-        if(endDate.isBefore(startDate)){
+        if (endDate.isBefore(startDate)) {
             log.info("날짜 오류");
             throw new AppException(ErrorCode.DATE_INVALID);
         }
@@ -82,12 +81,5 @@ public class GenerationService {
         if(generation.isPresent()){
             throw new AppException(ErrorCode.GENERATION_NUMBER_EXIST);
         }
-    }
-
-    private GenerationInfo buildGenerationInfo(Generation generation) {
-        return GenerationInfo.builder()
-                .generationId(generation.getId())
-                .generationNumber(generation.getNumber())
-                .build();
     }
 }
