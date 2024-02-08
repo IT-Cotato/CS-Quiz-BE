@@ -35,11 +35,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String accessToken = jwtUtil.resolveAccessToken(request);
         log.info("액세스토큰 반환 완료: {}", accessToken);
-
-        if (!jwtUtil.validateToken(accessToken)) {
+        if (accessToken != null && !accessToken.isEmpty()) {
             setAuthentication(accessToken);
         }
-
         filterChain.doFilter(request, response);
     }
 
