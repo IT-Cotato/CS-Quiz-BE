@@ -10,11 +10,13 @@ import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
+import cotato.csquiz.domain.entity.RefusedMember;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
+import cotato.csquiz.repository.RefusedMemberRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
     private final MemberRepository memberRepository;
     private final GenerationRepository generationRepository;
+    private final RefusedMemberRepository refusedMemberRepository;
 
     public List<MemberInfoResponse> getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
@@ -61,6 +64,7 @@ public class AdminService {
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(REFUSED);
             memberRepository.save(member);
+            addRefusedMember(member);
         }
     }
 
@@ -113,6 +117,13 @@ public class AdminService {
         if (member.getRole() != MemberRole.OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_OLD_MEMBER);
         }
+    }
+
+    private void addRefusedMember(Member member) {
+        RefusedMember refusedMember = RefusedMember.builder()
+                .member(member)
+                .build();
+        refusedMemberRepository.save(refusedMember);
     }
 }
 
