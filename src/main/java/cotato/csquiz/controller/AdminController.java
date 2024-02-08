@@ -46,6 +46,13 @@ public class AdminController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/reapprove")
+    public ResponseEntity<?> reapproveApplicant(@RequestBody MemberApproveRequest memberApproveRequest) {
+        log.info("가입자 재승인 컨트롤러, 요청된 member id : {}", memberApproveRequest.getUserId());
+        adminService.reapproveApplicant(memberApproveRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/active-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getCurrentActiveMembers() {
         log.info("현재 활동 중인 부원 목록 조회 컨트롤러");

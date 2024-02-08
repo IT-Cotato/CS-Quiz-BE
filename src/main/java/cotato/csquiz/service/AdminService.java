@@ -46,14 +46,25 @@ public class AdminService {
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getUserId());
-        Generation findGeneration = generationRepository.findById(memberApproveRequest.getGenerationId())
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+        Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
         validateIsGeneral(member);
         if (member.getRole() == MemberRole.GENERAL) {
             member.updateRole(MemberRole.MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
+        }
+    }
+
+    @Transactional
+    public void reapproveApplicant(MemberApproveRequest memberApproveRequest) {
+        Member member = findMember(memberApproveRequest.getUserId());
+        if (member.getRole() == REFUSED) {
+            Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
+            member.updateRole(MemberRole.MEMBER);
+            member.updateGeneration(findGeneration);
+            member.updatePosition(memberApproveRequest.getPosition());
+            deleteRefusedMember(member);
         }
     }
 
@@ -124,6 +135,17 @@ public class AdminService {
                 .member(member)
                 .build();
         refusedMemberRepository.save(refusedMember);
+    }
+
+    private void deleteRefusedMember(Member member) {
+        RefusedMember refusedMember = refusedMemberRepository.findByMember(member)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        refusedMemberRepository.delete(refusedMember);
+    }
+
+    private Generation getGeneration(Long generationId) {
+        return generationRepository.findById(generationId)
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
     }
 }
 
