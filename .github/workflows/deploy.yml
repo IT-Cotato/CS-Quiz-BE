@@ -27,7 +27,10 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
+    - name: Grant permission for gradlew
+      run: chmod +x ./gradlew
+      shell: bash
+      
     # Configure Gradle for optimal use in GiHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
