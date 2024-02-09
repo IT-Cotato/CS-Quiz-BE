@@ -113,7 +113,7 @@ public class QuizService {
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
             throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
-        if (!request.getImage().isEmpty() && request.getImage() != null) {
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
         }
         ShortQuiz createdShortQuiz = ShortQuiz.builder()
