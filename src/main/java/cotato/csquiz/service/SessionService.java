@@ -93,11 +93,13 @@ public class SessionService {
         return sessionRepository.findAllByGeneration(generation);
     }
 
-    public Session findSessionById(long sessionId) {
-        return sessionRepository.findById(sessionId).orElseThrow(() -> new AppException(ErrorCode.DATA_NOTFOUND));
+    public Session findSessionById(Long sessionId) {
+        return sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND));
     }
 
-    private Generation getGeneration(long generationId) {
-        return generationRepository.findById(generationId).orElseThrow(() -> new AppException(ErrorCode.DATA_NOTFOUND));
+    private Generation getGeneration(Long generationId) {
+        return generationRepository.findById(generationId)
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
     }
 }
