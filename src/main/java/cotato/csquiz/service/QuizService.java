@@ -198,9 +198,7 @@ public class QuizService {
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
         List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
-                .map(shortAnswer -> ShortAnswerResponse.builder()
-                        .answer(shortAnswer.getContent())
-                        .build())
+                .map(ShortAnswerResponse::from)
                 .toList();
 
         ShortQuizResponse response = ShortQuizResponse.builder()
@@ -219,12 +217,7 @@ public class QuizService {
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
         List<ChoiceResponse> choiceResponses = choices.stream()
-                .map(choice -> ChoiceResponse.builder()
-                        .choiceId(choice.getId())
-                        .number(choice.getChoiceNumber())
-                        .content(choice.getContent())
-                        .isAnswer(choice.getIsCorrect())
-                        .build())
+                .map(ChoiceResponse::from)
                 .toList();
 
         MultipleQuizResponse response = MultipleQuizResponse.builder()
