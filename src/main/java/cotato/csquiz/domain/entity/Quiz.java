@@ -58,12 +58,18 @@ public class Quiz extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education;
 
-    public Quiz(int number, String question, String photoUrl, Education education, int appearSecond) {
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "generation_id")
+    private Generation generation;
+
+    public Quiz(int number, String question, String photoUrl, Education education, int appearSecond,
+                Generation generation) {
         this.number = number;
         this.question = question;
         this.photoUrl = photoUrl;
         this.education = education;
         this.appearSecond = appearSecond;
+        this.generation = generation;
     }
 
     public void updateStatus(QuizStatus status) {
