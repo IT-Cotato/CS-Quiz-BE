@@ -21,8 +21,9 @@ public class MultipleQuiz extends Quiz {
     private List<Choice> choices = new ArrayList<>();
 
     @Builder
-    public MultipleQuiz(int number, String question, String photoUrl, Education education, int appearSecond) {
-        super(number, question, photoUrl, education, appearSecond);
+    public MultipleQuiz(int number, String question, String photoUrl, Education education, int appearSecond,
+                        Generation generation) {
+        super(number, question, photoUrl, education, appearSecond, generation);
     }
 
     public void addChoices(List<Choice> choices) {

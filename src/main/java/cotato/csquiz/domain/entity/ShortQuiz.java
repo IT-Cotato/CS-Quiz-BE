@@ -24,7 +24,8 @@ public class ShortQuiz extends Quiz {
     }
 
     @Builder
-    public ShortQuiz(int number, String question, String photoUrl, Education education, int appearSecond) {
-        super(number, question, photoUrl, education, appearSecond);
+    public ShortQuiz(int number, String question, String photoUrl, Education education, int appearSecond,
+                     Generation generation) {
+        super(number, question, photoUrl, education, appearSecond, generation);
     }
 }

@@ -1,9 +1,13 @@
 package cotato.csquiz.domain.dto.quiz;
 
-import lombok.Builder;
+import cotato.csquiz.domain.entity.ShortAnswer;
 
-@Builder
 public record ShortAnswerResponse(
         String answer
 ) {
+    public static ShortAnswerResponse from(ShortAnswer shortAnswer) {
+        return new ShortAnswerResponse(
+                shortAnswer.getContent()
+        );
+    }
 }

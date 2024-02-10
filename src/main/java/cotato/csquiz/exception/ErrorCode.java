@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
-    GENERATION_NAME_EXIST(HttpStatus.CONFLICT, "이미 이름이 있습니다"),
+    GENERATION_NUMBER_EXIST(HttpStatus.CONFLICT, "같은 숫자의 기수가 있습니다"),
     EDUCATION_EXIST(HttpStatus.CONFLICT, "이미 교육이 존재합니다"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "변경할 이미지가 없습니다"),
@@ -19,7 +19,7 @@ public enum ErrorCode {
     PHONE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "존재하는 전화번호입니다."),
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."),
     LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "로그인 요청에 실패했습니다."),
-    JWT_NOT_EXISTS(HttpStatus.NO_CONTENT, "Jwt 토큰이 존재하지 않습니다."),
+    JWT_NOT_EXISTS(HttpStatus.UNAUTHORIZED, "Jwt 토큰이 존재하지 않습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원이 존재하지 않습니다."),
     TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "토큰이 만료되었습니다."),
     ROLE_IS_NOT_MATCH(HttpStatus.BAD_REQUEST, "해당 ROLE은 변경할 수 없습니다."),
@@ -38,7 +38,9 @@ public enum ErrorCode {
     QUIZ_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 id의 퀴즈를 찾을 수 없습니다."),
     QUIZ_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "해당 문제는 접근이 불가능한 상태입니다. 접근을 허용해주십시오"),
     MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다"),
-    RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패");
+    RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
+    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "accessToken이 만료되었습니다."),
+    SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
