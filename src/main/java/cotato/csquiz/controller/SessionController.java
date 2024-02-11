@@ -5,6 +5,7 @@ import cotato.csquiz.domain.dto.session.AddSessionResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
@@ -41,6 +42,12 @@ public class SessionController {
         log.info("세션 추가 컨트롤러 : {}", request.getDescription());
         AddSessionResponse response = sessionService.addSession(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PatchMapping(value = "/update", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateSession(@ModelAttribute UpdateSessionRequest request) throws ImageException {
+        sessionService.updateSession(request);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/number")

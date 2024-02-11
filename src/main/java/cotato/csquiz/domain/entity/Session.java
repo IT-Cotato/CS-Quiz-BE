@@ -61,11 +61,14 @@ public class Session {
     private CSEducation csEducation;
 
     @Builder
-    public Session(int number, String photoUrl, String description, Generation generation) {
+    public Session(int number, String photoUrl, String description, Generation generation,ItIssue itIssue, CSEducation csEducation, Networking networking) {
         this.number = number;
         this.photoUrl = photoUrl;
         this.description = description;
         this.generation = generation;
+        this.itIssue = itIssue;
+        this.csEducation = csEducation;
+        this.networking = networking;
     }
 
     public int changeSessionNum(int sessionNumber) {
@@ -81,5 +84,11 @@ public class Session {
     public long changePhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
         return this.id;
+    }
+
+    public void updateToggle(ItIssue itIssue, CSEducation csEducation, Networking networking) {
+        this.itIssue = itIssue;
+        this.csEducation = csEducation;
+        this.networking = networking;
     }
 }

@@ -2,9 +2,11 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
+import cotato.csquiz.domain.dto.session.DeleteSessionRequest;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.AppException;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,9 @@ public class SessionService {
                 .photoUrl(imageUrl)
                 .description(request.getDescription())
                 .generation(findGeneration)
+                .itIssue(request.getItIssue())
+                .csEducation(request.getCsEducation())
+                .networking(request.getNetworking())
                 .build();
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
@@ -54,6 +60,17 @@ public class SessionService {
                 .build();
     }
 
+    public void updateSession(UpdateSessionRequest request) throws ImageException {
+        Session session = findSessionById(request.getSessionId());
+
+        session.changeDescription(request.getDescription());
+        session.updateToggle(request.getItIssue(), request.getCsEducation(), request.getNetworking());
+        changePhoto(session, request.getSessionImage());
+    }
+
+    public void deleteSession(DeleteSessionRequest request) {
+    }
+
     private int calculateLastSessionNumber(Generation generation) {
         List<Session> allSession = sessionRepository.findAllByGeneration(generation);
         return allSession.stream().mapToInt(Session::getNumber).max()
@@ -62,25 +79,26 @@ public class SessionService {
 
     @Transactional
     public void changeSessionNum(SessionNumRequest request) {
-        //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeSessionNum(session.getNumber());
     }
 
     @Transactional
     public void changeDescription(SessionDescriptionRequest request) {
-        //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
         session.changeDescription(request.getDescription());
     }
 
     @Transactional
     public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
-        //운영진인지 확인하는 절차 TODO
         Session session = findSessionById(request.getSessionId());
+        changePhoto(session, request.getSessionImage());
+    }
+
+    private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
         String imageUrl;
-        if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+        if (sessionImage != null && !sessionImage.isEmpty()) {
+            imageUrl = s3Uploader.uploadFiles(sessionImage, "session");
         } else {
             throw new ImageException(ErrorCode.IMAGE_NOT_FOUND);
         }
