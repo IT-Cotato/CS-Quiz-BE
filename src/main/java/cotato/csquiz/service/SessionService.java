@@ -17,7 +17,6 @@ import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.SessionRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
