@@ -2,6 +2,7 @@ package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
+import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
@@ -66,5 +67,11 @@ public class SessionController {
     public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException {
         sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/cs-on")
+    public ResponseEntity<?> getSessionsWithCsEducationOn(@RequestParam Long generationId) {
+        List<CsEducationOnSessionNumberResponse> sessionNumbers = sessionService.findAllCsOnSessionsByGenerationId(generationId);
+        return ResponseEntity.status(HttpStatus.OK).body(sessionNumbers);
     }
 }
