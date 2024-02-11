@@ -9,6 +9,7 @@ import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
+import cotato.csquiz.repository.SessionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class GenerationService {
 
     private final GenerationRepository generationRepository;
+    private final SessionRepository sessionRepository;
 
     //기수 추가
     public AddGenerationResponse addGeneration(AddGenerationRequest request) {
@@ -32,6 +34,7 @@ public class GenerationService {
         checkNumberValid(request.getGenerationNumber());
         Generation generation = Generation.builder()
                 .number(request.getGenerationNumber())
+                .sessionCount(request.getSessionCount())
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
