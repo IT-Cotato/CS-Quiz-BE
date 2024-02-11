@@ -9,6 +9,7 @@ import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
+import cotato.csquiz.repository.SessionRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class GenerationService {
 
     private final GenerationRepository generationRepository;
+    private final SessionRepository sessionRepository;
 
     public AddGenerationResponse addGeneration(AddGenerationRequest request) {
-        LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
-        LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
-        checkPeriodValid(startDate, endDate);
+        checkPeriodValid(request.getStartDate(), request.getEndDate());
         checkNumberValid(request.getGenerationNumber());
         Generation generation = Generation.builder()
                 .number(request.getGenerationNumber())
-                .startDate(startDate)
-                .endDate(endDate)
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .sessionCount(request.getSessionCount())
                 .build();
         Generation savedGeneration = generationRepository.save(generation);
         return AddGenerationResponse.builder()
@@ -48,13 +49,11 @@ public class GenerationService {
     }
 
     public void changePeriod(ChangePeriodRequest request) {
-        LocalDate startDate = LocalDate.of(request.getStartYear(), request.getStartMonth(), request.getStartDay());
-        LocalDate endDate = LocalDate.of(request.getEndYear(), request.getEndMonth(), request.getEndDay());
-        checkPeriodValid(startDate, endDate);
+        checkPeriodValid(request.getStartDate(), request.getEndDate());
         Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
                 () -> new AppException(ErrorCode.DATA_NOTFOUND));
-        generation.changePeriod(startDate, endDate);
-        log.info("change date " + startDate + " " + endDate);
+        generation.changePeriod(request.getStartDate(), request.getEndDate());
+        log.info("change date " + request.getStartDate() + " " + request.getEndDate());
     }
 
     public List<GenerationInfoResponse> getGenerations() {
