@@ -29,35 +29,30 @@ public class SocketController {
         return ResponseEntity.ok().build();
     }
 
-    //문제 접근 허용
     @PatchMapping("/access")
     public ResponseEntity<?> accessQuiz(@RequestBody QuizSocketRequest request) {
         socketService.accessQuiz(request);
         return ResponseEntity.ok().build();
     }
 
-    //퀴즈 풀기 시작
     @PatchMapping("/start")
     public ResponseEntity<?> startQuiz(@RequestBody QuizSocketRequest request) {
         socketService.startQuiz(request);
         return ResponseEntity.ok().build();
     }
 
-    //문제 접근 차단
     @PatchMapping("/deny")
     public ResponseEntity<?> denyQuiz(@RequestBody QuizSocketRequest request) {
         socketService.denyQuiz(request);
         return ResponseEntity.ok().build();
     }
 
-    //퀴즈 풀기 닫기
     @PatchMapping("/stop")
     public ResponseEntity<?> stopQuiz(@RequestBody QuizSocketRequest request) {
         socketService.stopQuiz(request);
         return ResponseEntity.ok().build();
     }
 
-    //전체 문제 끄기
     @PatchMapping("/close/csquiz")
     public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
         socketService.stopAllQuiz(request);

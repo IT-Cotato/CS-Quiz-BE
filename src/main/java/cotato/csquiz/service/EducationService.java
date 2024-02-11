@@ -28,9 +28,7 @@ public class EducationService {
     private final SessionService sessionService;
     private final EducationRepository educationRepository;
 
-    //교육 추가
     public AddEducationResponse addEducation(AddEducationRequest request) {
-        //교원팀 권한인지 확인 TODO
         Session session = sessionService.findSessionById(request.getSessionId());
         checkEducationExist(session);
         Education education = Education.builder()
@@ -44,7 +42,6 @@ public class EducationService {
                 .build();
     }
 
-    //교육이 이미 존재하면 예외 발생
     private void checkEducationExist(Session session) {
         Optional<Education> education = educationRepository.findEducationBySession(session);
         if (education.isPresent()) {
@@ -52,7 +49,6 @@ public class EducationService {
         }
     }
 
-    //교육 상태(오픈여부) 가져오기
     public GetStatusResponse getStatus(long educationId) {
         Education education = findEducation(educationId);
         return GetStatusResponse.builder()
