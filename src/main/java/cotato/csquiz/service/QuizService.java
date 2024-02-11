@@ -101,7 +101,7 @@ public class QuizService {
     }
 
     private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes) {
-        log.info("요청된 객관식 문제의 수: {}개", shortQuizzes.size());
+        log.info("요청된 주관식 문제의 수: {}개", shortQuizzes.size());
         shortQuizzes.forEach(request -> {
             try {
                 createShortQuiz(findEducation, request);
