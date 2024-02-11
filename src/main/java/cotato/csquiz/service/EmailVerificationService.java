@@ -40,7 +40,7 @@ public class EmailVerificationService {
     public void sendVerificationCodeToEmail(String recipient, String subject) {
         emailFormValidator.validateEmailForm(recipient);
         String verificationCode = getVerificationCode();
-        log.info(verificationCode + " 인증 번호");
+        log.info("인증 번호 생성 완료");
         verificationCodeRedisRepository.saveCodeWithEmail(recipient, verificationCode);
         sendEmailWithVerificationCode(recipient, verificationCode, subject);
     }
@@ -67,7 +67,7 @@ public class EmailVerificationService {
             message.setText(getVerificationText(verificationCode), "utf-8", "html");
             message.setFrom(getInternetAddress());
             mailSender.send(message);
-
+            log.info("이메일 전송 완료");
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +92,7 @@ public class EmailVerificationService {
     public void verifyCode(String email, String code) {
         String savedVerificationCode = verificationCodeRedisRepository.getByEmail(email);
         validateEmailCodeMatching(savedVerificationCode, code);
-        log.info("[이메일 인증 완료]: 저장된 코드 == {}", savedVerificationCode);
+        log.info("[이메일 인증 완료]: 성공한 이메일 == {}", email);
     }
 
     private void validateEmailCodeMatching(String savedVerificationCode, String code) {

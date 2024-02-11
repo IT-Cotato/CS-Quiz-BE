@@ -41,8 +41,7 @@ public class AuthService {
         validateService.checkDuplicateEmail(request.getEmail());
         validateService.checkDuplicatePhoneNumber(request.getPhoneNumber());
 
-        log.info("[회원 가입 서비스] : {}, {}, {}", request.getEmail(), request.getPassword(), request.getPassword());
-
+        log.info("[회원 가입 서비스]: {}, {}", request.getEmail(), request.getPassword());
         Member newMember = Member.builder()
                 .email(request.getEmail())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))

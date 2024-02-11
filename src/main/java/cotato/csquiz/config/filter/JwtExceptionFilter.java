@@ -12,11 +12,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
+@Slf4j
 public class JwtExceptionFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -44,6 +44,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
 
     private void setErrorResponse(HttpServletResponse response, ErrorResponse errorResponse)
             throws IOException {
+        log.error("jwt토큰 인증 에러 발생, 타입 {}", errorResponse.message());
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         response.setStatus(errorResponse.status().value());
         response.setContentType("application/json; charset=UTF-8");
