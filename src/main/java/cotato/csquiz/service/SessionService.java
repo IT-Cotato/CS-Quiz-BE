@@ -2,7 +2,6 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
-import cotato.csquiz.domain.dto.session.DeleteSessionRequest;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
@@ -66,9 +65,6 @@ public class SessionService {
         session.changeDescription(request.getDescription());
         session.updateToggle(request.getItIssue(), request.getCsEducation(), request.getNetworking());
         changePhoto(session, request.getSessionImage());
-    }
-
-    public void deleteSession(DeleteSessionRequest request) {
     }
 
     private int calculateLastSessionNumber(Generation generation) {
