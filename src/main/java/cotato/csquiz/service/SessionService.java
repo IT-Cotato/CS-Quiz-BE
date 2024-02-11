@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class SessionService {
 
+    private static final String SESSION_BUCKET_DIRECTORY = "session";
     private final SessionRepository sessionRepository;
     private final GenerationRepository generationRepository;
     private final S3Uploader s3Uploader;
@@ -38,7 +39,7 @@ public class SessionService {
     public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
         String imageUrl = null;
         if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), SESSION_BUCKET_DIRECTORY);
         }
         Generation findGeneration = getGeneration(request.getGenerationId());
 
