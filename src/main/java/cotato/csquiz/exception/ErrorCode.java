@@ -40,7 +40,8 @@ public enum ErrorCode {
     MEMBER_CANT_ACCESS(HttpStatus.BAD_REQUEST, "해당 멤버의 ROLE로 접근할 수 없습니다"),
     RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
     JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "accessToken이 만료되었습니다."),
-    SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다.");
+    SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다."),
+    NO_GENERATION_EXIST(HttpStatus.CONFLICT, "오늘에 해당하는 기수가 없습니다");
 
     private final HttpStatus httpStatus;
     private final String message;
