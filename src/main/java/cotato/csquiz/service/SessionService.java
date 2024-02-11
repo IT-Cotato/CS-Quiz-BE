@@ -2,12 +2,14 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
+import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
+import cotato.csquiz.domain.enums.CSEducation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
@@ -27,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class SessionService {
 
+    private static final String SESSION_BUCKET_DIRECTORY = "session";
     private final SessionRepository sessionRepository;
     private final GenerationRepository generationRepository;
     private final S3Uploader s3Uploader;
@@ -35,7 +38,7 @@ public class SessionService {
     public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
         String imageUrl = null;
         if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), "session");
+            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), SESSION_BUCKET_DIRECTORY);
         }
         Generation findGeneration = getGeneration(request.getGenerationId());
 
@@ -115,5 +118,15 @@ public class SessionService {
     private Generation getGeneration(Long generationId) {
         return generationRepository.findById(generationId)
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+    }
+
+    public List<CsEducationOnSessionNumberResponse> findAllCsOnSessionsByGenerationId(Long generationId) {
+        Generation generation = generationRepository.findById(generationId)
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+        List<Session> sessions = sessionRepository.findAllByGeneration(generation);
+        return sessions.stream()
+                .filter(session -> session.getCsEducation() == CSEducation.CS_ON)
+                .map(CsEducationOnSessionNumberResponse::from)
+                .toList();
     }
 }

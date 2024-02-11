@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuizService {
 
+    private static final String QUIZ_BUCKET_DIRECTORY = "quiz";
     private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
@@ -76,7 +77,7 @@ public class QuizService {
             throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
+            imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
         MultipleQuiz createdMultipleQuiz = MultipleQuiz.builder()
                 .education(findEducation)
@@ -117,7 +118,7 @@ public class QuizService {
             throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
+            imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
         ShortQuiz createdShortQuiz = ShortQuiz.builder()
                 .education(findEducation)
