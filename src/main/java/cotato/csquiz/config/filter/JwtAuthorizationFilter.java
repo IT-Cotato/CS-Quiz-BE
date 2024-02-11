@@ -42,7 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void setAuthentication(String accessToken) {
-        log.info("setAuthentication");
+        log.info("jwt 기반 인증 진행");
         String email = jwtUtil.getEmail(accessToken);
         String role = jwtUtil.getRole(accessToken);
         log.info("Member Role: {}", role);
