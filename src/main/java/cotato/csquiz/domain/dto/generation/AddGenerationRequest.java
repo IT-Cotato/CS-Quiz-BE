@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public class AddGenerationRequest {
     private int generationNumber;
+    private int sessionCount;
     private int startYear;
     private int startMonth;
     private int startDay;

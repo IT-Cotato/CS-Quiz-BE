@@ -4,7 +4,9 @@ import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
 import cotato.csquiz.domain.dto.generation.AddGenerationResponse;
 import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
+import cotato.csquiz.domain.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.service.GenerationService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,8 @@ public class GenerationController {
 
     @GetMapping("")
     public ResponseEntity<?> getGenerations() {
-        return ResponseEntity.ok().body(generationService.getGenerations());
+        List<GenerationInfoResponse> generations = generationService.getGenerations();
+        return ResponseEntity.ok().body(generations);
     }
 
     @PostMapping("/add")
