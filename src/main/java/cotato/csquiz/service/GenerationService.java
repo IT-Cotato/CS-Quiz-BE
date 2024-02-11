@@ -62,6 +62,7 @@ public class GenerationService {
                 .map(GenerationInfoResponse::from)
                 .toList();
     }
+
     private void checkPeriodValid(LocalDate startDate, LocalDate endDate) {
         if (endDate.isBefore(startDate)) {
             log.info("날짜 오류");
