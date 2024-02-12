@@ -32,7 +32,7 @@ jobs:
         env:
           spring.datasource.url: ${{ secrets.DB_PATH }}
           spring.datasource.username: ${{ secrets.DB_USERNAME }}
-          spring.datasource.password: ${{ secrets.DB_PASSWORD }}
+          spring.datasource.password: ${{ secrets.DB_PWD }}
           spring.jpa.hibernate.ddl-auto: ${{ secrets.DDL_AUTO }}
           spring.mail.username: ${{ secrets.SENDER_EMAIL }}
           spring.mail.password: ${{ secrets.SENDER_PASSWORD }}
