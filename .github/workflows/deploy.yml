@@ -9,7 +9,7 @@ env:
   PROJECT_NAME: CS-Quiz-BE
   BUCKET_NAME: cotato-ci-cd-bucket
   CODE_DEPLOY_APP_NAME: cotato-server
-  DEPLOYMENT_GROUP_NAME: cotato-server-s3-code-deploy-group
+  DEPLOYMENT_GROUP_NAME: cotato-server-deploy
 
 jobs:
   build:
