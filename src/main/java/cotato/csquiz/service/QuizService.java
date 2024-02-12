@@ -208,15 +208,11 @@ public class QuizService {
     public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
         List<CsAdminQuizResponse> list = quizzes.stream()
-                .map(this::toQuizInAdmin)
+                .map(CsAdminQuizResponse::from)
                 .toList();
         return AllQuizzesInCsQuizResponse.builder()
                 .quizzes(list)
                 .build();
-    }
-
-    private CsAdminQuizResponse toQuizInAdmin(Quiz quiz) {
-        return CsAdminQuizResponse.from(quiz);
     }
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
@@ -268,13 +264,15 @@ public class QuizService {
     @Transactional
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
-        List<String> answerList;
-        if (quiz instanceof ShortQuiz) {
-            answerList = getShortQuizAnswer(quiz);
-        } else {
-            answerList = getMultipleQuizAnswer(quiz);
-        }
+        List<String> answerList = getAnswerList(quiz);
         return QuizInfoInCsQuizResponse.from(quiz, answerList);
+    }
+
+    private List<String> getAnswerList(Quiz quiz) {
+        if (quiz instanceof ShortQuiz) {
+            return getShortQuizAnswer(quiz);
+        }
+        return getMultipleQuizAnswer(quiz);
     }
 
     private List<String> getMultipleQuizAnswer(Quiz quiz) {
@@ -300,10 +298,9 @@ public class QuizService {
     private void addAnswerInRepository(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
             addShortAnswer((ShortQuiz) quiz, answer);
-        } else if (quiz instanceof MultipleQuiz) {
+        }
+        if (quiz instanceof MultipleQuiz) {
             updateChoiceCorrect((MultipleQuiz) quiz, answer);
-        } else {
-            throw new IllegalArgumentException("Unsupported quiz type");
         }
     }
 
@@ -318,22 +315,16 @@ public class QuizService {
     private void updateChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
         try {
             int choiceNumber = Integer.parseInt(answer);
-            Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber);
-            updateChoiceCorrect(choice);
+            Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber)
+                    .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
+            choice.changeCorrect(ChoiceCorrect.ANSWER);
         } catch (NumberFormatException e) {
             throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
         }
     }
 
-    private void updateChoiceCorrect(Choice choice) {
-        if (choice == null) {
-            throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
-        }
-        choice.changeCorrect(ChoiceCorrect.ANSWER);
-    }
-
     private Quiz findQuizById(Long quizId) {
-        return quizRepository.findById(quizId).orElseThrow(() ->
-                new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
     }
 }
