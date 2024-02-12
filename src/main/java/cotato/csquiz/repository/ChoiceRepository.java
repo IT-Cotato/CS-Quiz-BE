@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ChoiceRepository extends JpaRepository<Choice, Long> {
     List<Choice> findAllByMultipleQuiz(MultipleQuiz multipleQuiz);
+    Choice findByMultipleQuizAndChoiceNumber(MultipleQuiz multipleQuiz, int choiceNumber);
 }

@@ -1,5 +1,6 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
@@ -19,6 +20,7 @@ import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
+import cotato.csquiz.domain.enums.ChoiceCorrect;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -204,6 +206,7 @@ public class QuizService {
                 .build();
     }
 
+    @Transactional
     public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
         List<CsAdminQuizResponse> list = quizzes.stream()
@@ -257,17 +260,16 @@ public class QuizService {
 
     @Transactional
     public QuizResponse getQuiz(Long quizId) {
-        Quiz findQuiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
             return toMultipleQuizResponse(findQuiz);
         }
         return toShortQuizResponse(findQuiz);
     }
 
+    @Transactional
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
-                new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        Quiz quiz = findQuizById(quizId);
         List<String> answerList;
         if (quiz instanceof ShortQuiz) {
             answerList = getShortQuizAnswer(quiz);
@@ -289,5 +291,35 @@ public class QuizService {
         return allByShortQuiz.stream()
                 .map(ShortAnswer::getContent)
                 .toList();
+    }
+
+    @Transactional
+    public void addAdditionalAnswer(AddAdditionalAnswerRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        addAnswerInRepository(quiz, request.getAnswer());
+    }
+
+    private void addAnswerInRepository(Quiz quiz, String answer) {
+        if (quiz instanceof ShortQuiz) {
+            ShortAnswer shortAnswer = ShortAnswer.builder()
+                    .content(answer)
+                    .build();
+            shortAnswer.matchShortQuiz((ShortQuiz) quiz);
+            shortAnswerRepository.save(shortAnswer);
+        } else {
+            try {
+                Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(
+                        (MultipleQuiz) quiz, Integer.parseInt(answer));
+                choice.changeCorrect(ChoiceCorrect.ANSWER);
+            } catch (NumberFormatException e) {
+                throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
+            }
+        }
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
+                new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        return quiz;
     }
 }
