@@ -57,6 +57,6 @@ jobs:
       - name: Code Deploy
         run: aws deploy create-deployment \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
+          --application-name cotato-deploy \
           --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
           --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
