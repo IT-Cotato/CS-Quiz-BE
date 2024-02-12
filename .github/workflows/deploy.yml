@@ -51,7 +51,7 @@ jobs:
 
       # [6] 빌드한 jar파일 S3업로드
       - name: Upload to s3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{env.BUCKET_NAME}}/${{env.PROJECT_NAME}}/$GITHUB_SHA.zip
 
       # [7] CodeDeploy에 S3에서 jar 파일을 받아라
       - name: Code Deploy
@@ -59,4 +59,4 @@ jobs:
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
           --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
-          --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
+          --s3-location bucket=${{env.BUCKET_NAME}},bundleType=zip,key=$GITHUB_SHA.zip
