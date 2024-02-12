@@ -66,7 +66,7 @@ public class QuizController {
 
     @PostMapping("/csadmin/answer/add")
     public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
-        log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
+        log.info("추가적인 정답을 저장하고 재체점하는 컨트롤러");
         quizService.addAdditionalAnswer(request);
         //TODO redis에 정답 넣어야함
         recordService.reGradeRecords(request);
