@@ -50,23 +50,23 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/csadmin/all")
+    @GetMapping("/cs-admin/all")
     public ResponseEntity<?> getAllQuizzesInCsQuiz(@RequestParam("educationId") Long educationId) {
-        log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러 in CSAdmin");
+        log.info("특정 세션 관리자용 문제 반환 컨트롤러");
         AllQuizzesInCsQuizResponse allQuizzes = quizService.getAllQuizzesInCsQuiz(educationId);
         return ResponseEntity.ok(allQuizzes);
     }
 
-    @GetMapping("/csadmin")
+    @GetMapping("/cs-admin")
     public ResponseEntity<?> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
-        log.info("한 문제에 대한 정보 조회 컨트롤러 in CSAdmin");
+        log.info("관리자용 한 문제 조회 컨트롤러");
         QuizInfoInCsQuizResponse response = quizService.getQuizInCsQuiz(quizId);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/csadmin/answer/add")
+    @PostMapping("/cs-admin/answer/add")
     public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
-        log.info("추가적인 정답을 저장하고 재체점하는 컨트롤러");
+        log.info("정답 추가에 따른 재채점 컨트롤러");
         quizService.addAdditionalAnswer(request);
         //TODO redis에 정답 넣어야함
         recordService.reGradeRecords(request);
