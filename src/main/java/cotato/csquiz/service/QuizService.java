@@ -8,6 +8,7 @@ import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
@@ -31,7 +32,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -260,5 +263,31 @@ public class QuizService {
             return toMultipleQuizResponse(findQuiz);
         }
         return toShortQuizResponse(findQuiz);
+    }
+
+    public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
+                new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        List<String> answerList;
+        if (quiz instanceof ShortQuiz) {
+            answerList = getShortQuizAnswer(quiz);
+        } else {
+            answerList = getMultipleQuizAnswer(quiz);
+        }
+        return QuizInfoInCsQuizResponse.from(quiz, answerList);
+    }
+
+    private List<String> getMultipleQuizAnswer(Quiz quiz) {
+        List<Choice> allByMultipleQuiz = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+        return allByMultipleQuiz.stream()
+                .map(choice -> String.valueOf(choice.getChoiceNumber()))
+                .toList();
+    }
+
+    private List<String> getShortQuizAnswer(Quiz quiz) {
+        List<ShortAnswer> allByShortQuiz = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+        return allByShortQuiz.stream()
+                .map(ShortAnswer::getContent)
+                .toList();
     }
 }

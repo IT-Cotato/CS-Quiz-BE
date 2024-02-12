@@ -3,6 +3,7 @@ package cotato.csquiz.controller;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.service.QuizService;
 import lombok.RequiredArgsConstructor;
@@ -50,5 +51,12 @@ public class QuizController {
         log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
         AllQuizzesInCsQuizResponse allQuizzes = quizService.getAllQuizzesInCsQuiz(educationId);
         return ResponseEntity.ok(allQuizzes);
+    }
+
+    @GetMapping("/csadmin")
+    public ResponseEntity<?> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
+        log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
+        QuizInfoInCsQuizResponse response = quizService.getQuizInCsQuiz(quizId);
+        return ResponseEntity.ok(response);
     }
 }
