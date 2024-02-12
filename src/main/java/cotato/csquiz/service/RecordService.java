@@ -83,18 +83,21 @@ public class RecordService {
         Record fastestRecord = records.stream()
                 .min(Comparator.comparing(Record::getCreatedAt))
                 .orElse(null);
-        Scorer previousFastestRecord = scorerRepository.findByQuiz(quiz);
+        Scorer previousFastestScorer = scorerRepository.findByQuiz(quiz);
         if (fastestRecord != null) {
-            changeScorer(fastestRecord, previousFastestRecord);
+            changeScorer(fastestRecord, previousFastestScorer);
         }
         recordRepository.saveAll(records);
     }
 
-    private void changeScorer(Record fastestRecord, Scorer previousFastestRecord) {
-        if (previousFastestRecord == null || fastestRecord.getCreatedAt()
-                .isBefore(previousFastestRecord.getCreatedAt())) {
-            Scorer scorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
-            scorerRepository.save(scorer);
+    private void changeScorer(Record fastestRecord, Scorer previousFastestScorer) {
+        Record previousFastestRecord = recordRepository.findByMemberQuizAndMember(previousFastestScorer.getQuiz(),
+                previousFastestScorer.getMember());
+        if (previousFastestRecord == null
+                || fastestRecord.getTicketNumber() < previousFastestRecord.getTicketNumber()) {
+            Scorer newScorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
+            scorerRepository.delete(previousFastestScorer);
+            scorerRepository.save(newScorer);
         }
     }
 }
