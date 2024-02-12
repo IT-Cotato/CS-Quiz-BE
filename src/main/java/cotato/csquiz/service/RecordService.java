@@ -91,12 +91,14 @@ public class RecordService {
     }
 
     private void changeScorer(Record fastestRecord, Scorer previousFastestScorer) {
-        Record previousFastestRecord = recordRepository.findByMemberQuizAndMember(previousFastestScorer.getQuiz(),
-                previousFastestScorer.getMember());
+        List<Record> previousRecords = recordRepository.findAllByQuizAndMemberAndIsCorrect(previousFastestScorer.getQuiz(),
+                previousFastestScorer.getMember(), true);
+        Record previousFastestRecord = previousRecords.stream()
+                .min(Comparator.comparingLong(Record::getTicketNumber))
+                .orElse(null);
         if (previousFastestRecord == null
                 || fastestRecord.getTicketNumber() < previousFastestRecord.getTicketNumber()) {
-            Scorer newScorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
-            scorerRepository.delete(previousFastestScorer);
+            Scorer newScorer = previousFastestScorer.changeMember(fastestRecord.getMember());
             scorerRepository.save(newScorer);
         }
     }

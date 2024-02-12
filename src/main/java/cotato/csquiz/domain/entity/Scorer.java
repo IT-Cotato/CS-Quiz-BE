@@ -45,4 +45,9 @@ public class Scorer extends BaseTimeEntity {
     public static Scorer of(Member member, Quiz quiz) {
         return new Scorer(member, quiz);
     }
+
+    public Scorer changeMember(Member member) {
+        this.member = member;
+        return this;
+    }
 }
