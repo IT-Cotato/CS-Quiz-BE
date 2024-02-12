@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+
 env:
   PROJECT_NAME: CS-Quiz-BE
   BUCKET_NAME: cotato-ci-cd-bucket
