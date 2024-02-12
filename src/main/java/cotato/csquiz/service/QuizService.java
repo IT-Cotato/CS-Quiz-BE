@@ -34,9 +34,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -301,25 +299,41 @@ public class QuizService {
 
     private void addAnswerInRepository(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
-            ShortAnswer shortAnswer = ShortAnswer.builder()
-                    .content(answer)
-                    .build();
-            shortAnswer.matchShortQuiz((ShortQuiz) quiz);
-            shortAnswerRepository.save(shortAnswer);
+            addShortAnswer((ShortQuiz) quiz, answer);
+        } else if (quiz instanceof MultipleQuiz) {
+            updateChoiceCorrect((MultipleQuiz) quiz, answer);
         } else {
-            try {
-                Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(
-                        (MultipleQuiz) quiz, Integer.parseInt(answer));
-                choice.changeCorrect(ChoiceCorrect.ANSWER);
-            } catch (NumberFormatException e) {
-                throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
-            }
+            throw new IllegalArgumentException("Unsupported quiz type");
         }
     }
 
+    private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
+        ShortAnswer shortAnswer = ShortAnswer.builder()
+                .content(answer)
+                .build();
+        shortAnswer.matchShortQuiz(shortQuiz);
+        shortAnswerRepository.save(shortAnswer);
+    }
+
+    private void updateChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
+        try {
+            int choiceNumber = Integer.parseInt(answer);
+            Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber);
+            updateChoiceCorrect(choice);
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
+        }
+    }
+
+    private void updateChoiceCorrect(Choice choice) {
+        if (choice == null) {
+            throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
+        }
+        choice.changeCorrect(ChoiceCorrect.ANSWER);
+    }
+
     private Quiz findQuizById(Long quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
+        return quizRepository.findById(quizId).orElseThrow(() ->
                 new AppException(ErrorCode.QUIZ_NOT_FOUND));
-        return quiz;
     }
 }
