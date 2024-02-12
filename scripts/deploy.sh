@@ -1,16 +1,16 @@
 #!/bin/bash
 
-PROJECT_NAME = "CS-Quiz-BE"
-JAR_PATH = "/home/ubuntu/backend/$PROJECT_NAME/build/libs/*.jar"
-DEPLOY_PATH = /home/ubuntu/backend/$PROJECT_NAME/
-DEPLOY_LOG_PATH = "/home/ubuntu/backend/$PROJECT_NAME/deploy.log"
-DEPLOY_ERR_LOG_PATH = "/home/ubuntu/backend/$PROJECT_NAME/deploy_err.log"
-APPLICATION_LOG_PATH = "/home/ubuntu/backend/$PROJECT_NAME/application.log"
+PROJECT_NAME="CS-Quiz-BE"
+JAR_PATH="/home/ubuntu/backend/$PROJECT_NAME/build/libs/*.jar"
+DEPLOY_PATH=/home/ubuntu/backend/$PROJECT_NAME/
+DEPLOY_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy.log"
+DEPLOY_ERR_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy_err.log"
+APPLICATION_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/application.log"
 BUILD_JAR=$(ls $JAR_PATH)
 JAR_NAME=$(basename $BUILD_JAR)
 
 
-echo "=========== 배포 시작 : ${date + %c} ===========" >> $DEPLOY_LOG_PATH
+echo "=========== 배포 시작 : $(date +%c) ===========" >> $DEPLOY_LOG_PATH
 
 echo "> build 파일명: $JAR_NAME" >> $DEPLOY_LOG_PATH
 echo "> build 파일 복사" >> $DEPLOY_LOG_PATH
@@ -32,7 +32,7 @@ fi
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo "> DEPLOY_JAR 배포" >> $DEPLOY_LOG_PATH
 
-nohup java -jar $DEPLOY_JAR --server.port = 8080>> APPLICATION_LOG_PATH >> 2> $DEPLOY_ERR_LOG_PATH &
+nohup java -jar -Dspring.profiles.active=local $DEPLOY_JAR --server.port=8080  >> $APPLICATION_LOG_PATH 2> $DEPLOY_ERR_LOG_PATH &
 
 sleep 3
 echo "> 배포 종료 : $(date +%c)" >> $DEPLOY_LOG_PATH
