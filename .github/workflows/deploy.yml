@@ -8,8 +8,8 @@ on:
 env:
   PROJECT_NAME: CS-Quiz-BE
   BUCKET_NAME: cotato-ci-cd-bucket
-  CODE_DEPLOY_APP_NAME: cotato-server
-  DEPLOYMENT_GROUP_NAME: cotato-server-deploy
+  CODE_DEPLOY_APP_NAME: cotato-deploy
+  DEPLOYMENT_GROUP_NAME: cotato-deploy-group
 
 jobs:
   build:
