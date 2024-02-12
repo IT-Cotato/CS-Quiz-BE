@@ -39,7 +39,7 @@ public class QuizAnswerRedisRepository {
     public void saveAdditionalQuizAnswer(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
             ShortAnswer shortAnswer = shortAnswerRepository.findByShortQuizAndContent((ShortQuiz) quiz, answer);
-            saveAdditionalShortQuizAnswer(quiz, shortAnswer);
+            saveAdditionalShortQuizAnswer(quiz, shortAnswer.getContent());
         }
         if (quiz instanceof MultipleQuiz) {
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber((MultipleQuiz) quiz,
@@ -59,7 +59,7 @@ public class QuizAnswerRedisRepository {
         );
     }
 
-    private void saveAdditionalShortQuizAnswer(Quiz quiz, ShortAnswer answer) {
+    private void saveAdditionalShortQuizAnswer(Quiz quiz, String answer) {
         String quizKey = KEY_PREFIX + quiz.getId();
         redisTemplate.opsForList()
                 .rightPush(quizKey, answer);

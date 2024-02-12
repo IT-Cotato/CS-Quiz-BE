@@ -64,8 +64,7 @@ public class RecordService {
     }
 
     private Quiz findQuizById(Long quizId) {
-        return quizRepository.findById(quizId)
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        return quizRepository.findById(quizId).orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
     }
 
     private void validateQuizOpen(Quiz findQuiz) {
@@ -85,27 +84,47 @@ public class RecordService {
         Quiz quiz = findQuizById(request.getQuizId());
         List<Record> records = recordRepository.findAllByQuizAndReply(quiz, request.getAnswer());
         records.forEach(record -> record.changeCorrect(true));
-        Record fastestRecord = records.stream()
-                .min(Comparator.comparing(Record::getCreatedAt))
-                .orElse(null);
+        Record fastestRecord = records.stream().min(Comparator.comparing(Record::getTicketNumber)).orElse(null);
         Scorer previousFastestScorer = scorerRepository.findByQuiz(quiz);
+        recordRepository.saveAll(records);
         if (fastestRecord != null) {
             changeScorer(fastestRecord, previousFastestScorer);
         }
-        recordRepository.saveAll(records);
     }
 
     private void changeScorer(Record fastestRecord, Scorer previousFastestScorer) {
-        List<Record> previousRecords = recordRepository.findAllByQuizAndMemberAndIsCorrect(
-                previousFastestScorer.getQuiz(),
-                previousFastestScorer.getMember(), true);
-        Record previousFastestRecord = previousRecords.stream()
-                .min(Comparator.comparingLong(Record::getTicketNumber))
-                .orElse(null);
-        if (previousFastestRecord == null
-                || fastestRecord.getTicketNumber() < previousFastestRecord.getTicketNumber()) {
-            Scorer newScorer = previousFastestScorer.changeMember(fastestRecord.getMember());
+        if (shouldChangeScorer(fastestRecord, previousFastestScorer)) {
+            Scorer newScorer = (previousFastestScorer == null)
+                    ? createScorer(fastestRecord)
+                    : changeScorerMember(previousFastestScorer, fastestRecord.getMember());
             scorerRepository.save(newScorer);
         }
+    }
+
+    private boolean shouldChangeScorer(Record fastestRecord, Scorer previousFastestScorer) {
+        return previousFastestScorer == null
+                || isFastestRecord(fastestRecord, previousFastestScorer);
+    }
+
+    private boolean isFastestRecord(Record fastestRecord, Scorer previousFastestScorer) {
+        Record previousFastestRecord = findPreviousFastestRecord(previousFastestScorer);
+        return previousFastestRecord == null
+                || fastestRecord.getTicketNumber() < previousFastestRecord.getTicketNumber();
+    }
+
+    private Record findPreviousFastestRecord(Scorer previousFastestScorer) {
+        List<Record> previousRecords = recordRepository.findAllByQuizAndMemberAndIsCorrect(
+                previousFastestScorer.getQuiz(), previousFastestScorer.getMember(), true);
+        return previousRecords.stream()
+                .min(Comparator.comparingLong(Record::getTicketNumber))
+                .orElse(null);
+    }
+
+    private Scorer createScorer(Record fastestRecord) {
+        return Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
+    }
+
+    private Scorer changeScorerMember(Scorer previousFastestScorer, Member member) {
+        return previousFastestScorer.changeMember(member);
     }
 }
