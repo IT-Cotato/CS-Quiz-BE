@@ -53,7 +53,7 @@ public class Record extends BaseTimeEntity {
         return new Record(reply, isCorrect, member, quiz, ticketNumber);
     }
 
-    public void changeCorrect(boolean b) {
-        this.isCorrect = b;
+    public void changeCorrect(boolean isCorrect) {
+        this.isCorrect = isCorrect;
     }
 }
