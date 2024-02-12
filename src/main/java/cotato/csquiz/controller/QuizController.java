@@ -7,6 +7,7 @@ import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.service.QuizService;
+import cotato.csquiz.service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QuizController {
 
     private final QuizService quizService;
+    private final RecordService recordService;
 
     @PostMapping(value = "/adds", consumes = "multipart/form-data")
     public ResponseEntity<?> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
@@ -66,7 +68,8 @@ public class QuizController {
     public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
         log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
         quizService.addAdditionalAnswer(request);
-        //TODO redis에 정답 넣어야함, 재채점 로직도 실행해야 함
+        //TODO redis에 정답 넣어야함
+        recordService.reGradeRecords(request);
         return ResponseEntity.ok().build();
     }
 }

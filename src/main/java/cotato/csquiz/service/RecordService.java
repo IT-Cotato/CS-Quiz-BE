@@ -1,5 +1,6 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
 import cotato.csquiz.domain.dto.record.ReplyRequest;
 import cotato.csquiz.domain.dto.record.ReplyResponse;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
@@ -16,6 +17,8 @@ import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.utils.QuizAnswerRedisRepository;
 import cotato.csquiz.utils.ScorerExistRedisRepository;
 import cotato.csquiz.utils.TicketCountRedisRepository;
+import java.util.Comparator;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,8 +40,7 @@ public class RecordService {
 
     @Transactional
     public ReplyResponse replyToQuiz(ReplyRequest request) {
-        Quiz findQuiz = quizRepository.findById(request.quizId())
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        Quiz findQuiz = findQuizById(request.quizId());
         validateQuizOpen(findQuiz);
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
@@ -56,6 +58,11 @@ public class RecordService {
         return ReplyResponse.from(isCorrect);
     }
 
+    private Quiz findQuizById(Long quizId) {
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+    }
+
     private void validateQuizOpen(Quiz findQuiz) {
         if (findQuiz.isOff() || !findQuiz.isStart()) {
             throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
@@ -66,5 +73,27 @@ public class RecordService {
     public void saveAnswers(QuizOpenRequest request) {
         scorerExistRedisRepository.saveAllScorerNone(request.getEducationId());
         quizAnswerRedisRepository.saveAllQuizAnswers(request.getEducationId());
+    }
+
+    @Transactional
+    public void reGradeRecords(AddAdditionalAnswerRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        List<Record> records = recordRepository.findAllByQuizAndReply(quiz, request.getAnswer());
+        records.forEach(record -> record.changeCorrect(true));
+        Record fastestRecord = records.stream()
+                .min(Comparator.comparing(Record::getCreatedAt))
+                .orElse(null);
+        Scorer previousFastestRecord = scorerRepository.findByQuiz(quiz);
+        if (fastestRecord!=null) {
+            changeScorer(fastestRecord, previousFastestRecord);
+        }
+        recordRepository.saveAll(records);
+    }
+
+    private void changeScorer(Record fastestRecord, Scorer previousFastestRecord) {
+        if (previousFastestRecord == null || fastestRecord.getCreatedAt().isBefore(previousFastestRecord.getCreatedAt())) {
+            Scorer scorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
+            scorerRepository.save(scorer);
+        }
     }
 }

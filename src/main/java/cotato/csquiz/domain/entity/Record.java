@@ -52,4 +52,8 @@ public class Record extends BaseTimeEntity {
     public static Record of(String reply, Boolean isCorrect, Member member, Quiz quiz, Long ticketNumber) {
         return new Record(reply, isCorrect, member, quiz, ticketNumber);
     }
+
+    public void changeCorrect(boolean b) {
+        this.isCorrect = b;
+    }
 }
