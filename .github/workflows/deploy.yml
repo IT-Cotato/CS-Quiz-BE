@@ -3,8 +3,7 @@ name: CI
 on:
   push:
     branches: [ "develop" ]
-  pull_request:
-    branches: [ "develop" ]
+
 env:
   PROJECT_NAME: CS-Quiz-BE
   BUCKET_NAME: cotato-ci-cd-bucket
@@ -55,4 +54,4 @@ jobs:
 
       # [7] CodeDeploy에 S3에서 파일 받고 배포
       - name: Code Deploy
-        run: aws deploy create-deployment --deployment-config-name CodeDeployDefault.AllAtOnce --application-name ${{ env.CODE_DEPLOY_APP_NAME }} --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
+        run: aws deploy create-deployment --deployment-config-name CodeDeployDefault.AllAtOnce --application-name ${{ env.CODE_DEPLOY_APP_NAME }} --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} --s3-location bucket=${{ env.BUCKET_NAME }}/${{ env.PROJECT_NAME }},bundleType=zip,key=$GITHUB_SHA.zip
