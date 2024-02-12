@@ -25,7 +25,7 @@ jobs:
           distribution: 'zulu'
 
       # [1] Set up Yaml File
-      - name: Set up Yaml File
+      #      - name: Set up Yaml File
 
       # [2] 실행 권한 부여
       - name: Grant permission for gradlew
