@@ -68,7 +68,7 @@ public class QuizController {
     public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
         log.info("정답 추가에 따른 재채점 컨트롤러");
         quizService.addAdditionalAnswer(request);
-        //TODO redis에 정답 넣어야함
+        recordService.addAdditionalAnswerRedis(request);
         recordService.reGradeRecords(request);
         return ResponseEntity.ok().build();
     }

@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ShortAnswerRepository extends JpaRepository<ShortAnswer, Long> {
     List<ShortAnswer> findAllByShortQuiz(ShortQuiz shortQuiz);
+
+    ShortAnswer findByShortQuizAndContent(ShortQuiz quiz, String answer);
 }

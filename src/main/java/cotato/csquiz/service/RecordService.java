@@ -58,6 +58,11 @@ public class RecordService {
         return ReplyResponse.from(isCorrect);
     }
 
+    public void addAdditionalAnswerRedis(AddAdditionalAnswerRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, request.getAnswer());
+    }
+
     private Quiz findQuizById(Long quizId) {
         return quizRepository.findById(quizId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
@@ -91,7 +96,8 @@ public class RecordService {
     }
 
     private void changeScorer(Record fastestRecord, Scorer previousFastestScorer) {
-        List<Record> previousRecords = recordRepository.findAllByQuizAndMemberAndIsCorrect(previousFastestScorer.getQuiz(),
+        List<Record> previousRecords = recordRepository.findAllByQuizAndMemberAndIsCorrect(
+                previousFastestScorer.getQuiz(),
                 previousFastestScorer.getMember(), true);
         Record previousFastestRecord = previousRecords.stream()
                 .min(Comparator.comparingLong(Record::getTicketNumber))

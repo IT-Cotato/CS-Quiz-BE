@@ -6,6 +6,8 @@ import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
+import cotato.csquiz.exception.AppException;
+import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
@@ -32,6 +34,36 @@ public class QuizAnswerRedisRepository {
     public void saveAllQuizAnswers(Long educationId) {
         List<Quiz> allQuizzes = quizRepository.findAllByEducationId(educationId);
         allQuizzes.forEach(this::saveQuizAnswer);
+    }
+
+    public void saveAdditionalQuizAnswer(Quiz quiz, String answer) {
+        if (quiz instanceof ShortQuiz) {
+            ShortAnswer shortAnswer = shortAnswerRepository.findByShortQuizAndContent((ShortQuiz) quiz, answer);
+            saveAdditionalShortQuizAnswer(quiz, shortAnswer);
+        }
+        if (quiz instanceof MultipleQuiz) {
+            Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber((MultipleQuiz) quiz,
+                            Integer.parseInt(answer))
+                    .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
+            saveAdditionalMultipleQuizAnswer(quiz, choice.getChoiceNumber());
+        }
+    }
+
+    private void saveAdditionalMultipleQuizAnswer(Quiz quiz, int answerNumber) {
+        String quizKey = KEY_PREFIX + quiz.getId();
+        redisTemplate.opsForValue().set(
+                quizKey,
+                answerNumber,
+                QUIZ_ANSWER_EXPIRATION_TIME,
+                TimeUnit.MINUTES
+        );
+    }
+
+    private void saveAdditionalShortQuizAnswer(Quiz quiz, ShortAnswer answer) {
+        String quizKey = KEY_PREFIX + quiz.getId();
+        redisTemplate.opsForList()
+                .rightPush(quizKey, answer);
+        redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
     private void saveQuizAnswer(Quiz quiz) {
