@@ -84,14 +84,15 @@ public class RecordService {
                 .min(Comparator.comparing(Record::getCreatedAt))
                 .orElse(null);
         Scorer previousFastestRecord = scorerRepository.findByQuiz(quiz);
-        if (fastestRecord!=null) {
+        if (fastestRecord != null) {
             changeScorer(fastestRecord, previousFastestRecord);
         }
         recordRepository.saveAll(records);
     }
 
     private void changeScorer(Record fastestRecord, Scorer previousFastestRecord) {
-        if (previousFastestRecord == null || fastestRecord.getCreatedAt().isBefore(previousFastestRecord.getCreatedAt())) {
+        if (previousFastestRecord == null || fastestRecord.getCreatedAt()
+                .isBefore(previousFastestRecord.getCreatedAt())) {
             Scorer scorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
             scorerRepository.save(scorer);
         }
