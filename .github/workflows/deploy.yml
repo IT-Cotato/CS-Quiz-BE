@@ -57,6 +57,10 @@ jobs:
       - name: Code Deploy
         run: aws deploy create-deployment \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --application-name ${{env.CODE_DEPLOY_APP_NAME}} \
-          --deployment-group-name ${{env.DEPLOYMENT_GROUP_NAME}} \
+          --application-name ${{ env.CODE_DEPLOY_APP_NAME }} \
+          --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }} \
           --s3-location bucket=$BUCKET_NAME,bundleType=zip,key=$GITHUB_SHA.zip
+
+      - name: Success
+        run: echo "> ${{ env.CODE_DEPLOY_APP_NAME }} 실행완료!"
+        shell: bash
