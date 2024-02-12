@@ -1,5 +1,6 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
@@ -42,5 +43,12 @@ public class QuizController {
         log.info("특정 퀴즈 반환 컨트롤러");
         QuizResponse response = quizService.getQuiz(quizId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/csadmin/all")
+    public ResponseEntity<?> getAllQuizzesInCsQuiz(@RequestParam("educationId") Long educationId) {
+        log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
+        AllQuizzesInCsQuizResponse allQuizzes = quizService.getAllQuizzesInCsQuiz(educationId);
+        return ResponseEntity.ok(allQuizzes);
     }
 }

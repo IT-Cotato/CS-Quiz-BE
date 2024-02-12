@@ -1,9 +1,11 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
+import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
@@ -197,6 +199,20 @@ public class QuizService {
                 .multiples(multiples)
                 .shortQuizzes(shortQuizzes)
                 .build();
+    }
+
+    public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        List<CsAdminQuizResponse> list = quizzes.stream()
+                .map(this::toQuizInAdmin)
+                .toList();
+        return AllQuizzesInCsQuizResponse.builder()
+                .quizzes(list)
+                .build();
+    }
+
+    private CsAdminQuizResponse toQuizInAdmin(Quiz quiz) {
+        return CsAdminQuizResponse.from(quiz);
     }
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
