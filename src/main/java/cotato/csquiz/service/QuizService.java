@@ -207,12 +207,10 @@ public class QuizService {
     @Transactional
     public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
-        List<CsAdminQuizResponse> list = quizzes.stream()
+        List<CsAdminQuizResponse> responses = quizzes.stream()
                 .map(CsAdminQuizResponse::from)
                 .toList();
-        return AllQuizzesInCsQuizResponse.builder()
-                .quizzes(list)
-                .build();
+        return AllQuizzesInCsQuizResponse.from(responses);
     }
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
@@ -264,8 +262,8 @@ public class QuizService {
     @Transactional
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
-        List<String> answerList = getAnswerList(quiz);
-        return QuizInfoInCsQuizResponse.from(quiz, answerList);
+        List<String> answers = getAnswerList(quiz);
+        return QuizInfoInCsQuizResponse.from(quiz, answers);
     }
 
     private List<String> getAnswerList(Quiz quiz) {
@@ -276,15 +274,15 @@ public class QuizService {
     }
 
     private List<String> getMultipleQuizAnswer(Quiz quiz) {
-        List<Choice> allByMultipleQuiz = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
-        return allByMultipleQuiz.stream()
+        List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+        return choices.stream()
                 .map(choice -> String.valueOf(choice.getChoiceNumber()))
                 .toList();
     }
 
     private List<String> getShortQuizAnswer(Quiz quiz) {
-        List<ShortAnswer> allByShortQuiz = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
-        return allByShortQuiz.stream()
+        List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+        return shortAnswers.stream()
                 .map(ShortAnswer::getContent)
                 .toList();
     }
@@ -300,7 +298,7 @@ public class QuizService {
             addShortAnswer((ShortQuiz) quiz, answer);
         }
         if (quiz instanceof MultipleQuiz) {
-            updateChoiceCorrect((MultipleQuiz) quiz, answer);
+            addChoiceCorrect((MultipleQuiz) quiz, answer);
         }
     }
 
@@ -312,7 +310,7 @@ public class QuizService {
         shortAnswerRepository.save(shortAnswer);
     }
 
-    private void updateChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
+    private void addChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
         try {
             int choiceNumber = Integer.parseInt(answer);
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber)

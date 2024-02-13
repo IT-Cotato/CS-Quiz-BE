@@ -58,7 +58,8 @@ public class RecordService {
         return ReplyResponse.from(isCorrect);
     }
 
-    public void addAdditionalAnswerRedis(AddAdditionalAnswerRequest request) {
+    @Transactional
+    public void addAdditionalAnswerToRedis(AddAdditionalAnswerRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, request.getAnswer());
     }
@@ -84,7 +85,9 @@ public class RecordService {
         Quiz quiz = findQuizById(request.getQuizId());
         List<Record> records = recordRepository.findAllByQuizAndReply(quiz, request.getAnswer());
         records.forEach(record -> record.changeCorrect(true));
-        Record fastestRecord = records.stream().min(Comparator.comparing(Record::getTicketNumber)).orElse(null);
+        Record fastestRecord = records.stream()
+                .min(Comparator.comparing(Record::getTicketNumber))
+                .orElse(null);
         Scorer previousFastestScorer = scorerRepository.findByQuiz(quiz);
         recordRepository.saveAll(records);
         if (fastestRecord != null) {
