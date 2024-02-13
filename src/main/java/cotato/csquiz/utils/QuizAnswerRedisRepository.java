@@ -38,7 +38,8 @@ public class QuizAnswerRedisRepository {
 
     public void saveAdditionalQuizAnswer(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
-            ShortAnswer shortAnswer = shortAnswerRepository.findByShortQuizAndContent((ShortQuiz) quiz, answer);
+            ShortAnswer shortAnswer = shortAnswerRepository.findByShortQuizAndContent((ShortQuiz) quiz, answer)
+                    .orElseThrow(() -> new AppException(ErrorCode.CONTENT_IS_NOT_ANSWER));
             saveAdditionalShortQuizAnswer(quiz, shortAnswer.getContent());
         }
         if (quiz instanceof MultipleQuiz) {

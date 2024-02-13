@@ -304,11 +304,19 @@ public class QuizService {
     }
 
     private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
+        checkAnswerAlreadyExist(shortQuiz, answer);
         ShortAnswer shortAnswer = ShortAnswer.builder()
                 .content(answer)
                 .build();
         shortAnswer.matchShortQuiz(shortQuiz);
         shortAnswerRepository.save(shortAnswer);
+    }
+
+    private void checkAnswerAlreadyExist(ShortQuiz shortQuiz, String answer) {
+        shortAnswerRepository.findByShortQuizAndContent(shortQuiz, answer)
+                .ifPresent(existingAnswer -> {
+                    throw new AppException(ErrorCode.CONTENT_IS_ALREADY_ANSWER);
+                });
     }
 
     private void addChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
