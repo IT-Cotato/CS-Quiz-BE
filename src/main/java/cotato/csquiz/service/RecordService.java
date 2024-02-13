@@ -1,8 +1,11 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.domain.dto.record.RecordResponse;
+import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
 import cotato.csquiz.domain.dto.record.ReplyRequest;
 import cotato.csquiz.domain.dto.record.ReplyResponse;
+import cotato.csquiz.domain.dto.record.ScorerResponse;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
@@ -19,6 +22,7 @@ import cotato.csquiz.utils.ScorerExistRedisRepository;
 import cotato.csquiz.utils.TicketCountRedisRepository;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -137,5 +141,28 @@ public class RecordService {
 
     private Scorer changeScorerMember(Scorer previousFastestScorer, Member member) {
         return previousFastestScorer.changeMember(member);
+    }
+
+    @Transactional
+    public RecordsAndScorerResponse getRecordsAndScorer(Long quizId) {
+        Quiz findQuiz = findQuizById(quizId);
+        List<RecordResponse> records = getRecordByQuiz(findQuiz);
+        Optional<Scorer> scorer = scorerRepository.findByQuiz(findQuiz);
+        if (scorer.isPresent()) {
+            log.info("[기존 득점자 존재]");
+            return RecordsAndScorerResponse.from(records,
+                    ScorerResponse.from(scorerRepository.findByQuiz(findQuiz).get()));
+        }
+        log.info("[응답과 득점자 반환 서비스]");
+        return RecordsAndScorerResponse.from(records, null);
+    }
+
+    private List<RecordResponse> getRecordByQuiz(Quiz quiz) {
+        List<Record> records = recordRepository.findAllByQuiz(quiz);
+        log.info("[문제에 모든 응답 반환 서비스]");
+        return records.stream()
+                .sorted(Comparator.comparing(Record::getTicketNumber))
+                .map(RecordResponse::from)
+                .toList();
     }
 }
