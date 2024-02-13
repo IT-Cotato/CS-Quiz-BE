@@ -8,6 +8,10 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
+    List<Record> findAllByQuizAndIsCorrect(Quiz quiz, boolean isCorrect);
+
+    List<Record> findAllByQuizAndIsCorrectAndMember(Quiz quiz, boolean isCorrect, Member member);
+    
     List<Record> findAllByQuizAndReply(Quiz quiz, String answer);
 
     List<Record> findAllByQuiz(Quiz quiz);
