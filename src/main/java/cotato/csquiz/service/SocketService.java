@@ -45,6 +45,7 @@ public class SocketService {
         Quiz quiz = findQuizById(request.getQuizId());
         isQuizStatusTrue(quiz);
         quiz.updateStart(true);
+        sleepRandomTime(quiz);
         webSocketHandler.startQuiz(quiz.getId());
     }
 
@@ -90,5 +91,13 @@ public class SocketService {
     private Education findEducationById(long educationId) {
         return educationRepository.findById(educationId).orElseThrow(
                 () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+    }
+
+    private void sleepRandomTime(Quiz quiz) {
+        try {
+            Thread.sleep(1000L * quiz.getAppearSecond());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
