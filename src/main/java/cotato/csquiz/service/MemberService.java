@@ -24,8 +24,7 @@ public class MemberService {
     public MemberInfoResponse getMemberInfo(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-        int numberLength = findMember.getPhoneNumber().length();
-        String lastFourNumber = findMember.getPhoneNumber().substring(numberLength - 4);
+        String lastFourNumber = findMember.getBackFourNumber();
         log.info("이름 + 번호 4자리: {}({})", findMember.getName(), lastFourNumber);
 
         return MemberInfoResponse.builder()

@@ -83,4 +83,9 @@ public class Member extends BaseTimeEntity {
     public void updatePosition(MemberPosition position) {
         this.position = position;
     }
+
+    public String getBackFourNumber() {
+        int numberLength = phoneNumber.length();
+        return phoneNumber.substring(numberLength - 4);
+    }
 }
