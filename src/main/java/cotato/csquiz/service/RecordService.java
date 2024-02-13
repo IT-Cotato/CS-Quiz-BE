@@ -53,7 +53,7 @@ public class RecordService {
         validateAlreadyCorrect(findQuiz, findMember);
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
-        if (isCorrect && !scorerExistRedisRepository.isExist(findQuiz)) {
+        if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
             Scorer scorer = Scorer.of(findMember, findQuiz);
             log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
@@ -142,7 +142,7 @@ public class RecordService {
         List<RecordResponse> records = getRecordByQuiz(findQuiz);
         Optional<Scorer> scorer = scorerRepository.findByQuiz(findQuiz);
         if (scorer.isPresent()) {
-            log.info("[기존 득점자 존재]");
+            log.info("[기존 득점자 존재]: {}", scorer.get().getMember().getName());
             return RecordsAndScorerResponse.from(records,
                     ScorerResponse.from(scorer.get()));
         }
