@@ -25,21 +25,19 @@ public class MyPageController {
     @GetMapping("/hall-of-fame")
     public ResponseEntity<?> getHallOfFame(@RequestParam("generationId") Long generationId,
                                            @RequestHeader("Authorization") String authorizationHeader) {
-        log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
-        String email = emailFromAuth(authorizationHeader);
+        log.info("명예의 전당 정보 전달 API");
+        String accessToken = jwtUtil.getBearer(authorizationHeader);
+        String email = jwtUtil.getEmail(accessToken);
         HallOfFameResponse response = myPageService.getHallOfFame(generationId, email);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/member-info")
     public ResponseEntity<?> userInfo(@RequestHeader("Authorization") String authorizationHeader) {
-        String email = emailFromAuth(authorizationHeader);
+        log.info("멤버 정보 전달 API");
+        String accessToken = jwtUtil.getBearer(authorizationHeader);
+        String email = jwtUtil.getEmail(accessToken);
         MyPageMemberInfoResponse response = myPageService.getMemberInfo(email);
         return ResponseEntity.ok(response);
-    }
-
-    private String emailFromAuth(String authorizationHeader) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
-        return jwtUtil.getEmail(accessToken);
     }
 }
