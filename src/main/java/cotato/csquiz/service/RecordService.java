@@ -44,7 +44,7 @@ public class RecordService {
         validateQuizOpen(findQuiz);
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-
+        validateAlreadyCorrect(findQuiz, findMember);
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
         if (isCorrect && !scorerExistRedisRepository.isExist(findQuiz)) {
@@ -56,6 +56,14 @@ public class RecordService {
         Record createdRecord = Record.of(request.input(), isCorrect, findMember, findQuiz, ticketNumber);
         recordRepository.save(createdRecord);
         return ReplyResponse.from(isCorrect);
+    }
+
+    private void validateAlreadyCorrect(Quiz findQuiz, Member findMember) {
+        if (recordRepository.findByQuizAndMemberAndIsCorrect(findQuiz, findMember, true).isPresent()) {
+            log.warn("이미 해당 문제에 정답 제출한 사용자입니다.");
+            log.warn("문제 번호: {}, 제출한 멤버: {}", findQuiz.getNumber(), findMember.getName());
+            throw new AppException(ErrorCode.ALREADY_REPLY_CORRECT);
+        }
     }
 
     @Transactional

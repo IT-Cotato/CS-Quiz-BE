@@ -41,7 +41,8 @@ public enum ErrorCode {
     RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
     JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "accessToken이 만료되었습니다."),
     SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다."),
-    ANSWER_VALIDATION_FAULT(HttpStatus.BAD_REQUEST,"사용될 수 없는 정답");
+    ANSWER_VALIDATION_FAULT(HttpStatus.BAD_REQUEST, "사용될 수 없는 정답"),
+    ALREADY_REPLY_CORRECT(HttpStatus.BAD_REQUEST, "이미 해당 문제에 정답 처리되셨습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
