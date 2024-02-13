@@ -69,7 +69,6 @@ public class QuizController {
         log.info("정답 추가에 따른 재채점 컨트롤러");
         quizService.addAdditionalAnswer(request);
         recordService.addAdditionalAnswerToRedis(request);
-        recordService.reGradeRecords(request);
         return ResponseEntity.ok().build();
     }
 }

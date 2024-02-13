@@ -33,13 +33,17 @@ public class ScorerExistRedisRepository {
         );
     }
 
-    public void saveScorer(Quiz quiz) {
+    public void saveScorer(Quiz quiz, Long ticketNumber) {
         String quizKey = KEY_PREFIX + quiz.getId();
-        redisTemplate.opsForValue().set(quizKey, true);
+        redisTemplate.opsForValue().set(quizKey, ticketNumber);
     }
 
     public boolean isExist(Quiz quiz) {
         String quizKey = KEY_PREFIX + quiz.getId();
         return Objects.equals(redisTemplate.opsForValue().get(quizKey), true);
+    }
+
+    public Long getScorerTicketNumber(Quiz quiz) {
+        return (Long) redisTemplate.opsForValue().get(quiz.getId());
     }
 }

@@ -1,6 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
+import cotato.csquiz.domain.dto.record.RegradeRequest;
 import cotato.csquiz.domain.dto.record.ReplyRequest;
 import cotato.csquiz.domain.dto.record.ReplyResponse;
 import cotato.csquiz.service.RecordService;
@@ -34,5 +35,12 @@ public class RecordController {
         log.info("문제에 답한 기록 반환 컨트롤러, 문제 pk: {}", quizId);
         RecordsAndScorerResponse response = recordService.getRecordsAndScorer(quizId);
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/regrade")
+    public ResponseEntity<?> regradeQuiz(@RequestBody RegradeRequest request) {
+        log.info("[재채점 컨트롤러] 새로운 정답: {}", request.newAnswer());
+        recordService.regradeRecords(request);
+        return ResponseEntity.ok().build();
     }
 }

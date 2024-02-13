@@ -42,7 +42,9 @@ public enum ErrorCode {
     JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "accessToken이 만료되었습니다."),
     SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "세션이 존재하지 않습니다."),
     ANSWER_VALIDATION_FAULT(HttpStatus.BAD_REQUEST, "사용될 수 없는 정답"),
-    ALREADY_REPLY_CORRECT(HttpStatus.BAD_REQUEST, "이미 해당 문제에 정답 처리되셨습니다.");
+    ALREADY_REPLY_CORRECT(HttpStatus.BAD_REQUEST, "이미 해당 문제에 정답 처리되셨습니다."),
+    REGRADE_FAIL(HttpStatus.BAD_REQUEST, "재채점 할 Record가 없습니다."),
+    QUIZ_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, "주관식 정답만 추가 가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
