@@ -2,6 +2,8 @@ package cotato.csquiz.service;
 
 import static cotato.csquiz.domain.enums.MemberRole.REFUSED;
 
+import cotato.csquiz.domain.dto.auth.ApplyListResponse;
+import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
@@ -30,17 +32,11 @@ public class AdminService {
     private final GenerationRepository generationRepository;
     private final RefusedMemberRepository refusedMemberRepository;
 
-    public List<MemberInfoResponse> getApplicantList() {
+    public ApplyListResponse getApplicantList() {
         List<Member> applicantList = memberRepository.findAll();
-        return applicantList.stream()
-                .filter(member -> member.getRole() == MemberRole.GENERAL)
-                .map(member -> MemberInfoResponse.builder()
-                        .id(member.getId())
-                        .name(member.getName())
-                        .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
-                        .role(member.getRole())
-                        .build())
-                .toList();
+        List<ApplyMemberInfo> generalMemberInfos = buildApplicationInfo(applicantList, MemberRole.GENERAL);
+        List<ApplyMemberInfo> refusedMemberInfos = buildApplicationInfo(applicantList, REFUSED);
+        return ApplyListResponse.from(generalMemberInfos, refusedMemberInfos);
     }
 
     @Transactional
@@ -146,6 +142,17 @@ public class AdminService {
     private Generation getGeneration(Long generationId) {
         return generationRepository.findById(generationId)
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+    }
+
+    private static List<ApplyMemberInfo> buildApplicationInfo(List<Member> applicantList, MemberRole memberRole) {
+        return applicantList.stream()
+                .filter(member -> member.getRole() == memberRole)
+                .map(member -> ApplyMemberInfo.builder()
+                        .id(member.getId())
+                        .name(member.getName())
+                        .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
+                        .build())
+                .toList();
     }
 }
 

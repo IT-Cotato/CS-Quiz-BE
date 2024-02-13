@@ -1,5 +1,6 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.domain.dto.auth.ApplyListResponse;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
@@ -26,10 +27,10 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/applicants")
-    public ResponseEntity<List<MemberInfoResponse>> getApplicantList() {
-        log.info("가입자 확인 컨트롤러");
-        List<MemberInfoResponse> applicantList = adminService.getApplicantList();
-        return ResponseEntity.ok().body(applicantList);
+    public ResponseEntity<?> getApplicantList() {
+        log.info("가입자/거절자 확인 컨트롤러");
+        ApplyListResponse response = adminService.getApplicantList();
+        return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/approve")
