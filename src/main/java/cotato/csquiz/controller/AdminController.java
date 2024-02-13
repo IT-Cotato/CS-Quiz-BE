@@ -1,7 +1,6 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
-import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
