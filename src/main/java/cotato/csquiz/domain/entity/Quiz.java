@@ -3,8 +3,11 @@ package cotato.csquiz.domain.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import cotato.csquiz.domain.enums.QuizStatus;
+import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,6 +27,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Quiz extends BaseTimeEntity {
 
@@ -90,5 +94,12 @@ public class Quiz extends BaseTimeEntity {
 
     public boolean isStart() {
         return start == QuizStatus.QUIZ_ON;
+    }
+
+    public QuizType getQuizType() {
+        if (this instanceof MultipleQuiz) {
+            return QuizType.MULTIPLE_QUIZ;
+        }
+        return QuizType.SHORT_QUIZ;
     }
 }

@@ -1,6 +1,7 @@
 package cotato.csquiz.domain.entity;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DiscriminatorValue(value = "MultipleQuiz")
 @Getter
 public class MultipleQuiz extends Quiz {
 
