@@ -6,7 +6,6 @@ import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,26 +28,28 @@ public class AuthController {
 
     @PostMapping("/join")
     public ResponseEntity<?> joinAuth(@RequestBody @Valid JoinRequest request) {
-        log.info("컨트롤러 코드 진입 시간 : {}", LocalDateTime.now());
+        log.info("[회원 가입 컨트롤러]: {}, {}", request.getEmail(), request.getName());
         authService.createLoginInfo(request);
-        log.info("[회원 가입 컨트롤러] : {}, {}, {}", request.getEmail(), request.getPassword(), request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<?> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken) {
+        log.info("[액세스 토큰 재발급 컨트롤러]:");
         ReissueResponse reissue = authService.reissue(refreshToken);
         return ResponseEntity.ok().body(reissue);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
+        log.info("[로그아웃 요청 컨트롤러]");
         authService.logout(refreshToken);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
+        log.info("[회원 가입 시 이메일 인증 요청 컨트롤러]: 요청된 이메일 {}", request.getEmail());
         authService.sendSignUpEmail(request);
         return ResponseEntity.ok().build();
     }
@@ -56,6 +57,7 @@ public class AuthController {
     @GetMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email,
                                         @RequestParam(name = "code") String code) {
+        log.info("[회원 가입 시 인증 코드 확인 컨트롤러]: {}", email);
         authService.verifySingUpCode(email, code);
         return ResponseEntity.ok().build();
     }

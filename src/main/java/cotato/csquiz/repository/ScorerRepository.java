@@ -11,4 +11,6 @@ public interface ScorerRepository extends JpaRepository<Scorer, Long> {
     List<Scorer> findAllByQuiz(Quiz quiz);
 
     List<Scorer> findAllByQuizAndMember(Quiz quiz, Member member);
+
+    Scorer findByQuiz(Quiz quiz);
 }

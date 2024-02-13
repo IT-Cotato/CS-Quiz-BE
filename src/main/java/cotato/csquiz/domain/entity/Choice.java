@@ -49,6 +49,10 @@ public class Choice extends BaseTimeEntity {
         this.isCorrect = isCorrect;
     }
 
+    public void changeCorrect(ChoiceCorrect choiceCorrect) {
+        this.isCorrect = choiceCorrect;
+    }
+
     public void matchMultipleQuiz(MultipleQuiz multipleQuiz) {
         this.multipleQuiz = multipleQuiz;
     }

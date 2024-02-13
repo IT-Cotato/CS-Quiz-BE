@@ -1,15 +1,20 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.service.QuizService;
+import cotato.csquiz.service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class QuizController {
 
     private final QuizService quizService;
+    private final RecordService recordService;
 
     @PostMapping(value = "/adds", consumes = "multipart/form-data")
     public ResponseEntity<?> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
@@ -42,5 +48,28 @@ public class QuizController {
         log.info("특정 퀴즈 반환 컨트롤러");
         QuizResponse response = quizService.getQuiz(quizId);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/cs-admin/all")
+    public ResponseEntity<?> getAllQuizzesInCsQuiz(@RequestParam("educationId") Long educationId) {
+        log.info("특정 세션 관리자용 문제 반환 컨트롤러");
+        AllQuizzesInCsQuizResponse allQuizzes = quizService.getAllQuizzesInCsQuiz(educationId);
+        return ResponseEntity.ok(allQuizzes);
+    }
+
+    @GetMapping("/cs-admin")
+    public ResponseEntity<?> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
+        log.info("관리자용 한 문제 조회 컨트롤러");
+        QuizInfoInCsQuizResponse response = quizService.getQuizInCsQuiz(quizId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/cs-admin/answer/add")
+    public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
+        log.info("정답 추가에 따른 재채점 컨트롤러");
+        quizService.addAdditionalAnswer(request);
+        recordService.addAdditionalAnswerToRedis(request);
+        recordService.reGradeRecords(request);
+        return ResponseEntity.ok().build();
     }
 }

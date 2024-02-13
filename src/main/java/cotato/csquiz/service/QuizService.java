@@ -1,11 +1,15 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
+import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
@@ -16,6 +20,7 @@ import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
+import cotato.csquiz.domain.enums.ChoiceCorrect;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -40,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class QuizService {
 
+    private static final String QUIZ_BUCKET_DIRECTORY = "quiz";
     private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
@@ -60,6 +66,7 @@ public class QuizService {
     }
 
     private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples) {
+        log.info("요청된 객관식 문제의 수: {}개", multiples.size());
         multiples.forEach(request -> {
             try {
                 createMultipleQuiz(findEducation, request);
@@ -75,7 +82,7 @@ public class QuizService {
             throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
+            imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
         MultipleQuiz createdMultipleQuiz = MultipleQuiz.builder()
                 .education(findEducation)
@@ -100,6 +107,7 @@ public class QuizService {
     }
 
     private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes) {
+        log.info("요청된 주관식 문제의 수: {}개", shortQuizzes.size());
         shortQuizzes.forEach(request -> {
             try {
                 createShortQuiz(findEducation, request);
@@ -115,7 +123,7 @@ public class QuizService {
             throws ImageException, NoSuchAlgorithmException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(request.getImage(), "quiz");
+            imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
         ShortQuiz createdShortQuiz = ShortQuiz.builder()
                 .education(findEducation)
@@ -197,6 +205,15 @@ public class QuizService {
                 .build();
     }
 
+    @Transactional
+    public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        List<CsAdminQuizResponse> responses = quizzes.stream()
+                .map(CsAdminQuizResponse::from)
+                .toList();
+        return AllQuizzesInCsQuizResponse.from(responses);
+    }
+
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
         List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
@@ -236,11 +253,77 @@ public class QuizService {
 
     @Transactional
     public QuizResponse getQuiz(Long quizId) {
-        Quiz findQuiz = quizRepository.findById(quizId)
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
             return toMultipleQuizResponse(findQuiz);
         }
         return toShortQuizResponse(findQuiz);
+    }
+
+    @Transactional
+    public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
+        Quiz quiz = findQuizById(quizId);
+        List<String> answers = getAnswerList(quiz);
+        return QuizInfoInCsQuizResponse.from(quiz, answers);
+    }
+
+    private List<String> getAnswerList(Quiz quiz) {
+        if (quiz instanceof ShortQuiz) {
+            return getShortQuizAnswer(quiz);
+        }
+        return getMultipleQuizAnswer(quiz);
+    }
+
+    private List<String> getMultipleQuizAnswer(Quiz quiz) {
+        List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+        return choices.stream()
+                .map(choice -> String.valueOf(choice.getChoiceNumber()))
+                .toList();
+    }
+
+    private List<String> getShortQuizAnswer(Quiz quiz) {
+        List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+        return shortAnswers.stream()
+                .map(ShortAnswer::getContent)
+                .toList();
+    }
+
+    @Transactional
+    public void addAdditionalAnswer(AddAdditionalAnswerRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        addAnswerInRepository(quiz, request.getAnswer());
+    }
+
+    private void addAnswerInRepository(Quiz quiz, String answer) {
+        if (quiz instanceof ShortQuiz) {
+            addShortAnswer((ShortQuiz) quiz, answer);
+        }
+        if (quiz instanceof MultipleQuiz) {
+            addChoiceCorrect((MultipleQuiz) quiz, answer);
+        }
+    }
+
+    private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
+        ShortAnswer shortAnswer = ShortAnswer.builder()
+                .content(answer)
+                .build();
+        shortAnswer.matchShortQuiz(shortQuiz);
+        shortAnswerRepository.save(shortAnswer);
+    }
+
+    private void addChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
+        try {
+            int choiceNumber = Integer.parseInt(answer);
+            Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber)
+                    .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
+            choice.changeCorrect(ChoiceCorrect.ANSWER);
+        } catch (NumberFormatException e) {
+            throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
+        }
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
     }
 }

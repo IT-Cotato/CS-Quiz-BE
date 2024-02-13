@@ -2,9 +2,11 @@ package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
+import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
@@ -43,6 +45,12 @@ public class SessionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PatchMapping(value = "/update", consumes = "multipart/form-data")
+    public ResponseEntity<?> updateSession(@ModelAttribute UpdateSessionRequest request) throws ImageException {
+        sessionService.updateSession(request);
+        return ResponseEntity.ok().build();
+    }
+
     @PatchMapping("/number")
     public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request) {
         sessionService.changeSessionNum(request);
@@ -59,5 +67,11 @@ public class SessionController {
     public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException {
         sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/cs-on")
+    public ResponseEntity<?> getSessionsWithCsEducationOn(@RequestParam Long generationId) {
+        List<CsEducationOnSessionNumberResponse> sessionNumbers = sessionService.findAllCsOnSessionsByGenerationId(generationId);
+        return ResponseEntity.status(HttpStatus.OK).body(sessionNumbers);
     }
 }
