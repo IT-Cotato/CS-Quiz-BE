@@ -127,12 +127,8 @@ public class AuthService {
         Member findMember = memberRepository.findByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
         validateMatchName(findMember.getName(), name);
-
         String maskedId = getMaskId(findMember.getEmail());
-
-        return MemberEmailResponse.builder()
-                .email(maskedId)
-                .build();
+        return MemberEmailResponse.from(maskedId);
     }
 
     private String getMaskId(String email) {
