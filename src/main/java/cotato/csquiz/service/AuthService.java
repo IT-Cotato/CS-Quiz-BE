@@ -1,6 +1,5 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.config.jwt.BlackList;
 import cotato.csquiz.config.jwt.BlackListRepository;
 import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
@@ -9,6 +8,7 @@ import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.constant.EmailConstants;
 import cotato.csquiz.domain.dto.auth.FindPasswordResponse;
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.auth.LogoutRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
@@ -64,7 +64,7 @@ public class AuthService {
     @Transactional
     public ReissueResponse reissue(String refreshToken, HttpServletResponse response) {
         if (jwtUtil.isExpired(refreshToken) || blackListRepository.existsById(refreshToken)) {
-            log.warn("재발급 에러 이유: {}", blackListRepository.existsById(refreshToken));
+            log.warn("블랙리스트에 존재하는 토큰: {}", blackListRepository.existsById(refreshToken));
             throw new AppException(ErrorCode.TOKEN_EXPIRED);
         }
         String email = jwtUtil.getEmail(refreshToken);
@@ -87,8 +87,15 @@ public class AuthService {
         return ReissueResponse.from(token.getAccessToken());
     }
 
-    public void logout(String refreshToken) {
-        jwtUtil.setBlackList(refreshToken);
+    @Transactional
+    public void logout(LogoutRequest request, String refreshToken) {
+        String email = jwtUtil.getEmail(refreshToken);
+        RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
+                .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
+        log.info("로그아웃된 토큰 블랙리스트 처리");
+        jwtUtil.setBlackList(existRefreshToken.getRefreshToken());
+        jwtUtil.setBlackList(request.accessToken());
+        refreshTokenRepository.delete(existRefreshToken);
     }
 
     public void sendSignUpEmail(SendEmailRequest request) {

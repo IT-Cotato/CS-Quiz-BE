@@ -1,6 +1,7 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.auth.LogoutRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
@@ -43,9 +44,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken,
+                                    @RequestBody LogoutRequest request) {
         log.info("[로그아웃 요청 컨트롤러]");
-        authService.logout(refreshToken);
+        authService.logout(request, refreshToken);
         return ResponseEntity.ok().build();
     }
 

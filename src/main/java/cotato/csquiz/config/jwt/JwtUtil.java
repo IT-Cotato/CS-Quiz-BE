@@ -1,7 +1,6 @@
 package cotato.csquiz.config.jwt;
 
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.exception.FilterAuthenticationException;
 import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,6 +10,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -68,6 +68,7 @@ public class JwtUtil {
                 .build();
     }
 
+    @Transactional
     public void setBlackList(String token) {
         String id = getEmail(token);
         RefreshToken findToken = refreshTokenRepository.findById(id)
