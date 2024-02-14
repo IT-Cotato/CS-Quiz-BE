@@ -24,15 +24,8 @@ public class MemberService {
     public MemberInfoResponse getMemberInfo(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-        String lastFourNumber = findMember.getBackFourNumber();
-        log.info("이름 + 번호 4자리: {}({})", findMember.getName(), lastFourNumber);
-
-        return MemberInfoResponse.builder()
-                .id(findMember.getId())
-                .name(findMember.getName())
-                .backFourNumber(lastFourNumber)
-                .role(findMember.getRole())
-                .build();
+        log.info("이름 + 번호 4자리: {}({})", findMember.getName(), findMember.getBackFourNumber());
+        return MemberInfoResponse.from(findMember);
     }
 
     public void checkCorrectPassword(String accessToken, String password) {

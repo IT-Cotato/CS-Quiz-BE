@@ -1,19 +1,20 @@
 package cotato.csquiz.domain.dto.auth;
 
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.enums.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class MemberInfoResponse {
-
-    private Long id;
-    private String name;
-    private String backFourNumber;
-    private MemberRole role;
+public record MemberInfoResponse(
+        Long id,
+        String name,
+        String backFourNumber,
+        MemberRole role
+) {
+    public static MemberInfoResponse from(Member member) {
+        return new MemberInfoResponse(
+                member.getId(),
+                member.getName(),
+                member.getBackFourNumber(),
+                member.getRole()
+        );
+    }
 }
