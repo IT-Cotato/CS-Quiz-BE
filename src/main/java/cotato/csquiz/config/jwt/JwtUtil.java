@@ -80,7 +80,7 @@ public class JwtUtil {
         blackListRepository.save(blackList);
     }
 
-    private Long getExpiration(String token) {
+    public Long getExpiration(String token) {
         Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         return claims.getExpiration().getTime() - new Date().getTime();
     }
