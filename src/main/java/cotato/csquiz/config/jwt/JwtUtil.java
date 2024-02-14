@@ -108,4 +108,10 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
+
+    public void validateMemberExist(String email) {
+        if (!memberRepository.existsByEmail(email)) {
+            throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
+        }
+    }
 }
