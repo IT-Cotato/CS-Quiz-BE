@@ -75,7 +75,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         cookie.setPath("/");
         cookie.setMaxAge(refreshTokenAge);
         cookie.setSecure(true);
-//        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
         log.info("로그인 성공, JWT 토큰 생성");
     }

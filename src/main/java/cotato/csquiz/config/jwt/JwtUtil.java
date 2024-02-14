@@ -1,5 +1,7 @@
 package cotato.csquiz.config.jwt;
 
+import cotato.csquiz.exception.FilterAuthenticationException;
+import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -8,6 +10,7 @@ import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +26,8 @@ public class JwtUtil {
     Long refreshExpiration;
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BlackListRepository blackListRepository;
+    private final MemberRepository memberRepository;
 
     public boolean isExpired(String token) {
         return Jwts.parser()
@@ -63,11 +68,22 @@ public class JwtUtil {
                 .build();
     }
 
+    @Transactional
     public void setBlackList(String token) {
         String id = getEmail(token);
         RefreshToken findToken = refreshTokenRepository.findById(id)
                 .orElseThrow();
         refreshTokenRepository.delete(findToken);
+        BlackList blackList = BlackList.builder()
+                .id(findToken.getRefreshToken())
+                .ttl(getExpiration(findToken.getRefreshToken()))
+                .build();
+        blackListRepository.save(blackList);
+    }
+
+    public Long getExpiration(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims.getExpiration().getTime() - new Date().getTime();
     }
 
     private String createAccessToken(String email, String authority) {
@@ -92,5 +108,11 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    public void validateMemberExist(String email) {
+        if (!memberRepository.existsByEmail(email)) {
+            throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
+        }
     }
 }

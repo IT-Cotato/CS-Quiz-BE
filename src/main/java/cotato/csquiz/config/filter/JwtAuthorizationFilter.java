@@ -46,6 +46,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String email = jwtUtil.getEmail(accessToken);
         String role = jwtUtil.getRole(accessToken);
         log.info("Member Role: {}", role);
+        jwtUtil.validateMemberExist(email);
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, "",
                 List.of(new SimpleGrantedAuthority(role)));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);

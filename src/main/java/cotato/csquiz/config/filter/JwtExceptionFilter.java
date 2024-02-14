@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ErrorResponse;
+import cotato.csquiz.exception.FilterAuthenticationException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
@@ -36,6 +37,14 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
                     LocalDateTime.now(),
                     HttpStatus.BAD_REQUEST,
                     "jwt 토큰 형식으로 입력해주세요.",
+                    request.getRequestURI()
+            );
+            setErrorResponse(response, errorResponse);
+        } catch (FilterAuthenticationException e) {
+            ErrorResponse errorResponse = new ErrorResponse(
+                    LocalDateTime.now(),
+                    HttpStatus.UNAUTHORIZED,
+                    e.getMessage(),
                     request.getRequestURI()
             );
             setErrorResponse(response, errorResponse);
