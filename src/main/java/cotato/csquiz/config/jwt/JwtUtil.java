@@ -1,5 +1,8 @@
 package cotato.csquiz.config.jwt;
 
+import cotato.csquiz.exception.AppException;
+import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -23,6 +26,8 @@ public class JwtUtil {
     Long refreshExpiration;
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final BlackListRepository blackListRepository;
+    private final MemberRepository memberRepository;
 
     public boolean isExpired(String token) {
         return Jwts.parser()
@@ -68,6 +73,16 @@ public class JwtUtil {
         RefreshToken findToken = refreshTokenRepository.findById(id)
                 .orElseThrow();
         refreshTokenRepository.delete(findToken);
+        BlackList blackList = BlackList.builder()
+                .id(findToken.getRefreshToken())
+                .ttl(getExpiration(findToken.getRefreshToken()))
+                .build();
+        blackListRepository.save(blackList);
+    }
+
+    private Long getExpiration(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims.getExpiration().getTime() - new Date().getTime();
     }
 
     private String createAccessToken(String email, String authority) {
