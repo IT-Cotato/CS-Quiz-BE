@@ -147,11 +147,7 @@ public class AdminService {
 
     private static List<ApplyMemberInfo> buildApplyInfoList(List<Member> applicantList) {
         return applicantList.stream()
-                .map(member -> ApplyMemberInfo.builder()
-                        .id(member.getId())
-                        .name(member.getName())
-                        .backFourNumber(member.getPhoneNumber().substring(member.getPhoneNumber().length() - 4))
-                        .build())
+                .map(ApplyMemberInfo::from)
                 .toList();
     }
 }

@@ -3,6 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.mypage.HallOfFameInfo;
 import cotato.csquiz.domain.dto.mypage.HallOfFameResponse;
 import cotato.csquiz.domain.dto.mypage.MyHallOfFameInfo;
+import cotato.csquiz.domain.dto.mypage.MyPageMemberInfoResponse;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
@@ -49,12 +50,21 @@ public class MyPageService {
         return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo);
     }
 
+    public MyPageMemberInfoResponse getMemberInfo(String email) {
+        Member member = findMemberByEmail(email);
+        return MyPageMemberInfoResponse.from(member);
+    }
+
     private MyHallOfFameInfo makeMyHallOfFameInfo(String email, List<Quiz> quizzes) {
-        Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-        long scorerCount =  countMyScorer(member,quizzes);
-        long answerCount = countMyAnswer(member,quizzes);
+        Member member = findMemberByEmail(email);
+        long scorerCount = countMyScorer(member, quizzes);
+        long answerCount = countMyAnswer(member, quizzes);
         return MyHallOfFameInfo.from(member, scorerCount, answerCount);
+    }
+
+    private Member findMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     private long countMyScorer(Member member, List<Quiz> quizzes) {

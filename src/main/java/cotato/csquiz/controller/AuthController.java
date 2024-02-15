@@ -1,10 +1,12 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.JoinRequest;
+import cotato.csquiz.domain.dto.auth.LogoutRequest;
 import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,16 +36,18 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<?> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken) {
+    public ResponseEntity<?> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken,
+                                          HttpServletResponse response) {
         log.info("[액세스 토큰 재발급 컨트롤러]:");
-        ReissueResponse reissue = authService.reissue(refreshToken);
+        ReissueResponse reissue = authService.reissue(refreshToken, response);
         return ResponseEntity.ok().body(reissue);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken) {
+    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken,
+                                    @RequestBody LogoutRequest request) {
         log.info("[로그아웃 요청 컨트롤러]");
-        authService.logout(refreshToken);
+        authService.logout(request, refreshToken);
         return ResponseEntity.ok().build();
     }
 

@@ -1,6 +1,6 @@
 package cotato.csquiz.domain.dto.auth;
 
-import cotato.csquiz.domain.enums.MemberRole;
+import cotato.csquiz.domain.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +15,12 @@ public class ApplyMemberInfo {
     private Long id;
     private String name;
     private String backFourNumber;
+
+    public static ApplyMemberInfo from(Member member) {
+        return new ApplyMemberInfo(
+                member.getId(),
+                member.getName(),
+                member.getBackFourNumber()
+        );
+    }
 }
