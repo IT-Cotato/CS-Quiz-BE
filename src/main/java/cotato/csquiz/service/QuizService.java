@@ -11,13 +11,17 @@ import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
+import cotato.csquiz.domain.dto.quiz.QuizResultsResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.Scorer;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
@@ -29,11 +33,13 @@ import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
+import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +55,7 @@ public class QuizService {
     private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
+    private final ScorerRepository scorerRepository;
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;
     private final S3Uploader s3Uploader;
@@ -63,6 +70,24 @@ public class QuizService {
         quizRepository.deleteAllByEducationId(educationId);
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
+    }
+
+    @Transactional
+    public QuizResultsResponse findQuizResults(Long educationId) {
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        List<QuizResultInfo> resultInfos = quizzes.stream()
+                .map(this::makeQuizResultInfo)
+                .toList();
+        return QuizResultsResponse.of(resultInfos);
+    }
+
+    private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
+        Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
+        if (scorerOptional.isPresent()) {
+            Member member = scorerOptional.get().getMember();
+            return QuizResultInfo.from(quiz, member);
+        }
+        return QuizResultInfo.noScorer(quiz);
     }
 
     private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples) {
