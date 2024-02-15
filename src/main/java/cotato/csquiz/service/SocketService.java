@@ -35,6 +35,7 @@ public class SocketService {
     }
 
     public void accessQuiz(QuizSocketRequest request) {
+        makeAllStartFalse();
         makeAllStatusFalse();
         Quiz quiz = findQuizById(request.getQuizId());
         quiz.updateStatus(QuizStatus.QUIZ_ON);
