@@ -1,7 +1,6 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
-import cotato.csquiz.domain.dto.quiz.QuizResultsResponse;
 import cotato.csquiz.domain.dto.record.RecordResponse;
 import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
 import cotato.csquiz.domain.dto.record.RegradeRequest;

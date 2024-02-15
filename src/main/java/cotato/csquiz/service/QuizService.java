@@ -14,7 +14,6 @@ import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
-import cotato.csquiz.domain.dto.quiz.QuizResultsResponse;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
@@ -78,12 +77,11 @@ public class QuizService {
     }
 
     @Transactional
-    public QuizResultsResponse findQuizResults(Long educationId) {
+    public List<QuizResultInfo> findQuizResults(Long educationId) {
         List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
-        List<QuizResultInfo> resultInfos = quizzes.stream()
+        return quizzes.stream()
                 .map(this::makeQuizResultInfo)
                 .toList();
-        return QuizResultsResponse.of(resultInfos);
     }
 
     @Transactional

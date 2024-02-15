@@ -7,9 +7,10 @@ import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizResultsResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
 import cotato.csquiz.service.QuizService;
 import cotato.csquiz.service.RecordService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -77,7 +78,7 @@ public class QuizController {
     @GetMapping("/cs-admin/results")
     public ResponseEntity<?> quizResults(@RequestParam("educationId") Long educationId) {
         log.info("cs문제 풀이의 득점자 목록 조회 컨트롤러");
-        QuizResultsResponse response = quizService.findQuizResults(educationId);
+        List<QuizResultInfo> response = quizService.findQuizResults(educationId);
         return ResponseEntity.ok(response);
     }
 
