@@ -7,17 +7,22 @@ import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
+import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
+import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.Scorer;
 import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
@@ -29,12 +34,17 @@ import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
+import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +59,7 @@ public class QuizService {
     private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
+    private final ScorerRepository scorerRepository;
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;
     private final S3Uploader s3Uploader;
@@ -63,6 +74,34 @@ public class QuizService {
         quizRepository.deleteAllByEducationId(educationId);
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
+    }
+
+    @Transactional
+    public List<QuizResultInfo> findQuizResults(Long educationId) {
+        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+        return quizzes.stream()
+                .map(this::makeQuizResultInfo)
+                .toList();
+    }
+
+    @Transactional
+    public QuizKingMembersResponse findKingMember(Long educationId) {
+        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+        List<Scorer> scorers = findScorerByQuizzes(quizzes);
+        List<Member> kingMembers = findKingMembers(scorers);
+        List<KingMemberInfo> kingMemberInfos = kingMembers.stream()
+                .map(KingMemberInfo::from)
+                .toList();
+        return QuizKingMembersResponse.of(kingMemberInfos);
+    }
+
+    private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
+        Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
+        if (scorerOptional.isPresent()) {
+            Member member = scorerOptional.get().getMember();
+            return QuizResultInfo.from(quiz, member);
+        }
+        return QuizResultInfo.noScorer(quiz);
     }
 
     private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples) {
@@ -188,7 +227,7 @@ public class QuizService {
 
     @Transactional
     public AllQuizzesResponse getAllQuizzes(Long educationId) {
-        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
         List<MultipleQuizResponse> multiples = quizzes.stream()
                 .filter(quiz -> quiz instanceof MultipleQuiz)
                 .map(this::toMultipleQuizResponse)
@@ -207,7 +246,7 @@ public class QuizService {
 
     @Transactional
     public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
-        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
         List<CsAdminQuizResponse> responses = quizzes.stream()
                 .map(CsAdminQuizResponse::from)
                 .toList();
@@ -333,5 +372,25 @@ public class QuizService {
     private Quiz findQuizById(Long quizId) {
         return quizRepository.findById(quizId)
                 .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+    }
+
+    private List<Quiz> findQuizzesFromEducationId(Long educationId) {
+        return quizRepository.findAllByEducationId(educationId);
+    }
+
+    private List<Scorer> findScorerByQuizzes(List<Quiz> quizzes) {
+        return quizzes.stream()
+                .flatMap(quiz -> scorerRepository.findAllByQuiz(quiz).stream())
+                .toList();
+    }
+
+    private List<Member> findKingMembers(List<Scorer> scorers) {
+        Map<Member, Long> countByMember = scorers.stream()
+                .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
+        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
+        return countByMember.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
+                .map(Entry::getKey)
+                .toList();
     }
 }
