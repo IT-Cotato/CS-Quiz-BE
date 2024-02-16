@@ -25,7 +25,8 @@ public class SecurityConfig {
     private static final String[] WHITE_LIST = {
             "/v1/api/generation",
             "/v1/api/session",
-            "/swagger-ui/**"
+            "/swagger-ui/**",
+            "/websocket/csquiz"
     };
 
     private final JwtUtil jwtUtil;
