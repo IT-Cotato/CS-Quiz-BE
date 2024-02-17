@@ -1,5 +1,8 @@
 package cotato.csquiz.config.jwt;
 
+import cotato.csquiz.domain.constant.TokenConstants;
+import cotato.csquiz.exception.AppException;
+import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.FilterAuthenticationException;
 import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
@@ -25,7 +28,6 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration}")
     Long refreshExpiration;
 
-    private static final String SOCKET_PAYLOAD = "socket";
     private static final Long SOCKET_TOKEN_EXPIRATION = 1000 * 30L;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
@@ -53,6 +55,13 @@ public class JwtUtil {
         return getBearer(header);
     }
 
+    public String resolveWithAccessToken(String token) {
+        if (token == null || !token.startsWith("Bearer ")) {
+            throw new FilterAuthenticationException("토큰 형태 오류");
+        }
+        return getBearer(token);
+    }
+
     public String getBearer(String authorizationHeader) {
         return authorizationHeader.replace("Bearer", "");
     }
@@ -60,6 +69,11 @@ public class JwtUtil {
     public String getRole(String token) {
         Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         return claims.get("role", String.class);
+    }
+
+    public String getType(String token) {
+        Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return claims.get("type", String.class);
     }
 
     public Token createToken(String email, String authority) {
@@ -73,7 +87,7 @@ public class JwtUtil {
     public void setBlackList(String token) {
         String id = getEmail(token);
         RefreshToken findToken = refreshTokenRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
         refreshTokenRepository.delete(findToken);
         BlackList blackList = BlackList.builder()
                 .id(findToken.getRefreshToken())
@@ -91,6 +105,7 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("email", email);
         claims.put("role", authority);
+        claims.put("type", TokenConstants.ACCESS_TOKEN);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -103,6 +118,7 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("email", email);
         claims.put("role", authority);
+        claims.put("type", TokenConstants.REFRESH_TOKEN);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -121,12 +137,19 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.put("email", email);
         claims.put("role", role);
+        claims.put("type", TokenConstants.SOCKET_TOKEN);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setPayload(SOCKET_PAYLOAD)
                 .setExpiration(new Date(System.currentTimeMillis() + SOCKET_TOKEN_EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    public void validateSocketToken(String socketToken) {
+        String tokenType = getType(socketToken);
+        if (TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
+            throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
+        }
     }
 }

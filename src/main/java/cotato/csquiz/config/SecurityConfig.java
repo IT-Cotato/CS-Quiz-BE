@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers("/v1/api/socket/token").hasAnyRole("EDUCATION", "ADMIN", "MEMBER")
                         .requestMatchers("/v1/api/generation/**").hasAnyRole("GENERAL", "ADMIN")
                         .requestMatchers("/v1/api/session/**").hasAnyRole("GENERAL", "ADMIN")
                         .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION", "ADMIN")
