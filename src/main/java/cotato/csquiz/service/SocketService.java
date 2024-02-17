@@ -1,5 +1,7 @@
 package cotato.csquiz.service;
 
+import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
@@ -7,6 +9,7 @@ import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.enums.EducationStatus;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.QuizStatus;
+import cotato.csquiz.domain.enums.TokenType;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.global.websocket.WebSocketHandler;
@@ -16,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +33,8 @@ public class SocketService {
     private final QuizRepository quizRepository;
 
     private final EducationRepository educationRepository;
+
+    private final JwtUtil jwtUtil;
 
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.getEducationId());
@@ -100,5 +107,15 @@ public class SocketService {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public String makeSocketToken(String authorizationHeader) {
+        String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
+        String role = jwtUtil.getRole(token);
+        String email = jwtUtil.getEmail(token);
+        jwtUtil.validateMemberExist(email);
+        String socketToken = jwtUtil.createSocketToken(email, role);
+        log.info(socketToken);
+        return socketToken;
     }
 }
