@@ -14,7 +14,6 @@ import cotato.csquiz.domain.dto.auth.ReissueResponse;
 import cotato.csquiz.domain.dto.email.SendEmailRequest;
 import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.enums.TokenType;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.MemberRepository;

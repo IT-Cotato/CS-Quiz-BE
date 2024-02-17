@@ -7,7 +7,6 @@ import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.domain.enums.TokenType;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import jakarta.servlet.FilterChain;

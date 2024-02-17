@@ -23,17 +23,10 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
-        String bearerToken = request.getURI().getQuery().split("=")[1];
-        log.info("bearerToken ={}", bearerToken);
-        String token = jwtUtil.getBearer(bearerToken);
-        String tokenType = jwtUtil.getType(token);
-        log.info(tokenType);
-        if (!tokenType.equals("SOCKET")) {
-            log.info("error occurs");
-            throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
-        }
-        String role = jwtUtil.getRole(token);
-        String email = jwtUtil.getEmail(token);
+        String socketToken = request.getURI().getQuery().split("=")[1];
+        jwtUtil.validateSocketToken(socketToken);
+        String role = jwtUtil.getRole(socketToken);
+        String email = jwtUtil.getEmail(socketToken);
         attributes.put("email", email);
         attributes.put("role", role);
         return super.beforeHandshake(request, response, wsHandler, attributes);
