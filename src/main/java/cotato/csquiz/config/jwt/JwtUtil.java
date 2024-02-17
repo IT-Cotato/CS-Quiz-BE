@@ -45,11 +45,10 @@ public class JwtUtil {
 
     public String resolveAccessToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return getBearer(header);
-        } else {
-            return null;
+        if (header == null || !header.startsWith("Bearer ")) {
+            throw new FilterAuthenticationException("토큰 형태 오류");
         }
+        return getBearer(header);
     }
 
     public String getBearer(String authorizationHeader) {

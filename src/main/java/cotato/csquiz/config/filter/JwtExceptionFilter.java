@@ -7,6 +7,7 @@ import cotato.csquiz.exception.ErrorResponse;
 import cotato.csquiz.exception.FilterAuthenticationException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,10 +33,10 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
                     request.getRequestURI()
             );
             setErrorResponse(response, errorResponse);
-        } catch (MalformedJwtException e) {
+        } catch (MalformedJwtException | SignatureException e) {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
-                    HttpStatus.BAD_REQUEST,
+                    HttpStatus.UNAUTHORIZED,
                     "jwt 토큰 형식으로 입력해주세요.",
                     request.getRequestURI()
             );
