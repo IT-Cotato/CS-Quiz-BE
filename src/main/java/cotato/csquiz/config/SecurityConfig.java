@@ -31,10 +31,17 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CorsFilter corsFilter;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity.getSharedObject(AuthenticationManagerBuilder.class)
+                .build();
     }
 
     @Bean
@@ -48,7 +55,7 @@ public class SecurityConfig {
                 .cors().disable()
                 .formLogin().disable()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenRepository))
-                .addFilterBefore(new JwtAuthorizationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilter(corsFilter)
                 .authorizeHttpRequests(request -> request
