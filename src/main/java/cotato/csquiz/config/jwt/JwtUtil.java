@@ -25,6 +25,8 @@ public class JwtUtil {
     @Value("${jwt.refresh.expiration}")
     Long refreshExpiration;
 
+    private static final String SOCKET_PAYLOAD = "socket";
+    private static final Long SOCKET_TOKEN_EXPIRATION = 1000 * 30L;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
     private final MemberRepository memberRepository;
@@ -113,5 +115,18 @@ public class JwtUtil {
         if (!memberRepository.existsByEmail(email)) {
             throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
         }
+    }
+
+    public String createSocketToken(String email, String role) {
+        Claims claims = Jwts.claims();
+        claims.put("email", email);
+        claims.put("role", role);
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setPayload(SOCKET_PAYLOAD)
+                .setExpiration(new Date(System.currentTimeMillis() + SOCKET_TOKEN_EXPIRATION))
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
     }
 }
