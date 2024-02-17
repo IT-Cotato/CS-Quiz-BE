@@ -81,7 +81,7 @@ public class AuthService {
         refreshTokenRepository.save(findToken);
 
         Cookie refreshCookie = new Cookie(REFRESH_TOKEN, token.getRefreshToken());
-        refreshCookie.setMaxAge(refreshTokenAge);
+        refreshCookie.setMaxAge(refreshTokenAge / 1000);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         response.addCookie(refreshCookie);
@@ -146,5 +146,9 @@ public class AuthService {
         if (!originName.equals(requestName)) {
             throw new AppException(ErrorCode.NAME_NOT_MATCH);
         }
+    }
+
+    public boolean isBlocked(String token) {
+        return blackListRepository.existsById(token);
     }
 }
