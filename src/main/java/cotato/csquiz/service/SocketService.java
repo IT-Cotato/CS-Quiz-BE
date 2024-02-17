@@ -105,13 +105,13 @@ public class SocketService {
         }
     }
 
-    public String makeSocketToken(String authorizationHeader) {
+    public String createSocketToken(String authorizationHeader) {
         String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
         String email = jwtUtil.getEmail(token);
         jwtUtil.validateMemberExist(email);
         String socketToken = jwtUtil.createSocketToken(email, role);
-        log.info(socketToken);
+        log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return socketToken;
     }
 }

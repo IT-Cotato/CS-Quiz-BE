@@ -1,18 +1,13 @@
 package cotato.csquiz.global.websocket;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.enums.TokenType;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-
-import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
