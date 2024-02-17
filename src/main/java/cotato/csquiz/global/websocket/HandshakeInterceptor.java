@@ -30,7 +30,7 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
         log.info(tokenType);
         if (!tokenType.equals("SOCKET")) {
             log.info("error occurs");
-            throw new AppException(ErrorCode.IS_LOGIN_TOKEN);
+            throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
         }
         String role = jwtUtil.getRole(token);
         String email = jwtUtil.getEmail(token);
