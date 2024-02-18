@@ -50,7 +50,7 @@ public class JwtUtil {
     public String resolveAccessToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new FilterAuthenticationException("토큰 형태 오류");
+            throw new FilterAuthenticationException("Bearer 토큰이 존재하지 않습니다.");
         }
         return getBearer(header);
     }
@@ -63,7 +63,7 @@ public class JwtUtil {
     }
 
     public String getBearer(String authorizationHeader) {
-        return authorizationHeader.replace("Bearer", "");
+        return authorizationHeader.replace("Bearer ", "");
     }
 
     public String getRole(String token) {
@@ -85,13 +85,9 @@ public class JwtUtil {
 
     @Transactional
     public void setBlackList(String token) {
-        String id = getEmail(token);
-        RefreshToken findToken = refreshTokenRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
-        refreshTokenRepository.delete(findToken);
         BlackList blackList = BlackList.builder()
-                .id(findToken.getRefreshToken())
-                .ttl(getExpiration(findToken.getRefreshToken()))
+                .id(token)
+                .ttl(getExpiration(token))
                 .build();
         blackListRepository.save(blackList);
     }
@@ -151,5 +147,24 @@ public class JwtUtil {
         if (TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
             throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
         }
+    }
+
+    public void validateAccessToken(String accessToken) {
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new FilterAuthenticationException("액세스 토큰을 넣고 요청해주세요.");
+        }
+        if (!TokenConstants.ACCESS_TOKEN.equals(getType(accessToken))) {
+            throw new FilterAuthenticationException("액세스 토큰을 사용해주세요.");
+        }
+        if (isExpired(accessToken)) {
+            throw new FilterAuthenticationException("토큰이 만료되었습니다.");
+        }
+        if (isBlocked(accessToken)) {
+            throw new FilterAuthenticationException("차단된 토큰입니다.");
+        }
+    }
+
+    private boolean isBlocked(final String token) {
+        return blackListRepository.existsById(token);
     }
 }
