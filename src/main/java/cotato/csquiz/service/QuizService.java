@@ -11,7 +11,6 @@ import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
 import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
@@ -66,8 +65,7 @@ public class QuizService {
 
     @Transactional
     public void createQuizzes(Long educationId, CreateQuizzesRequest request) {
-        Education findEducation = educationRepository.findById(educationId)
-                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+        Education findEducation = findEducationById(educationId);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
         log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
@@ -85,15 +83,19 @@ public class QuizService {
     }
 
     @Transactional
-    public QuizKingMembersResponse findKingMember(Long educationId) {
+    public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
         List<Scorer> scorers = findScorersByEducationId(educationId);
         List<Member> kingMembers = findKingMembers(scorers);
-        List<KingMemberInfo> kingMemberInfos = kingMembers.stream()
+        return kingMembers.stream()
                 .map(KingMemberInfo::from)
                 .toList();
-        return QuizKingMembersResponse.of(kingMemberInfos);
     }
 
+    @Transactional
+    public List<Member> findKingMember(Long educationId) {
+        List<Scorer> scorers = findScorersByEducationId(educationId);
+        return findKingMembers(scorers);
+    }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
         Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
@@ -394,24 +396,20 @@ public class QuizService {
                 .toList();
     }
 
-    @Transactional
-    public void saveSingleWinnerFromEducation(Long educationId) {
-        Education education = educationRepository.findById(educationId).orElseThrow(
+    private Education findEducationById(Long educationId) {
+        return educationRepository.findById(educationId).orElseThrow(
                 () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND)
         );
-
-        List<Scorer> scorers = findScorersByEducationId(educationId);
-        List<Member> members = findKingMembers(scorers);
-
-        if (members.size() == 1) {
-            education.addWinner(members.get(0));
-            educationRepository.save(education);
-        }
     }
-
 
     private List<Scorer> findScorersByEducationId(Long educationId) {
         List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
         return findScorerByQuizzes(quizzes);
+    }
+
+    public void saveWinner(Member member, Long educationId) {
+        Education education = findEducationById(educationId);
+        education.addWinner(member);
+        educationRepository.save(education);
     }
 }

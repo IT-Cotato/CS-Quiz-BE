@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.quiz.QuizResponse;
@@ -85,7 +86,7 @@ public class QuizController {
     @GetMapping("/cs-admin/result/kings")
     public ResponseEntity<?> kingMembers(@RequestParam("educationId") Long educationId) {
         log.info("cs문제 풀이의 마지막 문제 풀 사람");
-        QuizKingMembersResponse response = quizService.findKingMember(educationId);
+        List<KingMemberInfo> response = quizService.findKingMemberInfo(educationId);
         return ResponseEntity.ok(response);
     }
 }
