@@ -61,6 +61,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     .quizId(quizId)
                     .command("show")
                     .status(QuizStatus.QUIZ_ON)
+                    .start(QuizStatus.QUIZ_OFF)
                     .build();
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
