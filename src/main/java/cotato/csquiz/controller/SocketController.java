@@ -3,6 +3,7 @@ package cotato.csquiz.controller;
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.domain.dto.socket.SocketTokenDto;
 import cotato.csquiz.service.RecordService;
 import cotato.csquiz.service.SocketService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -63,9 +64,8 @@ public class SocketController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader, HttpServletResponse response) {
-        String socketToken = socketService.createSocketToken(authorizationHeader);
-        response.addHeader("socketToken", socketToken);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader) {
+        SocketTokenDto response = socketService.createSocketToken(authorizationHeader);
+        return ResponseEntity.ok(response);
     }
 }

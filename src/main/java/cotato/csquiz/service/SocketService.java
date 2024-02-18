@@ -4,6 +4,7 @@ import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.domain.dto.socket.SocketTokenDto;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.EducationStatus;
@@ -105,13 +106,13 @@ public class SocketService {
         }
     }
 
-    public String createSocketToken(String authorizationHeader) {
+    public SocketTokenDto createSocketToken(String authorizationHeader) {
         String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
         String email = jwtUtil.getEmail(token);
         jwtUtil.validateMemberExist(email);
         String socketToken = jwtUtil.createSocketToken(email, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
-        return socketToken;
+        return SocketTokenDto.of(socketToken);
     }
 }
