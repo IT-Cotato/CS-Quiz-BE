@@ -47,7 +47,7 @@ public enum ErrorCode {
     QUIZ_TYPE_NOT_MATCH(HttpStatus.BAD_REQUEST, "주관식 정답만 추가 가능합니다."),
     CONTENT_IS_NOT_ANSWER(HttpStatus.BAD_REQUEST, "해당 문구는 정답이 아닙니다"),
     CONTENT_IS_ALREADY_ANSWER(HttpStatus.BAD_REQUEST, "이미 정답인 답을 추가했습니다"),
-    IS_NOT_SOCKET_TOKEN(HttpStatus.UNAUTHORIZED, "웹소켓 토큰을 사용해 주세요");
+    ENUM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 Enum을 resolve할 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

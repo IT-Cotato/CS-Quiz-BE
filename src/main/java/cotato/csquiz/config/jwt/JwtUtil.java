@@ -1,9 +1,8 @@
 package cotato.csquiz.config.jwt;
 
 import cotato.csquiz.domain.constant.TokenConstants;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.FilterAuthenticationException;
+import cotato.csquiz.exception.InterceptorException;
 import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -145,7 +144,7 @@ public class JwtUtil {
     public void validateSocketToken(String socketToken) {
         String tokenType = getType(socketToken);
         if (!TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
-            throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
+            throw new InterceptorException("소켓 토큰을 이용해주세요.");
         }
     }
 
