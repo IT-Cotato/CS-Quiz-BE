@@ -20,6 +20,7 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
                                    Map<String, Object> attributes) throws Exception {
         log.info("beforeHandshake");
         String socketToken = request.getURI().getQuery().split("=")[1];
+        jwtUtil.validateSocketToken(socketToken);
         String role = jwtUtil.getRole(socketToken);
         String email = jwtUtil.getEmail(socketToken);
         attributes.put("email", email);
