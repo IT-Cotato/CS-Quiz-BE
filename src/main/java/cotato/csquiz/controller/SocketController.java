@@ -64,6 +64,6 @@ public class SocketController {
     @PostMapping("/token")
     public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader) {
         String socketToken = socketService.createSocketToken(authorizationHeader);
-        return ResponseEntity.ok().header("Authorization", socketToken).build();
+        return ResponseEntity.ok().header("socketToken", socketToken).build();
     }
 }
