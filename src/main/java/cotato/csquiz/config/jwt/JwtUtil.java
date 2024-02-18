@@ -144,7 +144,7 @@ public class JwtUtil {
 
     public void validateSocketToken(String socketToken) {
         String tokenType = getType(socketToken);
-        if (TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
+        if (!TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
             throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
         }
     }
