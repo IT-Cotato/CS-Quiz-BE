@@ -85,13 +85,9 @@ public class JwtUtil {
 
     @Transactional
     public void setBlackList(String token) {
-        String id = getEmail(token);
-        RefreshToken findToken = refreshTokenRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
-        refreshTokenRepository.delete(findToken);
         BlackList blackList = BlackList.builder()
-                .id(findToken.getRefreshToken())
-                .ttl(getExpiration(findToken.getRefreshToken()))
+                .id(token)
+                .ttl(getExpiration(token))
                 .build();
         blackListRepository.save(blackList);
     }

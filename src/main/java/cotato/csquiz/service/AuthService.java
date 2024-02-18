@@ -1,6 +1,5 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.config.jwt.BlackList;
 import cotato.csquiz.config.jwt.BlackListRepository;
 import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
@@ -95,12 +94,8 @@ public class AuthService {
                 .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
         log.info("로그아웃된 토큰 블랙리스트 처리");
         jwtUtil.setBlackList(existRefreshToken.getRefreshToken());
-        BlackList blackList = BlackList.builder()
-                .id(request.accessToken())
-                .ttl(jwtUtil.getExpiration(existRefreshToken.getRefreshToken()))
-                .build();
-        blackListRepository.save(blackList);
         refreshTokenRepository.delete(existRefreshToken);
+        jwtUtil.setBlackList(request.accessToken());
     }
 
     public void sendSignUpEmail(SendEmailRequest request) {
@@ -146,9 +141,5 @@ public class AuthService {
         if (!originName.equals(requestName)) {
             throw new AppException(ErrorCode.NAME_NOT_MATCH);
         }
-    }
-
-    public boolean isBlocked(String token) {
-        return blackListRepository.existsById(token);
     }
 }
