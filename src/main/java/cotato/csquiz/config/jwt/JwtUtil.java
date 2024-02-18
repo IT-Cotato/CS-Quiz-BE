@@ -50,7 +50,7 @@ public class JwtUtil {
     public String resolveAccessToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {
-            throw new FilterAuthenticationException("토큰 형태 오류");
+            throw new FilterAuthenticationException("Bearer 토큰이 존재하지 않습니다.");
         }
         return getBearer(header);
     }
@@ -151,5 +151,24 @@ public class JwtUtil {
         if (TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
             throw new AppException(ErrorCode.IS_NOT_SOCKET_TOKEN);
         }
+    }
+
+    public void validateAccessToken(String accessToken) {
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new FilterAuthenticationException("액세스토큰을 넣고 요청해주세요.");
+        }
+        if (!TokenConstants.ACCESS_TOKEN.equals(getType(accessToken))) {
+            throw new FilterAuthenticationException("액세스 토큰을 사용해주세요.");
+        }
+        if (isExpired(accessToken)) {
+            throw new FilterAuthenticationException("토큰이 만료되었습니다.");
+        }
+        if (isBlocked(accessToken)) {
+            throw new FilterAuthenticationException("차단된 토큰입니다.");
+        }
+    }
+
+    private boolean isBlocked(String token) {
+        return blackListRepository.existsById(token);
     }
 }
