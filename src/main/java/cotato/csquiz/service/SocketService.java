@@ -1,6 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.domain.dto.quiz.QuizKingMembersResponse;
 import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
@@ -30,6 +31,8 @@ public class SocketService {
     private final QuizRepository quizRepository;
 
     private final EducationRepository educationRepository;
+
+    private final QuizService quizService;
 
     private final JwtUtil jwtUtil;
 
@@ -63,7 +66,16 @@ public class SocketService {
     public void stopQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         quiz.updateStart(false);
+        calculateKingMember(quiz);
     }
+
+    private void calculateKingMember(Quiz quiz) {
+        if (quiz.getNumber() == 9) {
+            log.info("CS퀴즈 우승자 선택");
+            quizService.saveSingleWinnerFromEducation(findEducationIdByQuiz(quiz));
+        }
+    }
+
 
     public void stopAllQuiz(QuizCloseRequest request) {
         makeAllStatusFalse();
@@ -114,5 +126,9 @@ public class SocketService {
         String socketToken = jwtUtil.createSocketToken(email, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return SocketTokenDto.of(socketToken);
+    }
+
+    private Long findEducationIdByQuiz(Quiz quiz) {
+        return quiz.getEducation().getId();
     }
 }

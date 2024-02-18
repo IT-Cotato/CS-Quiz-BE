@@ -86,14 +86,14 @@ public class QuizService {
 
     @Transactional
     public QuizKingMembersResponse findKingMember(Long educationId) {
-        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
-        List<Scorer> scorers = findScorerByQuizzes(quizzes);
+        List<Scorer> scorers = findScorersByEducationId(educationId);
         List<Member> kingMembers = findKingMembers(scorers);
         List<KingMemberInfo> kingMemberInfos = kingMembers.stream()
                 .map(KingMemberInfo::from)
                 .toList();
         return QuizKingMembersResponse.of(kingMemberInfos);
     }
+
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
         Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
@@ -392,5 +392,26 @@ public class QuizService {
                 .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
                 .map(Entry::getKey)
                 .toList();
+    }
+
+    @Transactional
+    public void saveSingleWinnerFromEducation(Long educationId) {
+        Education education = educationRepository.findById(educationId).orElseThrow(
+                () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND)
+        );
+
+        List<Scorer> scorers = findScorersByEducationId(educationId);
+        List<Member> members = findKingMembers(scorers);
+
+        if (members.size() == 1) {
+            education.addWinner(members.get(0));
+            educationRepository.save(education);
+        }
+    }
+
+
+    private List<Scorer> findScorersByEducationId(Long educationId) {
+        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+        return findScorerByQuizzes(quizzes);
     }
 }
