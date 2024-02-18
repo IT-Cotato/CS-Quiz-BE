@@ -63,7 +63,7 @@ public class JwtUtil {
     }
 
     public String getBearer(String authorizationHeader) {
-        return authorizationHeader.replace("Bearer", "");
+        return authorizationHeader.replace("Bearer ", "");
     }
 
     public String getRole(String token) {
@@ -155,7 +155,7 @@ public class JwtUtil {
 
     public void validateAccessToken(String accessToken) {
         if (accessToken == null || accessToken.isEmpty()) {
-            throw new FilterAuthenticationException("액세스토큰을 넣고 요청해주세요.");
+            throw new FilterAuthenticationException("액세스 토큰을 넣고 요청해주세요.");
         }
         if (!TokenConstants.ACCESS_TOKEN.equals(getType(accessToken))) {
             throw new FilterAuthenticationException("액세스 토큰을 사용해주세요.");
@@ -168,7 +168,7 @@ public class JwtUtil {
         }
     }
 
-    private boolean isBlocked(String token) {
+    private boolean isBlocked(final String token) {
         return blackListRepository.existsById(token);
     }
 }
