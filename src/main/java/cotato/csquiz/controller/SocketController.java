@@ -5,6 +5,7 @@ import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.service.RecordService;
 import cotato.csquiz.service.SocketService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -62,8 +63,9 @@ public class SocketController {
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader, HttpServletResponse response) {
         String socketToken = socketService.createSocketToken(authorizationHeader);
-        return ResponseEntity.ok().header("socketToken", socketToken).build();
+        response.addHeader("socketToken", socketToken);
+        return ResponseEntity.ok().build();
     }
 }
