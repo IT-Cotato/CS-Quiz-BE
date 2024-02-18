@@ -18,6 +18,7 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
                                    Map<String, Object> attributes) throws Exception {
+        log.info("beforeHandshake");
         String socketToken = request.getURI().getQuery().split("=")[1];
         jwtUtil.validateSocketToken(socketToken);
         String role = jwtUtil.getRole(socketToken);
