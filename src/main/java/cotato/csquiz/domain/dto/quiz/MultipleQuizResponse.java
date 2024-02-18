@@ -1,5 +1,6 @@
 package cotato.csquiz.domain.dto.quiz;
 
+import cotato.csquiz.domain.entity.Quiz;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,16 @@ public class MultipleQuizResponse extends QuizResponse {
         super(id, number, question, image);
     }
 
-    public void addChoice(ChoiceResponse choiceResponse) {
-        this.choices.add(choiceResponse);
+    public void addChoices(List<ChoiceResponse> choiceResponses) {
+        this.choices.addAll(choiceResponses);
+    }
+
+    public static MultipleQuizResponse from(Quiz quiz) {
+        return new MultipleQuizResponse(
+                quiz.getId(),
+                quiz.getNumber(),
+                quiz.getQuestion(),
+                quiz.getPhotoUrl()
+        );
     }
 }
