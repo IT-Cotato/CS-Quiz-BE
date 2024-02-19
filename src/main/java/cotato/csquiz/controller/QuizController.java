@@ -84,7 +84,6 @@ public class QuizController {
         return ResponseEntity.ok(response);
     }
 
-
     @GetMapping("/cs-admin/result/kings")
     public ResponseEntity<?> kingMembers(@RequestParam("educationId") Long educationId) {
         log.info("cs문제 풀이의 마지막 문제 풀 사람");
