@@ -39,15 +39,23 @@ public class SocketService {
     }
 
     public void accessQuiz(QuizSocketRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         makeAllStartFalse();
         makeAllStatusFalse();
-        Quiz quiz = findQuizById(request.getQuizId());
         quiz.updateStatus(QuizStatus.QUIZ_ON);
         webSocketHandler.accessQuiz(quiz.getId());
     }
 
+    private void checkEducationOpen(Education education) {
+        if (EducationStatus.CLOSED == education.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_CLOSED);
+        }
+    }
+
     public void startQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
         quiz.updateStart(true);
         sleepRandomTime(quiz);
@@ -56,12 +64,14 @@ public class SocketService {
 
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         quiz.updateStatus(QuizStatus.QUIZ_OFF);
         quiz.updateStart(false);
     }
 
     public void stopQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         quiz.updateStart(false);
     }
 
