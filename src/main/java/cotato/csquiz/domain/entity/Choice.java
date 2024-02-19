@@ -2,6 +2,7 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import cotato.csquiz.domain.dto.quiz.CreateChoiceRequest;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
 import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -14,7 +15,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,11 +42,18 @@ public class Choice extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private MultipleQuiz multipleQuiz;
 
-    @Builder
-    public Choice(int choiceNumber, String content, ChoiceCorrect isCorrect) {
+    private Choice(int choiceNumber, String content, ChoiceCorrect isCorrect) {
         this.choiceNumber = choiceNumber;
         this.content = content;
         this.isCorrect = isCorrect;
+    }
+
+    public static Choice of(CreateChoiceRequest request) {
+        return new Choice(
+                request.getNumber(),
+                request.getContent(),
+                request.getIsAnswer()
+        );
     }
 
     public void changeCorrect(ChoiceCorrect choiceCorrect) {

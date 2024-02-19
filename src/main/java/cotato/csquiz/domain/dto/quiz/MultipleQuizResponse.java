@@ -1,27 +1,30 @@
 package cotato.csquiz.domain.dto.quiz;
 
+import cotato.csquiz.domain.entity.Quiz;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MultipleQuizResponse extends QuizResponse {
+public class MultipleQuizResponse {
 
+    private Long id;
+    private int number;
+    private String question;
+    private String image;
     private List<ChoiceResponse> choices = new ArrayList<>();
 
-    @Builder
-    public MultipleQuizResponse(Long id, int number, String question, String image) {
-        super(id, number, question, image);
-    }
-
-    public void addChoice(ChoiceResponse choiceResponse) {
-        this.choices.add(choiceResponse);
+    public static MultipleQuizResponse from(Quiz quiz, List<ChoiceResponse> choices) {
+        return new MultipleQuizResponse(
+                quiz.getId(),
+                quiz.getNumber(),
+                quiz.getQuestion(),
+                quiz.getPhotoUrl(),
+                choices
+        );
     }
 }

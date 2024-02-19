@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,17 +42,17 @@ public class QuizController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllQuizzes(@RequestParam("educationId") Long educationId) {
+    public ResponseEntity<?> findAllQuizzesForEducationTeam(@RequestParam("educationId") Long educationId) {
         log.info("교육에 등록된 전체 퀴즈 조회 컨트롤러");
-        AllQuizzesResponse allQuizzes = quizService.getAllQuizzes(educationId);
+        AllQuizzesResponse allQuizzes = quizService.findAllQuizzesForEducationTeam(educationId);
         return ResponseEntity.ok(allQuizzes);
     }
 
-    @GetMapping
-    public ResponseEntity<?> getOneQuiz(@RequestParam("quizId") Long quizId) {
+    @GetMapping("/{quizId}")
+    public ResponseEntity<?> findOneQuizForMember(@PathVariable("quizId") Long quizId) {
         log.info("특정 퀴즈 반환 컨트롤러");
-        QuizResponse response = quizService.getQuiz(quizId);
-        return ResponseEntity.ok(response);
+        QuizResponse response = quizService.findOneQuizForMember(quizId);
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/cs-admin/all")

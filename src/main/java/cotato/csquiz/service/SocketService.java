@@ -48,16 +48,24 @@ public class SocketService {
 
     @Transactional
     public void accessQuiz(QuizSocketRequest request) {
+        Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         makeAllStartFalse();
         makeAllStatusFalse();
-        Quiz quiz = findQuizById(request.getQuizId());
         quiz.updateStatus(QuizStatus.QUIZ_ON);
         webSocketHandler.accessQuiz(quiz.getId());
+    }
+
+    private void checkEducationOpen(Education education) {
+        if (EducationStatus.CLOSED == education.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_CLOSED);
+        }
     }
 
     @Transactional
     public void startQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
         quiz.updateStart(true);
         sleepRandomTime(quiz);
@@ -67,6 +75,7 @@ public class SocketService {
     @Transactional
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         quiz.updateStatus(QuizStatus.QUIZ_OFF);
         quiz.updateStart(false);
     }
@@ -74,6 +83,7 @@ public class SocketService {
     @Transactional
     public void stopQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
+        checkEducationOpen(quiz.getEducation());
         quiz.updateStart(false);
         calculateKingMember(quiz);
     }
@@ -98,10 +108,15 @@ public class SocketService {
 
     @Transactional
     public void stopAllQuiz(QuizCloseRequest request) {
-        makeAllStatusFalse();
-        makeAllStartFalse();
+        closeAllFlags();
         Education education = findEducationById(request.getEducationId());
         education.changeStatus(EducationStatus.CLOSED);
+    }
+
+    @Transactional
+    public void closeAllFlags() {
+        makeAllStatusFalse();
+        makeAllStartFalse();
     }
 
     private void makeAllStatusFalse() {

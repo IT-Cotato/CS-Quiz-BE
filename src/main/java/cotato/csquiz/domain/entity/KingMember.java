@@ -10,40 +10,26 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class ShortAnswer extends BaseTimeEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class KingMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "short_answer_id")
+    @Column(name = "king_member_id")
     private Long id;
 
-    @Column(name = "short_answer_content")
-    private String content;
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "quiz_id")
-    private ShortQuiz shortQuiz;
-
-    public void matchShortQuiz(ShortQuiz shortQuiz) {
-        this.shortQuiz = shortQuiz;
-    }
-
-    @Builder
-    public ShortAnswer(String content) {
-        this.content = content;
-    }
-
-    public static ShortAnswer of(String content) {
-        return new ShortAnswer(
-                content
-        );
-    }
+    @JoinColumn(name = "education_id")
+    private Education education;
 }

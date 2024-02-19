@@ -4,10 +4,10 @@ import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
 import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.domain.dto.session.SessionListResponse;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
-import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
 import java.util.List;
@@ -33,8 +33,8 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping("")
-    public ResponseEntity<List<Session>> getSessions(@RequestParam Long generationId) {
-        List<Session> sessions = sessionService.findSessionsByGenerationId(generationId);
+    public ResponseEntity<?> getSessions(@RequestParam Long generationId) {
+        List<SessionListResponse> sessions = sessionService.findSessionsByGenerationId(generationId);
         return ResponseEntity.status(HttpStatus.OK).body(sessions);
     }
 
