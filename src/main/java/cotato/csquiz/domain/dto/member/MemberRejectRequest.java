@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberRejectRequest {
 
-    private Long userId;
+    private Long memberId;
 }
