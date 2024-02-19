@@ -1,5 +1,10 @@
 package cotato.csquiz.service;
 
+import static cotato.csquiz.domain.enums.MemberRole.ADMIN;
+import static cotato.csquiz.domain.enums.MemberRole.EDUCATION;
+import static cotato.csquiz.domain.enums.MemberRole.GENERAL;
+import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
+import static cotato.csquiz.domain.enums.MemberRole.OLD_MEMBER;
 import static cotato.csquiz.domain.enums.MemberRole.REFUSED;
 
 import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
@@ -31,7 +36,7 @@ public class AdminService {
     private final RefusedMemberRepository refusedMemberRepository;
 
     public List<ApplyMemberInfo> getApplicantList() {
-        List<Member> applicantList = memberRepository.findAllByRole(MemberRole.GENERAL);
+        List<Member> applicantList = memberRepository.findAllByRole(GENERAL);
         return buildApplyInfoList(applicantList);
     }
 
@@ -45,8 +50,8 @@ public class AdminService {
         Member member = findMember(memberApproveRequest.getUserId());
         Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
         validateIsGeneral(member);
-        if (member.getRole() == MemberRole.GENERAL) {
-            member.updateRole(MemberRole.MEMBER);
+        if (member.getRole() == GENERAL) {
+            member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
             memberRepository.save(member);
@@ -58,7 +63,7 @@ public class AdminService {
         Member member = findMember(memberApproveRequest.getUserId());
         if (member.getRole() == REFUSED) {
             Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
-            member.updateRole(MemberRole.MEMBER);
+            member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
             deleteRefusedMember(member);
@@ -69,7 +74,7 @@ public class AdminService {
     public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
         Member member = findMember(memberRejectRequest.getUserId());
         validateIsGeneral(member);
-        if (member.getRole() == MemberRole.GENERAL) {
+        if (member.getRole() == GENERAL) {
             member.updateRole(REFUSED);
             memberRepository.save(member);
             addRefusedMember(member);
@@ -82,7 +87,7 @@ public class AdminService {
     }
 
     private void validateIsGeneral(Member member) {
-        if (member.getRole() != MemberRole.GENERAL) {
+        if (member.getRole() != GENERAL) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
     }
@@ -97,15 +102,29 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getUserId());
-        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED) {
+        if (member.getRole() == GENERAL || member.getRole() == REFUSED) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());
         memberRepository.save(member);
     }
 
+    @Transactional
+    public void updateActiveMemberToOldMember(List<Long> memberIds){
+        for (Long memberId : memberIds) {
+            Member member = findMember(memberId);
+            if (member.getRole() == MEMBER || member.getRole() == ADMIN || member.getRole() == EDUCATION ) {
+                member.updateRole(OLD_MEMBER);
+                memberRepository.save(member);
+            }
+            else {
+                throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
+            }
+        }
+    }
+
     public List<MemberEnrollInfoResponse> getOldMembersList() {
-        List<Member> oldMembers = memberRepository.findAllByRole(MemberRole.OLD_MEMBER);
+        List<Member> oldMembers = memberRepository.findAllByRole(OLD_MEMBER);
         return oldMembers.stream()
                 .map(MemberEnrollInfoResponse::from)
                 .toList();
@@ -115,14 +134,14 @@ public class AdminService {
     public void updateOldMemberToActiveGeneration(UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
         Member member = findMember(updateOldMemberRoleRequest.getUserId());
         validateIsOldMember(member);
-        if (member.getRole() == MemberRole.OLD_MEMBER) {
-            member.updateRole(MemberRole.MEMBER);
+        if (member.getRole() == OLD_MEMBER) {
+            member.updateRole(MEMBER);
             memberRepository.save(member);
         }
     }
 
     private void validateIsOldMember(Member member) {
-        if (member.getRole() != MemberRole.OLD_MEMBER) {
+        if (member.getRole() != OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_OLD_MEMBER);
         }
     }
@@ -151,4 +170,3 @@ public class AdminService {
                 .toList();
     }
 }
-
