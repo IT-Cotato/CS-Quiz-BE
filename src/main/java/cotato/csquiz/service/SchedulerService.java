@@ -20,6 +20,7 @@ public class SchedulerService {
 
     private final RefusedMemberRepository refusedMemberRepository;
     private final MemberRepository memberRepository;
+    private final SocketService socketService;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void updateRefusedMember() {
@@ -36,5 +37,11 @@ public class SchedulerService {
                 memberRepository.delete(refusedMember.getMember());
             }
         });
+    }
+
+    @Scheduled(cron = "0 0 2 * * SAT")
+    public void closeAllCsQuiz() {
+        socketService.closeAllFlags();
+        log.info("[ CS 퀴즈 모두 닫기 Scheduler 완료 ]");
     }
 }

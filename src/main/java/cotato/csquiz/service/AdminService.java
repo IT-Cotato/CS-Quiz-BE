@@ -102,7 +102,7 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
-        if (member.getRole() == GENERAL || member.getRole() == REFUSED) {
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());

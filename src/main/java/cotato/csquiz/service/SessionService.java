@@ -4,6 +4,7 @@ import cotato.csquiz.domain.dto.session.AddSessionRequest;
 import cotato.csquiz.domain.dto.session.AddSessionResponse;
 import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
 import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.domain.dto.session.SessionListResponse;
 import cotato.csquiz.domain.dto.session.SessionNumRequest;
 import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
@@ -104,10 +105,14 @@ public class SessionService {
         session.changePhotoUrl(imageUrl);
     }
 
-    //기수에 해당하는 세션 가지고 오기
-    public List<Session> findSessionsByGenerationId(long generationId) {
-        Generation generation = getGeneration(generationId);
-        return sessionRepository.findAllByGeneration(generation);
+    public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
+        Generation generation = generationRepository.findById(generationId)
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+
+        List<Session> sessions = sessionRepository.findAllByGeneration(generation);
+        return sessions.stream()
+                .map(SessionListResponse::from)
+                .toList();
     }
 
     public Session findSessionById(Long sessionId) {
