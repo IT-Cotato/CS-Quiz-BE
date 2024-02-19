@@ -5,8 +5,10 @@ import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.domain.dto.quiz.CreateShortAnswerRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
+import cotato.csquiz.domain.dto.quiz.FindMultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
@@ -134,11 +136,7 @@ public class QuizService {
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
         List<Choice> choices = request.getChoices().stream()
-                .map(choice -> Choice.builder()
-                        .choiceNumber(choice.getNumber())
-                        .content(choice.getContent())
-                        .isCorrect(choice.getIsAnswer())
-                        .build())
+                .map(Choice::of)
                 .toList();
         choiceRepository.saveAll(choices);
         log.info("객관식 선지 생성 : {}개", choices.size());
@@ -175,9 +173,8 @@ public class QuizService {
         log.info("주관식 문제 생성 : 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);
         List<ShortAnswer> shortAnswers = request.getShortAnswers().stream()
-                .map(answer -> ShortAnswer.builder()
-                        .content(answer.getAnswer())
-                        .build())
+                .map(CreateShortAnswerRequest::getAnswer)
+                .map(ShortAnswer::of)
                 .toList();
         shortAnswerRepository.saveAll(shortAnswers);
         log.info("주관식 정답 생성 : {}개", shortAnswers.size());
@@ -226,18 +223,16 @@ public class QuizService {
     }
 
     @Transactional
-    public AllQuizzesResponse getAllQuizzes(Long educationId) {
+    public AllQuizzesResponse findAllQuizzesForEducationTeam(Long educationId) {
         List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
         List<MultipleQuizResponse> multiples = quizzes.stream()
                 .filter(quiz -> quiz instanceof MultipleQuiz)
                 .map(this::toMultipleQuizResponse)
                 .toList();
-
         List<ShortQuizResponse> shortQuizzes = quizzes.stream()
                 .filter(quiz -> quiz instanceof ShortQuiz)
                 .map(this::toShortQuizResponse)
                 .toList();
-
         return AllQuizzesResponse.builder()
                 .multiples(multiples)
                 .shortQuizzes(shortQuizzes)
@@ -258,45 +253,28 @@ public class QuizService {
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
-
-        ShortQuizResponse response = ShortQuizResponse.builder()
-                .id(quiz.getId())
-                .number(quiz.getNumber())
-                .question(quiz.getQuestion())
-                .image(quiz.getPhotoUrl())
-                .build();
-        for (ShortAnswerResponse shortAnswerResponse : shortAnswerResponses) {
-            response.addShortAnswers(shortAnswerResponse);
-        }
-
-        return response;
+        return ShortQuizResponse.from(quiz, shortAnswerResponses);
     }
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
         List<ChoiceResponse> choiceResponses = choices.stream()
-                .map(ChoiceResponse::from)
+                .map(ChoiceResponse::forEducation)
                 .toList();
-
-        MultipleQuizResponse response = MultipleQuizResponse.builder()
-                .id(quiz.getId())
-                .number(quiz.getNumber())
-                .question(quiz.getQuestion())
-                .image(quiz.getPhotoUrl())
-                .build();
-        for (ChoiceResponse choiceResponse : choiceResponses) {
-            response.addChoice(choiceResponse);
-        }
-        return response;
+        return MultipleQuizResponse.from(quiz, choiceResponses);
     }
 
     @Transactional
-    public QuizResponse getQuiz(Long quizId) {
+    public QuizResponse findOneQuizForMember(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
-            return toMultipleQuizResponse(findQuiz);
+            List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz);
+            List<ChoiceResponse> choiceResponses = choices.stream()
+                    .map(ChoiceResponse::forMember)
+                    .toList();
+            return FindMultipleQuizResponse.from(findQuiz, choiceResponses);
         }
-        return toShortQuizResponse(findQuiz);
+        return QuizResponse.from((ShortQuiz) findQuiz);
     }
 
     @Transactional

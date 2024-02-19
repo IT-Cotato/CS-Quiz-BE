@@ -9,12 +9,21 @@ public record ChoiceResponse(
         String content,
         ChoiceCorrect isAnswer
 ) {
-    public static ChoiceResponse from(Choice choice) {
+    public static ChoiceResponse forEducation(Choice choice) {
         return new ChoiceResponse(
                 choice.getId(),
                 choice.getChoiceNumber(),
                 choice.getContent(),
                 choice.getIsCorrect()
+        );
+    }
+
+    public static ChoiceResponse forMember(Choice choice) {
+        return new ChoiceResponse(
+                choice.getId(),
+                choice.getChoiceNumber(),
+                choice.getContent(),
+                ChoiceCorrect.SECRET
         );
     }
 }

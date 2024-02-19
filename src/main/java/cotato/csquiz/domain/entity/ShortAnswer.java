@@ -40,4 +40,10 @@ public class ShortAnswer extends BaseTimeEntity {
     public ShortAnswer(String content) {
         this.content = content;
     }
+
+    public static ShortAnswer of(String content) {
+        return new ShortAnswer(
+                content
+        );
+    }
 }
