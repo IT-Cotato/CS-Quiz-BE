@@ -123,13 +123,11 @@ public class SocketService {
     private void decideWinnerForQuestionTen(Education education, Quiz quiz) {
         log.info("10번 문제 CS퀴즈 우승자 결정");
         if (winnerRepository.findByEducation(education).isEmpty()){
-            scorerRepository.findByQuiz(quiz).ifPresent(
-                    scorer -> {
-                        Member winnerMember = scorer.getMember();
-                        winnerRepository.save(Winner.of(winnerMember, education));
-                        log.info("새로운 우승자 등록: " + winnerMember);
-                    }
-            );
+            Scorer scorer = scorerRepository.findByQuiz(quiz).orElseThrow(() ->
+                    new AppException(ErrorCode.SCORER_NOT_FOUND));
+            Member winnerMember = scorer.getMember();
+            winnerRepository.save(Winner.of(winnerMember, education));
+            log.info("우승자 등록: " + winnerMember);
         }
     }
 
