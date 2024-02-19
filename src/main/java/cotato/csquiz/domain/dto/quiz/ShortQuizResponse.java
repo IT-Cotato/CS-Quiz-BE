@@ -4,34 +4,31 @@ import cotato.csquiz.domain.entity.Quiz;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ShortQuizResponse extends QuizResponse {
+public class ShortQuizResponse {
 
+    private Long id;
+    private int number;
+    private String question;
+    private String image;
     private List<ShortAnswerResponse> shortAnswers = new ArrayList<>();
-
-    @Builder
-    public ShortQuizResponse(Long id, int number, String question, String image) {
-        super(id, number, question, image);
-    }
 
     public void addShortAnswers(List<ShortAnswerResponse> shortAnswerResponses) {
         this.shortAnswers.addAll(shortAnswerResponses);
     }
 
-    public static ShortQuizResponse from(Quiz quiz) {
+    public static ShortQuizResponse from(Quiz quiz, List<ShortAnswerResponse> shortAnswers) {
         return new ShortQuizResponse(
                 quiz.getId(),
                 quiz.getNumber(),
                 quiz.getQuestion(),
-                quiz.getPhotoUrl()
+                quiz.getPhotoUrl(),
+                shortAnswers
         );
     }
 }

@@ -134,11 +134,7 @@ public class QuizService {
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
         List<Choice> choices = request.getChoices().stream()
-                .map(choice -> Choice.builder()
-                        .choiceNumber(choice.getNumber())
-                        .content(choice.getContent())
-                        .isCorrect(choice.getIsAnswer())
-                        .build())
+                .map(Choice::of)
                 .toList();
         choiceRepository.saveAll(choices);
         log.info("객관식 선지 생성 : {}개", choices.size());
@@ -175,9 +171,8 @@ public class QuizService {
         log.info("주관식 문제 생성 : 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);
         List<ShortAnswer> shortAnswers = request.getShortAnswers().stream()
-                .map(answer -> ShortAnswer.builder()
-                        .content(answer.getAnswer())
-                        .build())
+                .map(CreateShortAnswerRequest::getAnswer)
+                .map(ShortAnswer::of)
                 .toList();
         shortAnswerRepository.saveAll(shortAnswers);
         log.info("주관식 정답 생성 : {}개", shortAnswers.size());
@@ -256,9 +251,7 @@ public class QuizService {
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
-        ShortQuizResponse response = ShortQuizResponse.from(quiz);
-        response.addShortAnswers(shortAnswerResponses);
-        return response;
+        return ShortQuizResponse.from(quiz, shortAnswerResponses);
     }
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
@@ -266,9 +259,7 @@ public class QuizService {
         List<ChoiceResponse> choiceResponses = choices.stream()
                 .map(ChoiceResponse::forEducation)
                 .toList();
-        MultipleQuizResponse response = MultipleQuizResponse.from(quiz);
-        response.addChoices(choiceResponses);
-        return response;
+        return MultipleQuizResponse.from(quiz, choiceResponses);
     }
 
     @Transactional
