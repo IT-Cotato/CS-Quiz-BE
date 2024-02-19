@@ -185,6 +185,7 @@ public class SocketService {
         }
     }
 
+    @Transactional
     public SocketTokenDto createSocketToken(String authorizationHeader) {
         String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
@@ -192,7 +193,7 @@ public class SocketService {
         jwtUtil.validateMemberExist(email);
         String socketToken = jwtUtil.createSocketToken(email, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
-        return SocketTokenDto.of(socketToken);
+        return SocketTokenDto.from(socketToken);
     }
 
     private Education findEducationByQuiz(Quiz quiz) {
