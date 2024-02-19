@@ -84,6 +84,7 @@ public class QuizService {
 
     @Transactional
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
+        //이거 그냥 DB에서 찾기만 하는 로직으로 실행되게 변경 TODO
         List<Scorer> scorers = findScorersByEducationId(educationId);
         List<Member> kingMembers = findKingMembers(scorers);
         return kingMembers.stream()

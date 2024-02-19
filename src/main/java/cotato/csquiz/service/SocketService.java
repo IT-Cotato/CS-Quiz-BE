@@ -92,7 +92,7 @@ public class SocketService {
             log.info("10번 문제 CS퀴즈 우승자 결정");
             //education에 우승자가 있는지 확인 TODO
             //있으면 끝 없으면 10번째 문제 정답자 찾기 TODO
-            quizService.saveWinner(/*멤버Id 넣기*/);
+            //quizService.saveWinner(/*멤버Id 넣기*/);
         }
     }
 
