@@ -6,17 +6,24 @@ import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.dto.socket.SocketTokenDto;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
+import cotato.csquiz.domain.entity.Scorer;
+import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.domain.enums.EducationStatus;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.global.websocket.WebSocketHandler;
 import cotato.csquiz.repository.EducationRepository;
+import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.QuizRepository;
+import cotato.csquiz.repository.ScorerRepository;
+import cotato.csquiz.repository.WinnerRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,7 +41,11 @@ public class SocketService {
 
     private final EducationRepository educationRepository;
 
-    private final MemberRepository memberRepository;
+    private final KingMemberRepository kingMemberRepository;
+
+    private final WinnerRepository winnerRepository;
+
+    private final ScorerRepository scorerRepository;
 
     private final QuizService quizService;
 
@@ -89,22 +100,45 @@ public class SocketService {
     }
 
     private void calculateKingMember(Quiz quiz) {
+        Education education = findEducationByQuiz(quiz);
+
         if (quiz.getNumber() == 9) {
-            log.info("9번 문제 CS퀴즈 우승자 결정");
-            Long educationId = findEducationIdByQuiz(quiz);
-            List<Member> kingMembers = quizService.findKingMember(educationId);
-            //킹킹문제 DB에 kingMembers 멤버들 저장 TODO
-            if (kingMembers.size() == 1) {
-                quizService.saveWinner(kingMembers.get(0), educationId); //1명이면 우승자도 저장
-            }
+            decideWinnerForQuestionNine(education);
         }
+
         if (quiz.getNumber() == 10) {
-            log.info("10번 문제 CS퀴즈 우승자 결정");
-            //education에 우승자가 있는지 확인 TODO
-            //있으면 끝 없으면 10번째 문제 정답자 찾기 TODO
-            //quizService.saveWinner(/*멤버Id 넣기*/);
+            decideWinnerForQuestionTen(education, quiz);
         }
     }
+
+    private void decideWinnerForQuestionNine(Education education) {
+        log.info("9번 문제 CS퀴즈 우승자 결정");
+        List<Member> kingMembers = quizService.findKingMember(education.getId());
+        saveKingMembers(kingMembers, education);
+        if (kingMembers.size() == 1) {
+            winnerRepository.save(Winner.of(kingMembers.get(0), education));
+        }
+    }
+
+    private void decideWinnerForQuestionTen(Education education, Quiz quiz) {
+        log.info("10번 문제 CS퀴즈 우승자 결정");
+        if (winnerRepository.findByEducation(education).isEmpty()){
+            scorerRepository.findByQuiz(quiz).ifPresent(
+                    scorer -> {
+                        Member winnerMember = scorer.getMember();
+                        winnerRepository.save(Winner.of(winnerMember, education));
+                        log.info("새로운 우승자 등록: " + winnerMember);
+                    }
+            );
+        }
+    }
+
+    private List<KingMember> saveKingMembers(List<Member> kingMembers, Education education) {
+        return kingMembers.stream()
+                .map(kingMember -> saveKingMember(education, kingMember))
+                .toList();
+    }
+
 
     @Transactional
     public void stopAllQuiz(QuizCloseRequest request) {
@@ -163,7 +197,11 @@ public class SocketService {
         return SocketTokenDto.of(socketToken);
     }
 
-    private Long findEducationIdByQuiz(Quiz quiz) {
-        return quiz.getEducation().getId();
+    private Education findEducationByQuiz(Quiz quiz) {
+        return quiz.getEducation();
+    }
+
+    private KingMember saveKingMember(Education education, Member kingMember) {
+        return kingMemberRepository.save(KingMember.of(kingMember, education));
     }
 }

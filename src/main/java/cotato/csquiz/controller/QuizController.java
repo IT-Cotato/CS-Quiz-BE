@@ -85,7 +85,6 @@ public class QuizController {
     }
 
 
-    //이거 member role도 접근 가능하게 변경해야함 TODO
     @GetMapping("/cs-admin/result/kings")
     public ResponseEntity<?> kingMembers(@RequestParam("educationId") Long educationId) {
         log.info("cs문제 풀이의 마지막 문제 풀 사람");

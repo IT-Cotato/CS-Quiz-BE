@@ -20,6 +20,7 @@ import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
@@ -34,6 +35,7 @@ import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.EducationRepository;
+import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
@@ -63,6 +65,7 @@ public class QuizService {
     private final ScorerRepository scorerRepository;
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;
+    private final KingMemberRepository kingMemberRepository;
     private final S3Uploader s3Uploader;
 
     @Transactional
@@ -86,16 +89,11 @@ public class QuizService {
 
     @Transactional
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
-        //이거 아해 값들 그냥 DB에서 찾기만 하는 로직으로 실행되게 변경 TODO
         Education education = findEducationById(educationId);
-        //List<Member> kingMembers educationRepository.getKingKingMembers(); //킹킹 멤버 받기
-
-        List<Scorer> scorers = findScorersByEducationId(educationId);
-        List<Member> kingMembers = findKingMembers(scorers);
-        //위 두줄 삭제 예정
+        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
 
         return kingMembers.stream()
-                .map(KingMemberInfo::from)
+                .map(kingMember -> KingMemberInfo.from(kingMember.getMember()))
                 .toList();
     }
 
@@ -389,11 +387,5 @@ public class QuizService {
     private List<Scorer> findScorersByEducationId(Long educationId) {
         List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
         return findScorerByQuizzes(quizzes);
-    }
-
-    public void saveWinner(Member member, Long educationId) {
-        Education education = findEducationById(educationId);
-        education.addWinner(member);
-        educationRepository.save(education);
     }
 }
