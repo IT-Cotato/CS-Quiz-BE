@@ -39,10 +39,6 @@ public class Education extends BaseTimeEntity {
     private EducationStatus status;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "member_id")
-    private Member winner;
-
-    @OneToOne(fetch = LAZY)
     @JoinColumn(name = "session_id")
     private Session session;
 
@@ -60,9 +56,5 @@ public class Education extends BaseTimeEntity {
 
     public void updateSubject(String newSubject) {
         this.subject = newSubject;
-    }
-
-    public void addWinner(Member member) {
-        this.winner = member;
     }
 }
