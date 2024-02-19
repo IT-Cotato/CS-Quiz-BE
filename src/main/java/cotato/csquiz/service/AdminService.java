@@ -1,5 +1,6 @@
 package cotato.csquiz.service;
 
+import static cotato.csquiz.domain.enums.MemberRole.OLD_MEMBER;
 import static cotato.csquiz.domain.enums.MemberRole.REFUSED;
 
 import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
@@ -96,8 +97,8 @@ public class AdminService {
 
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
-        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED) {
+        Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());

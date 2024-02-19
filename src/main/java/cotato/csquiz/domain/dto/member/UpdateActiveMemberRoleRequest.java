@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateActiveMemberRoleRequest {
 
-    private Long userId;
+    private Long memberId;
     private MemberRole role;
 }
