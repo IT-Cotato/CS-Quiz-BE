@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberApproveRequest {
 
-    private Long userId;
+    private Long memberId;
     private MemberPosition position;
     private Long generationId;
 }

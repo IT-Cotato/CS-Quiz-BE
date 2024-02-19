@@ -42,21 +42,21 @@ public class AdminController {
 
     @PatchMapping("/approve")
     public ResponseEntity<?> approveApplicant(@RequestBody MemberApproveRequest memberApproveRequest) {
-        log.info("가입자 승인 컨트롤러, 요청된 member id : {}", memberApproveRequest.getUserId());
+        log.info("가입자 승인 컨트롤러, 요청된 member id : {}", memberApproveRequest.getMemberId());
         adminService.approveApplicant(memberApproveRequest);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/reject")
     public ResponseEntity<?> rejectApplicant(@RequestBody MemberRejectRequest memberRejectRequest) {
-        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberRejectRequest.getUserId());
+        log.info("가입자 거절 컨트롤러, 요청된 member id : {}", memberRejectRequest.getMemberId());
         adminService.rejectApplicant(memberRejectRequest);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/reapprove")
     public ResponseEntity<?> reapproveApplicant(@RequestBody MemberApproveRequest memberApproveRequest) {
-        log.info("가입자 재승인 컨트롤러, 요청된 member id : {}", memberApproveRequest.getUserId());
+        log.info("가입자 재승인 컨트롤러, 요청된 member id : {}", memberApproveRequest.getMemberId());
         adminService.reapproveApplicant(memberApproveRequest);
         return ResponseEntity.ok().build();
     }
@@ -71,7 +71,7 @@ public class AdminController {
     @PatchMapping("/active-members/role")
     public ResponseEntity<?> updateActiveMemberRole(
             @RequestBody UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        log.info("현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member id : {}", updateActiveMemberRoleRequest.getUserId());
+        log.info("현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member id : {}", updateActiveMemberRoleRequest.getMemberId());
         adminService.updateActiveMemberRole(updateActiveMemberRoleRequest);
         return ResponseEntity.ok().build();
     }
@@ -94,7 +94,7 @@ public class AdminController {
     @PatchMapping("/old-members/role")
     public ResponseEntity<?> updateOldMemberToActiveGeneration(
             @RequestBody UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
-        log.info("OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}", updateOldMemberRoleRequest.getUserId());
+        log.info("OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}", updateOldMemberRoleRequest.getMemberId());
         adminService.updateOldMemberToActiveGeneration(updateOldMemberRoleRequest);
         return ResponseEntity.ok().build();
     }

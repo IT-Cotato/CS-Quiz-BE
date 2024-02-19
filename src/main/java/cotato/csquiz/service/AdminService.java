@@ -47,7 +47,7 @@ public class AdminService {
 
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getUserId());
+        Member member = findMember(memberApproveRequest.getMemberId());
         Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
@@ -60,7 +60,7 @@ public class AdminService {
 
     @Transactional
     public void reapproveApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getUserId());
+        Member member = findMember(memberApproveRequest.getMemberId());
         if (member.getRole() == REFUSED) {
             Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
             member.updateRole(MEMBER);
@@ -72,7 +72,7 @@ public class AdminService {
 
     @Transactional
     public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
-        Member member = findMember(memberRejectRequest.getUserId());
+        Member member = findMember(memberRejectRequest.getMemberId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
             member.updateRole(REFUSED);
@@ -81,8 +81,8 @@ public class AdminService {
         }
     }
 
-    private Member findMember(Long userId) {
-        return memberRepository.findById(userId)
+    private Member findMember(Long memberId) {
+        return memberRepository.findById(memberId)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
@@ -101,7 +101,7 @@ public class AdminService {
 
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        Member member = findMember(updateActiveMemberRoleRequest.getUserId());
+        Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
         if (member.getRole() == GENERAL || member.getRole() == REFUSED) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
@@ -132,7 +132,7 @@ public class AdminService {
 
     @Transactional
     public void updateOldMemberToActiveGeneration(UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
-        Member member = findMember(updateOldMemberRoleRequest.getUserId());
+        Member member = findMember(updateOldMemberRoleRequest.getMemberId());
         validateIsOldMember(member);
         if (member.getRole() == OLD_MEMBER) {
             member.updateRole(MEMBER);
