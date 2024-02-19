@@ -84,9 +84,14 @@ public class QuizService {
 
     @Transactional
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
-        //이거 그냥 DB에서 찾기만 하는 로직으로 실행되게 변경 TODO
+        //이거 아해 값들 그냥 DB에서 찾기만 하는 로직으로 실행되게 변경 TODO
+        Education education = findEducationById(educationId);
+        //List<Member> kingMembers educationRepository.getKingKingMembers(); //킹킹 멤버 받기
+
         List<Scorer> scorers = findScorersByEducationId(educationId);
         List<Member> kingMembers = findKingMembers(scorers);
+        //위 두줄 삭제 예정
+
         return kingMembers.stream()
                 .map(KingMemberInfo::from)
                 .toList();
