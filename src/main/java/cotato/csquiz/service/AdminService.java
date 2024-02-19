@@ -6,6 +6,7 @@ import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
 import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.domain.dto.member.MemberRejectRequest;
+import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
@@ -94,17 +95,13 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateActiveMemberRole(List<Long> memberIds) {
-        for (Long memberId : memberIds) {
-            Member member = findMember(memberId);
-            if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED) {
-                throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
-            }
-            if (member.getRole() != MemberRole.OLD_MEMBER) {
-                member.updateRole(MemberRole.OLD_MEMBER);
-            }
-            memberRepository.save(member);
+    public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
+        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED) {
+            throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
+        member.updateRole(updateActiveMemberRoleRequest.getRole());
+        memberRepository.save(member);
     }
 
     public List<MemberEnrollInfoResponse> getOldMembersList() {

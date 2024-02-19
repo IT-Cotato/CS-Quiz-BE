@@ -1,7 +1,6 @@
 package cotato.csquiz.domain.dto.member;
 
 import cotato.csquiz.domain.enums.MemberRole;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateActiveMemberRoleRequest {
 
-    private List<Long> memberIds;
+    private Long memberId;
     private MemberRole role;
 }

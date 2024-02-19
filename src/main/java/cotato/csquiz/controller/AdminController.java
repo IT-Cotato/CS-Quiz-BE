@@ -68,11 +68,13 @@ public class AdminController {
     }
 
     @PatchMapping("/active-members/role")
-    public ResponseEntity<?> updateActiveMemberRole(@RequestBody UpdateActiveMemberRoleRequest updateRequest) {
-        log.info("현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member ids: {}", updateRequest.getMemberIds());
-        adminService.updateActiveMemberRole(updateRequest.getMemberIds());
+    public ResponseEntity<?> updateActiveMemberRole(
+            @RequestBody UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
+        log.info("현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member id : {}", updateActiveMemberRoleRequest.getMemberId());
+        adminService.updateActiveMemberRole(updateActiveMemberRoleRequest);
         return ResponseEntity.ok().build();
     }
+
 
     @GetMapping("/old-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getOldMembersList() {
