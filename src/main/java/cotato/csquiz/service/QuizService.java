@@ -43,11 +43,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Random;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -95,12 +92,6 @@ public class QuizService {
         return kingMembers.stream()
                 .map(kingMember -> KingMemberInfo.from(kingMember.getMember()))
                 .toList();
-    }
-
-    @Transactional
-    public List<Member> findKingMember(Long educationId) {
-        List<Scorer> scorers = findScorersByEducationId(educationId);
-        return findKingMembers(scorers);
     }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
@@ -362,30 +353,9 @@ public class QuizService {
         return quizRepository.findAllByEducationId(educationId);
     }
 
-    private List<Scorer> findScorerByQuizzes(List<Quiz> quizzes) {
-        return quizzes.stream()
-                .flatMap(quiz -> scorerRepository.findAllByQuiz(quiz).stream())
-                .toList();
-    }
-
-    private List<Member> findKingMembers(List<Scorer> scorers) {
-        Map<Member, Long> countByMember = scorers.stream()
-                .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
-        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
-        return countByMember.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
-                .map(Entry::getKey)
-                .toList();
-    }
-
     private Education findEducationById(Long educationId) {
         return educationRepository.findById(educationId).orElseThrow(
                 () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND)
         );
-    }
-
-    private List<Scorer> findScorersByEducationId(Long educationId) {
-        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
-        return findScorerByQuizzes(quizzes);
     }
 }
