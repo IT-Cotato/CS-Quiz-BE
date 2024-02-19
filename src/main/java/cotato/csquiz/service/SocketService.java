@@ -76,10 +76,15 @@ public class SocketService {
     }
 
     public void stopAllQuiz(QuizCloseRequest request) {
-        makeAllStatusFalse();
-        makeAllStartFalse();
+        closeAllFlags();
         Education education = findEducationById(request.getEducationId());
         education.changeStatus(EducationStatus.CLOSED);
+    }
+
+    @Transactional
+    public void closeAllFlags() {
+        makeAllStatusFalse();
+        makeAllStartFalse();
     }
 
     private void makeAllStatusFalse() {
