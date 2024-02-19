@@ -5,8 +5,10 @@ import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
 import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.domain.dto.quiz.CreateShortAnswerRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
+import cotato.csquiz.domain.dto.quiz.FindMultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
@@ -266,15 +268,13 @@ public class QuizService {
     public QuizResponse findOneQuizForMember(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
-            MultipleQuizResponse multipleQuizResponse = MultipleQuizResponse.from(findQuiz);
             List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz);
             List<ChoiceResponse> choiceResponses = choices.stream()
                     .map(ChoiceResponse::forMember)
                     .toList();
-            multipleQuizResponse.addChoices(choiceResponses);
-            return multipleQuizResponse;
+            return FindMultipleQuizResponse.from(findQuiz, choiceResponses);
         }
-        return ShortQuizResponse.from(findQuiz);
+        return QuizResponse.from((ShortQuiz) findQuiz);
     }
 
     @Transactional

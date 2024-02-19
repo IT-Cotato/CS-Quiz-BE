@@ -23,7 +23,7 @@ public record ChoiceResponse(
                 choice.getId(),
                 choice.getChoiceNumber(),
                 choice.getContent(),
-                null
+                ChoiceCorrect.SECRET
         );
     }
 }
