@@ -5,7 +5,7 @@ import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
-import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
+import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
 import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
@@ -76,12 +76,12 @@ public class EducationService {
     }
 
     @Transactional
-    public void patchSubject(PatchSubjectRequest request) {
-        validateNotEmpty(request.getNewSubject());
-
-        Education education = educationRepository.findById(request.getEducationId())
+    public void updateSubjectAndNumber(UpdateEducationRequest request) {
+        validateNotEmpty(request.newSubject());
+        Education education = educationRepository.findById(request.educationId())
                 .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
-        education.updateSubject(request.getNewSubject());
+        education.updateSubject(request.newSubject());
+        education.updateNumber(request.newNumber());
         educationRepository.save(education);
     }
 
