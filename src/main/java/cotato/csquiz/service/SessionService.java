@@ -80,7 +80,7 @@ public class SessionService {
     }
 
     @Transactional
-    public void changeSessionNum(SessionNumRequest request) {
+    public void changeSessionNumber(SessionNumRequest request) {
         Session session = findSessionById(request.getSessionId());
         session.changeSessionNum(session.getNumber());
     }
@@ -99,13 +99,12 @@ public class SessionService {
 
     private Session changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
         if (sessionImage != null && !sessionImage.isEmpty()) {
-            String imageUrl = s3Uploader.uploadFiles(sessionImage, "session");
+            String imageUrl = s3Uploader.uploadFiles(sessionImage, SESSION_BUCKET_DIRECTORY);
             session.changePhotoUrl(imageUrl);
         }
         return session;
     }
 
-    @Transactional
     public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
@@ -116,7 +115,6 @@ public class SessionService {
                 .toList();
     }
 
-    @Transactional
     public Session findSessionById(Long sessionId) {
         return sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND));
@@ -127,7 +125,6 @@ public class SessionService {
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
     }
 
-    @Transactional
     public List<CsEducationOnSessionNumberResponse> findAllCsOnSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
                 .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
