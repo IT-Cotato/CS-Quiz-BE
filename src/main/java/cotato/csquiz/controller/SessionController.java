@@ -53,7 +53,7 @@ public class SessionController {
 
     @PatchMapping("/number")
     public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request) {
-        sessionService.changeSessionNum(request);
+        sessionService.changeSessionNumber(request);
         return ResponseEntity.ok().build();
     }
 

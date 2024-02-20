@@ -81,9 +81,8 @@ public class Session {
         return this.id;
     }
 
-    public long changePhotoUrl(String photoUrl) {
+    public void changePhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
-        return this.id;
     }
 
     public void updateToggle(ItIssue itIssue, CSEducation csEducation, Networking networking) {

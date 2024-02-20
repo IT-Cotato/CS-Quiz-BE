@@ -63,12 +63,14 @@ public class SessionService {
                 .build();
     }
 
+    @Transactional
     public void updateSession(UpdateSessionRequest request) throws ImageException {
         Session session = findSessionById(request.getSessionId());
 
         session.changeDescription(request.getDescription());
         session.updateToggle(request.getItIssue(), request.getCsEducation(), request.getNetworking());
-        changePhoto(session, request.getSessionImage());
+        Session updateSession = changePhoto(session, request.getSessionImage());
+        sessionRepository.save(updateSession);
     }
 
     private int calculateLastSessionNumber(Generation generation) {
@@ -78,7 +80,7 @@ public class SessionService {
     }
 
     @Transactional
-    public void changeSessionNum(SessionNumRequest request) {
+    public void changeSessionNumber(SessionNumRequest request) {
         Session session = findSessionById(request.getSessionId());
         session.changeSessionNum(session.getNumber());
     }
@@ -95,14 +97,12 @@ public class SessionService {
         changePhoto(session, request.getSessionImage());
     }
 
-    private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
-        String imageUrl;
+    private Session changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
         if (sessionImage != null && !sessionImage.isEmpty()) {
-            imageUrl = s3Uploader.uploadFiles(sessionImage, "session");
-        } else {
-            throw new ImageException(ErrorCode.IMAGE_NOT_FOUND);
+            String imageUrl = s3Uploader.uploadFiles(sessionImage, SESSION_BUCKET_DIRECTORY);
+            session.changePhotoUrl(imageUrl);
         }
-        session.changePhotoUrl(imageUrl);
+        return session;
     }
 
     public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
