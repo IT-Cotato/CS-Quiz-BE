@@ -31,4 +31,16 @@ public class Winner extends BaseTimeEntity {
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
     private Education education;
+
+    public Winner(Member member, Education education) {
+        this.member = member;
+        this.education = education;
+    }
+
+    public static Winner of(Member member, Education education) {
+        return new Winner(
+                member,
+                education
+        );
+    }
 }

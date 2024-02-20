@@ -50,7 +50,7 @@ public class RecordService {
         validateQuizOpen(findQuiz);
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-        validateAlreadyCorrect(findQuiz, findMember);
+//        validateAlreadyCorrect(findQuiz, findMember);
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {

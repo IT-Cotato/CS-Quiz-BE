@@ -1,6 +1,7 @@
 package cotato.csquiz.repository;
 
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Session;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

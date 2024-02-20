@@ -21,23 +21,24 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class SocketService {
 
     private final WebSocketHandler webSocketHandler;
-
     private final QuizRepository quizRepository;
-
     private final EducationRepository educationRepository;
+    private final KingMemberService kingMemberService;
 
     private final JwtUtil jwtUtil;
 
+    @Transactional
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.getEducationId());
         education.changeStatus(EducationStatus.ONGOING);
     }
 
+    @Transactional
     public void accessQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
@@ -53,6 +54,7 @@ public class SocketService {
         }
     }
 
+    @Transactional
     public void startQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
@@ -62,6 +64,7 @@ public class SocketService {
         webSocketHandler.startQuiz(quiz.getId());
     }
 
+    @Transactional
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
@@ -69,12 +72,20 @@ public class SocketService {
         quiz.updateStart(false);
     }
 
+    @Transactional
     public void stopQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
         quiz.updateStart(false);
+        if (quiz.getNumber() == 9) {
+            kingMemberService.calculateKingMember(quiz);
+        }
+        if (quiz.getNumber() == 10) {
+            kingMemberService.saveWinner(quiz);
+        }
     }
 
+    @Transactional
     public void stopAllQuiz(QuizCloseRequest request) {
         closeAllFlags();
         Education education = findEducationById(request.getEducationId());
@@ -121,6 +132,7 @@ public class SocketService {
         }
     }
 
+    @Transactional
     public SocketTokenDto createSocketToken(String authorizationHeader) {
         String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
@@ -128,6 +140,6 @@ public class SocketService {
         jwtUtil.validateMemberExist(email);
         String socketToken = jwtUtil.createSocketToken(email, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
-        return SocketTokenDto.of(socketToken);
+        return SocketTokenDto.from(socketToken);
     }
 }

@@ -32,4 +32,16 @@ public class KingMember extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
     private Education education;
+
+    public KingMember(Member member, Education education) {
+        this.member = member;
+        this.education = education;
+    }
+
+    public static KingMember of(Member member, Education education) {
+        return new KingMember(
+                member,
+                education
+        );
+    }
 }

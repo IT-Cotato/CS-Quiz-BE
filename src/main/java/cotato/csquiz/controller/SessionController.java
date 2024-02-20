@@ -71,7 +71,8 @@ public class SessionController {
 
     @GetMapping("/cs-on")
     public ResponseEntity<?> getSessionsWithCsEducationOn(@RequestParam Long generationId) {
-        List<CsEducationOnSessionNumberResponse> sessionNumbers = sessionService.findAllCsOnSessionsByGenerationId(generationId);
+        List<CsEducationOnSessionNumberResponse> sessionNumbers = sessionService.findAllCsOnSessionsByGenerationId(
+                generationId);
         return ResponseEntity.status(HttpStatus.OK).body(sessionNumbers);
     }
 }

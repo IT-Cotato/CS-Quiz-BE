@@ -6,11 +6,17 @@ import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
+import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
+import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Session;
+import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
+import cotato.csquiz.repository.KingMemberRepository;
+import cotato.csquiz.repository.WinnerRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class EducationService {
 
     private final SessionService sessionService;
     private final EducationRepository educationRepository;
+    private final KingMemberRepository kingMemberRepository;
+    private final WinnerRepository winnerRepository;
 
+    @Transactional
     public AddEducationResponse addEducation(AddEducationRequest request) {
         Session session = sessionService.findSessionById(request.getSessionId());
         checkEducationExist(session);
@@ -55,6 +64,7 @@ public class EducationService {
                 .build();
     }
 
+    @Transactional
     public void patchEducationStatus(PatchEducationRequest request) {
         Education education = findEducation(request.getEducationId());
         education.changeStatus(request.getStatus());
@@ -65,6 +75,7 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
+    @Transactional
     public void patchSubject(PatchSubjectRequest request) {
         validateNotEmpty(request.getNewSubject());
 
@@ -85,5 +96,30 @@ public class EducationService {
         return educationList.stream()
                 .map(AllEducationResponse::convertFromEducation)
                 .toList();
+    }
+
+    public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
+        Education findEducation = educationRepository.findById(educationId)
+                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
+        validateEmpty(kingMembers);
+        return kingMembers.stream()
+                .map(KingMember::getMember)
+                .map(KingMemberInfo::from)
+                .toList();
+    }
+
+    private void validateEmpty(List<KingMember> kingMembers) {
+        if (kingMembers.isEmpty()) {
+            throw new AppException(ErrorCode.KING_MEMBER_NOT_FOUND);
+        }
+    }
+
+    public WinnerInfoResponse findWinner(Long educationId) {
+        Education findEducation = educationRepository.findById(educationId)
+                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+        Winner findWinner = winnerRepository.findByEducation(findEducation)
+                .orElseThrow(() -> new AppException(ErrorCode.WINNER_NOT_FOUND));
+        return WinnerInfoResponse.from(findWinner);
     }
 }
