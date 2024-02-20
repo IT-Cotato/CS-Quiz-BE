@@ -52,7 +52,7 @@ jwt:
 cloud:
   aws:
     s3:
-      bucket: cotato
+      bucket: ${S3_BUCKET_NAME}
     stack.auto: false
     region.static: ap-northeast-2
     credentials:
