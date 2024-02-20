@@ -4,7 +4,6 @@ import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
 import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
@@ -29,6 +28,12 @@ public class EducationController {
 
     private final EducationService educationService;
 
+    @GetMapping
+    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") Long generationId) {
+        List<AllEducationResponse> educationList = educationService.getEducationListByGeneration(generationId);
+        return ResponseEntity.ok().body(educationList);
+    }
+
     @GetMapping("/status")
     public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") Long educationId) {
         GetStatusResponse response = educationService.getStatus(educationId);
@@ -41,23 +46,17 @@ public class EducationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping
+    @PatchMapping("/update")
     public ResponseEntity<?> updateEducation(@RequestBody UpdateEducationRequest request) {
         educationService.updateSubjectAndNumber(request);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<?> getEducationListByGeneration(@RequestParam(value = "generationId") Long generationId) {
-        List<AllEducationResponse> educationList = educationService.getEducationListByGeneration(generationId);
-        return ResponseEntity.ok().body(educationList);
-    }
-
-    @PatchMapping("/status")
-    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
-        educationService.patchEducationStatus(request);
-        return ResponseEntity.ok().build();
-    }
+//    @PatchMapping("/status")
+//    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
+//        educationService.patchEducationStatus(request);
+//        return ResponseEntity.ok().build();
+//    }
 
     @GetMapping("/result/kings")
     public ResponseEntity<?> findFinalKingMembers(@RequestParam("educationId") Long educationId) {

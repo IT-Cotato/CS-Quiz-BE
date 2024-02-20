@@ -26,7 +26,7 @@ public class GenerationController {
 
     private final GenerationService generationService;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<?> getGenerations() {
         List<GenerationInfoResponse> generations = generationService.getGenerations();
         return ResponseEntity.ok().body(generations);
