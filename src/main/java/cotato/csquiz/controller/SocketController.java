@@ -4,7 +4,6 @@ import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
 import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.dto.socket.SocketTokenDto;
-import cotato.csquiz.service.KingMemberService;
 import cotato.csquiz.service.RecordService;
 import cotato.csquiz.service.SocketService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class SocketController {
 
     private final SocketService socketService;
     private final RecordService recordService;
-    private final KingMemberService kingMemberService;
 
     @PatchMapping("/start/csquiz")
     public ResponseEntity<?> openCSQuiz(@RequestBody QuizOpenRequest request) {

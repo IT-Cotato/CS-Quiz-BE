@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -23,8 +24,7 @@ import org.springframework.web.filter.CorsFilter;
 public class SecurityConfig {
 
     private static final String[] WHITE_LIST = {
-            "/v1/api/generation",
-            "/v1/api/session",
+            "/v1/api/auth/**",
             "/swagger-ui/**",
             "/websocket/csquiz"
     };
@@ -62,11 +62,26 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers("/v1/api/socket/token").hasAnyRole("EDUCATION", "ADMIN", "MEMBER")
-                        .requestMatchers("/v1/api/generation/**").hasAnyRole("GENERAL", "ADMIN")
-                        .requestMatchers("/v1/api/session/**").hasAnyRole("GENERAL", "ADMIN")
+                        .requestMatchers("/v1/api/education/result/**").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/v1/api/education/status", "GET"))
+                        .hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/v1/api/education", "GET")).authenticated()
+                        .requestMatchers("/v1/api/education/**").hasAnyRole("EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/generation").authenticated()
+                        .requestMatchers("/v1/api/generation/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/v1/api/mypage/**").hasAnyRole("MEMBER", "OLD_MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/quiz/cs-admin/**").hasAnyRole("EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/quiz/adds").hasAnyRole("EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/quiz/**").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/record/reply").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/record/**").hasAnyRole("EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/session/cs-on").hasAnyRole("EDUCATION", "ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/v1/api/session", "GET")).authenticated()
+                        .requestMatchers("/v1/api/session/**").hasAnyRole("ADMIN")
+                        .requestMatchers(new AntPathRequestMatcher("/v1/api/socket/token", "POST"))
+                        .hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
                         .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION", "ADMIN")
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 );
         return http.build();
     }
