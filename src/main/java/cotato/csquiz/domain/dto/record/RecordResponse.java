@@ -8,7 +8,7 @@ public record RecordResponse(
         Long ticketNumber,
         Long memberId,
         String memberName,
-        String backForNumber,
+        String backFourNumber,
         String reply
 ) implements Serializable {
 
