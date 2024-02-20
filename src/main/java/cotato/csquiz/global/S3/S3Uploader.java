@@ -58,7 +58,7 @@ public class S3Uploader {
 
     private Optional<File> convert(MultipartFile file) throws ImageException {
         File convertFile = new File(System.getProperty("user.dir") + "/" +  UUID.randomUUID());
-        log.info("original file name: {}", file.getName());
+        log.info("original file name: {}", convertFile.getName());
 
         try {
             log.info("convert try start");
@@ -70,7 +70,7 @@ public class S3Uploader {
                 return Optional.of(convertFile);
             }
         } catch (IOException e) {
-            log.info("convert 실패");
+            log.error("convert 실패", e);
             throw new ImageException(ErrorCode.IMAGE_PROCESSING_FAIL);
         }
         log.info("convert empty");
