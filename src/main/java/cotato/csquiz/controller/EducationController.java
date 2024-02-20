@@ -53,12 +53,6 @@ public class EducationController {
         return ResponseEntity.ok().build();
     }
 
-//    @PatchMapping("/status")
-//    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
-//        educationService.patchEducationStatus(request);
-//        return ResponseEntity.ok().build();
-//    }
-
     @GetMapping("/from")
     public ResponseEntity<?> findEducationId(@RequestParam("quizId") Long quizId) {
         log.info("[{} quizId의 educationId 조회 컨트롤러]", quizId);
