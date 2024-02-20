@@ -58,7 +58,7 @@ public class S3Uploader {
 
     private Optional<File> convert(MultipartFile file) throws ImageException {
         File convertFile = new File(System.getProperty("user.dir") + "/" +  UUID.randomUUID());
-        log.info("original file name: {}", file.getName());
+        log.info("original file name: {}", convertFile.getName());
 
         try {
             log.info("convert try start");
