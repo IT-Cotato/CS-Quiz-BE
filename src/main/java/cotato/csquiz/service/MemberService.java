@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberMyPageInfoResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -56,5 +57,11 @@ public class MemberService {
         if (bCryptPasswordEncoder.matches(newPassword, originPassword)) {
             throw new AppException(ErrorCode.SAME_PASSWORD);
         }
+    }
+
+    public MemberMyPageInfoResponse findMyPageInfo(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+        return MemberMyPageInfoResponse.from(findMember);
     }
 }
