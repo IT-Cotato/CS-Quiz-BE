@@ -9,7 +9,6 @@ import cotato.csquiz.domain.dto.quiz.CreateShortAnswerRequest;
 import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
 import cotato.csquiz.domain.dto.quiz.FindMultipleQuizResponse;
-import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
@@ -20,7 +19,6 @@ import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
-import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
@@ -35,7 +33,6 @@ import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.ChoiceRepository;
 import cotato.csquiz.repository.EducationRepository;
-import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
@@ -47,7 +44,6 @@ import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +59,6 @@ public class QuizService {
     private final ScorerRepository scorerRepository;
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;
-    private final KingMemberRepository kingMemberRepository;
     private final S3Uploader s3Uploader;
 
     @Transactional
@@ -83,23 +78,6 @@ public class QuizService {
         return quizzes.stream()
                 .map(this::makeQuizResultInfo)
                 .toList();
-    }
-
-    @Transactional
-    public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
-        Education education = findEducationById(educationId);
-        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
-        noKingMemberException(kingMembers);
-
-        return kingMembers.stream()
-                .map(kingMember -> KingMemberInfo.from(kingMember.getMember()))
-                .toList();
-    }
-
-    private void noKingMemberException(List<KingMember> kingMembers) {
-        if (kingMembers.isEmpty()) {
-            throw new AppException(ErrorCode.KING_MEMBER_NOT_FOUND);
-        }
     }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {

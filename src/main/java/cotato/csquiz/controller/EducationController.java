@@ -57,4 +57,11 @@ public class EducationController {
         educationService.patchEducationStatus(request);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/result/kings")
+    public ResponseEntity<?> findFinalKingMembers(@RequestParam("educationId") Long educationId) {
+        log.info("[{} 교육 결승진출자 조회 컨트롤러]", educationId);
+        List<KingMemberInfo> kingMemberInfos = educationService.findKingMemberInfo(educationId);
+        return ResponseEntity.ok().body(kingMemberInfos);
+    }
 }
