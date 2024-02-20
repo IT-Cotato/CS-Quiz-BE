@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,15 +27,15 @@ public class S3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadFiles(MultipartFile multipartFile, String dirName) throws ImageException{
-        log.info("upload Files {}",multipartFile);
+    public String uploadFiles(MultipartFile multipartFile, String dirName) throws ImageException {
+        log.info("upload Files {}", multipartFile);
         File uploadFile = convert(multipartFile)
                 .orElseThrow(() -> new ImageException(ErrorCode.IMAGE_PROCESSING_FAIL));
-        return upload(uploadFile, dirName);
+        return upload(uploadFile, dirName, multipartFile.getOriginalFilename());
     }
 
-    private String upload(File uploadFile, String dirName) {
-        String fileName = dirName + "/" + uploadFile.getName();
+    private String upload(File uploadFile, String dirName, String originalName) {
+        String fileName = dirName + "/" + UUID.randomUUID() + originalName;
         String uploadUrl = putS3(uploadFile, fileName);
         removeNewFile(uploadFile);
         log.info(uploadUrl);
@@ -44,19 +45,20 @@ public class S3Uploader {
     private void removeNewFile(File targetFile) {
         if (targetFile.delete()) {
             log.info("삭제 완료");
-        }else{
+        } else {
             log.info("삭제 에러");
         }
     }
 
     private String putS3(File uploadFile, String fileName) {
-        amazonS3.putObject(new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3.putObject(
+                new PutObjectRequest(bucket, fileName, uploadFile).withCannedAcl(CannedAccessControlList.PublicRead));
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
     private Optional<File> convert(MultipartFile file) throws ImageException {
-        File convertFile = new File(System.getProperty("user.dir") + "/" + file.getOriginalFilename());
-        log.info("original file name: {}",file.getOriginalFilename());
+        File convertFile = new File(System.getProperty("user.dir") + "/" +  UUID.randomUUID());
+        log.info("original file name: {}", file.getName());
 
         try {
             log.info("convert try start");
@@ -64,7 +66,7 @@ public class S3Uploader {
                 FileOutputStream fos = new FileOutputStream(convertFile); // FileOutputStream 데이터를 파일에 바이트 스트림으로 저장하기 위함
                 fos.write(file.getBytes());
                 fos.close();
-                log.info("convert to "+convertFile);
+                log.info("convert to " + convertFile);
                 return Optional.of(convertFile);
             }
         } catch (IOException e) {
