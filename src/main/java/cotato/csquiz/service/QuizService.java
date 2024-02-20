@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,10 +89,17 @@ public class QuizService {
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
         Education education = findEducationById(educationId);
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
+        noKingMemberException(kingMembers);
 
         return kingMembers.stream()
                 .map(kingMember -> KingMemberInfo.from(kingMember.getMember()))
                 .toList();
+    }
+
+    private void noKingMemberException(List<KingMember> kingMembers) {
+        if (kingMembers.isEmpty()) {
+            throw new AppException(ErrorCode.KING_MEMBER_NOT_FOUND);
+        }
     }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
