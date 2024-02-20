@@ -6,7 +6,8 @@ import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
-import cotato.csquiz.domain.enums.EducationStatus;
+import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
+import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.service.EducationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,12 @@ public class EducationController {
         log.info("[{} 교육 결승진출자 조회 컨트롤러]", educationId);
         List<KingMemberInfo> kingMemberInfos = educationService.findKingMemberInfo(educationId);
         return ResponseEntity.ok().body(kingMemberInfos);
+    }
+
+    @GetMapping("/result/winner")
+    public ResponseEntity<?> findWinner(@RequestParam("educationId") Long educationId) {
+        log.info("[{} 교육 우승자 조회 컨트롤러]", educationId);
+        WinnerInfoResponse winner = educationService.findWinner(educationId);
+        return ResponseEntity.ok().body(winner);
     }
 }

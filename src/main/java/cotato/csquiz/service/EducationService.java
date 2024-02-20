@@ -6,10 +6,12 @@ import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
+import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Session;
+import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
@@ -111,5 +113,13 @@ public class EducationService {
         if (kingMembers.isEmpty()) {
             throw new AppException(ErrorCode.KING_MEMBER_NOT_FOUND);
         }
+    }
+
+    public WinnerInfoResponse findWinner(Long educationId) {
+        Education findEducation = educationRepository.findById(educationId)
+                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+        Winner findWinner = winnerRepository.findByEducation(findEducation)
+                .orElseThrow(() -> new AppException(ErrorCode.WINNER_NOT_FOUND));
+        return WinnerInfoResponse.from(findWinner);
     }
 }
