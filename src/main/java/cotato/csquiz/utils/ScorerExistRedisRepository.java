@@ -14,7 +14,7 @@ public class ScorerExistRedisRepository {
 
     private static final String KEY_PREFIX = "$Scorer for ";
     private static final Long NONE_VALUE = Long.MAX_VALUE;
-    private static final Integer SCORER_EXPIRATION = 120;
+    private static final Integer SCORER_EXPIRATION = 60 * 24;
     private final QuizRepository quizRepository;
     private final RedisTemplate<String, Long> redisTemplate;
 
