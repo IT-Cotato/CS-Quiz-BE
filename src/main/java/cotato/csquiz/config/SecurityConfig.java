@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/v1/api/education/result/**").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
+                        .requestMatchers("/v1/api/education/from").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/v1/api/education/status", "GET"))
                         .hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
                         .requestMatchers(new AntPathRequestMatcher("/v1/api/education", "GET")).authenticated()
