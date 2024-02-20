@@ -3,6 +3,7 @@ package cotato.csquiz.controller;
 import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
+import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
 import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
@@ -52,11 +53,12 @@ public class EducationController {
         return ResponseEntity.ok().build();
     }
 
-//    @PatchMapping("/status")
-//    public ResponseEntity<?> patchEducationStatus(@RequestBody PatchEducationRequest request) {
-//        educationService.patchEducationStatus(request);
-//        return ResponseEntity.ok().build();
-//    }
+    @GetMapping("/from")
+    public ResponseEntity<?> findEducationId(@RequestParam("quizId") Long quizId) {
+        log.info("[{} quizId의 educationId 조회 컨트롤러]", quizId);
+        EducationIdOfQuizResponse educationId = educationService.findEducationIdOfQuizId(quizId);
+        return ResponseEntity.ok().body(educationId);
+    }
 
     @GetMapping("/result/kings")
     public ResponseEntity<?> findFinalKingMembers(@RequestParam("educationId") Long educationId) {
