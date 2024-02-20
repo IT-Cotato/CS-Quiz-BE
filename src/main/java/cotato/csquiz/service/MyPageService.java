@@ -31,10 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MyPageService {
 
+    private static final int SHOW_PEOPLE_COUNT = 5;
     private final GenerationRepository generationRepository;
     private final QuizRepository quizRepository;
     private final MemberRepository memberRepository;
-    private static final int SHOW_PEOPLE_COUNT = 5;
 
     public HallOfFameResponse getHallOfFame(Long generationId, String email) {
         Generation findGeneration = generationRepository.findById(generationId)
