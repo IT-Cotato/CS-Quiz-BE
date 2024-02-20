@@ -3,6 +3,7 @@ package cotato.csquiz.service;
 import cotato.csquiz.domain.dto.AllEducationResponse;
 import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
+import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
@@ -10,12 +11,14 @@ import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.KingMember;
+import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.KingMemberRepository;
+import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.WinnerRepository;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +36,7 @@ public class EducationService {
     private final SessionService sessionService;
     private final EducationRepository educationRepository;
     private final KingMemberRepository kingMemberRepository;
+    private final QuizRepository quizRepository;
     private final WinnerRepository winnerRepository;
 
     @Transactional
@@ -121,5 +125,12 @@ public class EducationService {
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new AppException(ErrorCode.WINNER_NOT_FOUND));
         return WinnerInfoResponse.from(findWinner);
+    }
+
+    public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
+                new AppException(ErrorCode.QUIZ_NOT_FOUND)
+        );
+        return EducationIdOfQuizResponse.from(quiz);
     }
 }
