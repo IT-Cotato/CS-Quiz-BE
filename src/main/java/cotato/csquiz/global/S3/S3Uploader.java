@@ -70,7 +70,7 @@ public class S3Uploader {
                 return Optional.of(convertFile);
             }
         } catch (IOException e) {
-            log.info("convert 실패");
+            log.error("convert 실패", e);
             throw new ImageException(ErrorCode.IMAGE_PROCESSING_FAIL);
         }
         log.info("convert empty");
