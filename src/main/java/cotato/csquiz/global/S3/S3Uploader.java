@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,11 +31,11 @@ public class S3Uploader {
         log.info("upload Files {}",multipartFile);
         File uploadFile = convert(multipartFile)
                 .orElseThrow(() -> new ImageException(ErrorCode.IMAGE_PROCESSING_FAIL));
-        return upload(uploadFile, dirName);
+        return upload(uploadFile, dirName, multipartFile.getOriginalFilename());
     }
 
-    private String upload(File uploadFile, String dirName) {
-        String fileName = dirName + "/" + uploadFile.getName();
+    private String upload(File uploadFile, String dirName, String originalName) {
+        String fileName = dirName + "/" + UUID.randomUUID() + originalName;
         String uploadUrl = putS3(uploadFile, fileName);
         removeNewFile(uploadFile);
         log.info(uploadUrl);
@@ -55,8 +56,8 @@ public class S3Uploader {
     }
 
     private Optional<File> convert(MultipartFile file) throws ImageException {
-        File convertFile = new File(System.getProperty("user.dir") + "/" + file.getOriginalFilename());
-        log.info("original file name: {}",file.getOriginalFilename());
+        File convertFile = new File(System.getProperty("user.dir") + "/" + UUID.randomUUID());
+        log.info("original file name: {}",convertFile.getName());
 
         try {
             log.info("convert try start");
@@ -68,7 +69,7 @@ public class S3Uploader {
                 return Optional.of(convertFile);
             }
         } catch (IOException e) {
-            log.info("convert 실패");
+            log.info("convert 실패", e);
             throw new ImageException(ErrorCode.IMAGE_PROCESSING_FAIL);
         }
         log.info("convert empty");
