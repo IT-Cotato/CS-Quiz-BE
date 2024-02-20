@@ -57,4 +57,8 @@ public class Education extends BaseTimeEntity {
     public void updateSubject(String newSubject) {
         this.subject = newSubject;
     }
+
+    public void updateNumber(int changeNumber) {
+        this.number = changeNumber;
+    }
 }

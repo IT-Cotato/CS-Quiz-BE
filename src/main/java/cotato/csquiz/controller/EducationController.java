@@ -5,7 +5,7 @@ import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
 import cotato.csquiz.domain.dto.education.PatchEducationRequest;
-import cotato.csquiz.domain.dto.education.PatchSubjectRequest;
+import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
 import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
 import cotato.csquiz.service.EducationService;
@@ -41,9 +41,9 @@ public class EducationController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/subject")
-    public ResponseEntity<?> patchSubject(@RequestBody PatchSubjectRequest request) {
-        educationService.patchSubject(request);
+    @PatchMapping
+    public ResponseEntity<?> updateEducation(@RequestBody UpdateEducationRequest request) {
+        educationService.updateSubjectAndNumber(request);
         return ResponseEntity.ok().build();
     }
 
