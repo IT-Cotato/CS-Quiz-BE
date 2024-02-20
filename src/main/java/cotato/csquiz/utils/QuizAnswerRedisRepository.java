@@ -25,7 +25,7 @@ import org.springframework.stereotype.Repository;
 public class QuizAnswerRedisRepository {
 
     private static final String KEY_PREFIX = "$quiz";
-    private static final Integer QUIZ_ANSWER_EXPIRATION_TIME = 120;
+    private static final Integer QUIZ_ANSWER_EXPIRATION_TIME = 60 * 24;
     private final QuizRepository quizRepository;
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;

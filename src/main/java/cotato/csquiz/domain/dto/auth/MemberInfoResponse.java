@@ -4,8 +4,8 @@ import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.enums.MemberRole;
 
 public record MemberInfoResponse(
-        Long id,
-        String name,
+        Long memberId,
+        String memberName,
         String backFourNumber,
         MemberRole role
 ) {

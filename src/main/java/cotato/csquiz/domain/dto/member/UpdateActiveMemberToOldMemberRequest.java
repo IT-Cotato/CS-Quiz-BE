@@ -1,5 +1,6 @@
 package cotato.csquiz.domain.dto.member;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateOldMemberRoleRequest {
+public class UpdateActiveMemberToOldMemberRequest {
 
-    private Long memberId;
+    private List<Long> memberIds;
 }

@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberEnrollInfoResponse {
 
-    private Long id;
-    private String name;
+    private Long memberId;
+    private String memberName;
     private MemberPosition position;
     private int generationNumber;
 
