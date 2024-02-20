@@ -46,7 +46,7 @@ public class SessionService {
         int sessionNumber = calculateLastSessionNumber(findGeneration);
         log.info("해당 기수에 추가된 마지막 세션 : {}", sessionNumber);
         Session session = Session.builder()
-                .number(sessionNumber)
+                .number(sessionNumber + 1)
                 .photoUrl(imageUrl)
                 .description(request.getDescription())
                 .generation(findGeneration)
@@ -74,7 +74,7 @@ public class SessionService {
     private int calculateLastSessionNumber(Generation generation) {
         List<Session> allSession = sessionRepository.findAllByGeneration(generation);
         return allSession.stream().mapToInt(Session::getNumber).max()
-                .orElse(0);
+                .orElse(-1);
     }
 
     @Transactional
