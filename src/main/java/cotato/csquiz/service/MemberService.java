@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private static final int MIN_LENGTH = 8;
+    private static final int MAX_LENGTH = 16;
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -49,14 +51,21 @@ public class MemberService {
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-        validateSamePassword(findMember.getPassword(), password);
+        validatePassword(findMember.getPassword(), password);
         findMember.updatePassword(bCryptPasswordEncoder.encode(password));
     }
 
-    private void validateSamePassword(String originPassword, String newPassword) {
+    private void validatePassword(String originPassword, String newPassword) {
+        if (!isProperLength(newPassword)) {
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
         if (bCryptPasswordEncoder.matches(newPassword, originPassword)) {
             throw new AppException(ErrorCode.SAME_PASSWORD);
         }
+    }
+
+    private boolean isProperLength(String newPassword) {
+        return MIN_LENGTH <= newPassword.length() && newPassword.length() <= MAX_LENGTH;
     }
 
     public MemberMyPageInfoResponse findMyPageInfo(Long memberId) {

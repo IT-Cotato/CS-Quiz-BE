@@ -1,5 +1,8 @@
 package cotato.csquiz.domain.entity;
 
+import static cotato.csquiz.domain.enums.MemberRole.ADMIN;
+import static cotato.csquiz.domain.enums.MemberRole.EDUCATION;
+import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
 import static jakarta.persistence.FetchType.LAZY;
 
 import cotato.csquiz.domain.enums.MemberPosition;
@@ -87,5 +90,9 @@ public class Member extends BaseTimeEntity {
     public String getBackFourNumber() {
         int numberLength = phoneNumber.length();
         return phoneNumber.substring(numberLength - 4);
+    }
+
+    public boolean isActiveRole() {
+        return role == ADMIN || role == EDUCATION || role == MEMBER;
     }
 }
