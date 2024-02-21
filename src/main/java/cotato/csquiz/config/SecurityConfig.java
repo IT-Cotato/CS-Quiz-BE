@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilter(corsFilter)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers("/v1/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/v1/api/education/result/**").hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
@@ -84,7 +85,6 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/v1/api/socket/token", "POST"))
                         .hasAnyRole("MEMBER", "EDUCATION", "ADMIN")
                         .requestMatchers("/v1/api/socket/**").hasAnyRole("EDUCATION", "ADMIN")
-                        .requestMatchers(CorsUtils::isCorsRequest).permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();

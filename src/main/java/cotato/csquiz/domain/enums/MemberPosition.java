@@ -9,7 +9,7 @@ public enum MemberPosition {
     NONE("NONE"),
     BE("Back-end"),
     FE("Front-end"),
-    Design("Design"),
+    DESIGN("Design"),
     PM("Product-Manager");
 
     private final String fullName;
