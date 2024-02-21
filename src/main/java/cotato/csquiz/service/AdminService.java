@@ -93,8 +93,8 @@ public class AdminService {
     }
 
     public List<MemberEnrollInfoResponse> findCurrentActiveMembers() {
-        List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
-        return activeMembers.stream()
+        return memberRepository.findAll().stream()
+                .filter(Member::isActiveRole)
                 .map(MemberEnrollInfoResponse::from)
                 .toList();
     }
