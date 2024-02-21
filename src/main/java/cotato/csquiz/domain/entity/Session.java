@@ -32,7 +32,7 @@ public class Session {
     @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "session_number", unique = true, nullable = false)
+    @Column(name = "session_number", nullable = false)
     private int number;
 
     @Column(name = "session_photo_url")
@@ -61,7 +61,8 @@ public class Session {
     private CSEducation csEducation;
 
     @Builder
-    public Session(int number, String photoUrl, String description, Generation generation,ItIssue itIssue, CSEducation csEducation, Networking networking) {
+    public Session(int number, String photoUrl, String description, Generation generation, ItIssue itIssue,
+                   CSEducation csEducation, Networking networking) {
         this.number = number;
         this.photoUrl = photoUrl;
         this.description = description;
