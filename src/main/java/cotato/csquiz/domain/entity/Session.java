@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import cotato.csquiz.domain.enums.CSEducation;
 import cotato.csquiz.domain.enums.ItIssue;
 import cotato.csquiz.domain.enums.Networking;
+import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -25,14 +26,14 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Session {
+public class Session extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "session_id")
     private Long id;
 
-    @Column(name = "session_number", nullable = false)
+    @Column(name = "session_number")
     private int number;
 
     @Column(name = "session_photo_url")

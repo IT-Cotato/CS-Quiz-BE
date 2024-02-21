@@ -28,7 +28,7 @@ public class Education extends BaseTimeEntity {
     @Column(name = "education_id")
     private Long id;
 
-    @Column(name = "education_number", unique = true, nullable = false)
+    @Column(name = "education_number")
     private int number;
 
     @Column(name = "education_subject")
