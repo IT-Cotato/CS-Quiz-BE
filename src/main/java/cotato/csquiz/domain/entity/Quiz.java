@@ -2,6 +2,7 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.global.entity.BaseTimeEntity;
@@ -18,6 +19,10 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -65,6 +70,14 @@ public class Quiz extends BaseTimeEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "generation_id")
     private Generation generation;
+
+    @OneToMany(mappedBy = "quiz", orphanRemoval = true)
+    @JsonIgnore
+    private List<Record> records = new ArrayList<>();
+
+    @OneToOne(mappedBy = "quiz", orphanRemoval = true)
+    @JsonIgnore
+    private Scorer scorer;
 
     public Quiz(int number, String question, String photoUrl, Education education, int appearSecond,
                 Generation generation) {

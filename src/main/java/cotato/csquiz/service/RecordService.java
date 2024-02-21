@@ -151,7 +151,7 @@ public class RecordService {
     }
 
     private List<RecordResponse> getRecordByQuiz(Quiz quiz) {
-        List<Record> records = recordRepository.findAllByQuiz(quiz);
+        List<Record> records = recordRepository.findAllFetchJoin(quiz);
         log.info("[문제에 모든 응답 반환 서비스]");
         return records.stream()
                 .sorted(Comparator.comparing(Record::getTicketNumber))

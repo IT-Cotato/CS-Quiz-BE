@@ -14,8 +14,7 @@ import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.QuizRepository;
-import cotato.csquiz.repository.RecordRepository;
-import cotato.csquiz.repository.ScorerRepository;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -32,22 +31,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class MyPageService {
 
+    private static final int SHOW_PEOPLE_COUNT = 5;
     private final GenerationRepository generationRepository;
     private final QuizRepository quizRepository;
-    private final ScorerRepository scorerRepository;
-    private final RecordRepository recordRepository;
     private final MemberRepository memberRepository;
-    private static final int SHOW_PEOPLE_COUNT = 5;
 
     public HallOfFameResponse getHallOfFame(Long generationId, String email) {
-        Generation generation = generationRepository.findById(generationId).orElseThrow(() ->
-                new AppException(ErrorCode.GENERATION_NOT_FOUND)
-        );
-        List<Quiz> quizzes = quizRepository.findByGeneration(generation);
-        List<HallOfFameInfo> scorerHallOfFame = makeScorerHallOfFame(quizzes);
-        List<HallOfFameInfo> answerHallOfFame = makeAnswerHallOfFame(quizzes);
-        MyHallOfFameInfo myHallOfFameInfo = makeMyHallOfFameInfo(email, quizzes);
-        return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo);
+        Generation findGeneration = generationRepository.findById(generationId)
+                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+        log.info("============{}기에 존재하는 모든 퀴즈 조회================", findGeneration.getNumber());
+        List<HallOfFameInfo> scorerHallOfFame = makeScorerHallOfFame(findGeneration);
+        log.info("============{}기에 존재하는 모든 득점자 조회================", findGeneration.getNumber());
+        List<HallOfFameInfo> answerHallOfFame = makeRecordsHallOfFameInfo(findGeneration);
+        log.info("============{}기에 존재하는 모든 정답자 조회================", findGeneration.getNumber());
+        Member member = findMemberByEmail(email);
+        MyHallOfFameInfo myHallOfFameInfo1 = makeMyHallOfFameInfo(member.getEmail(), findGeneration);
+        return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo1);
     }
 
     public MyPageMemberInfoResponse getMemberInfo(String email) {
@@ -55,10 +54,10 @@ public class MyPageService {
         return MyPageMemberInfoResponse.from(member);
     }
 
-    private MyHallOfFameInfo makeMyHallOfFameInfo(String email, List<Quiz> quizzes) {
+    private MyHallOfFameInfo makeMyHallOfFameInfo(String email, Generation generation) {
         Member member = findMemberByEmail(email);
-        long scorerCount = countMyScorer(member, quizzes);
-        long answerCount = countMyAnswer(member, quizzes);
+        long scorerCount = countMyScorer(member);
+        long answerCount = countMyAnswer(member);
         return MyHallOfFameInfo.from(member, scorerCount, answerCount);
     }
 
@@ -67,57 +66,67 @@ public class MyPageService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    private long countMyScorer(Member member, List<Quiz> quizzes) {
+    private long countMyScorer(Member member) {
+        List<Quiz> quizzes = quizRepository.findAllFetchJoinByScorer();
         List<Scorer> memberScorers = quizzes.stream()
-                .flatMap(quiz -> scorerRepository.findAllByQuizAndMember(quiz, member).stream())
+                .filter(quiz -> quiz.getGeneration().equals(member.getGeneration()))
+                .map(Quiz::getScorer)
+                .filter(scorer -> scorer.getMember().equals(member))
                 .toList();
         return memberScorers.size();
     }
 
-    private long countMyAnswer(Member member, List<Quiz> quizzes) {
-        List<Record> memberRecords = quizzes.stream()
-                .flatMap(quiz -> recordRepository.findAllByQuizAndIsCorrectAndMember(quiz, true, member).stream())
-                .toList();
-        return memberRecords.size();
+    private long countMyAnswer(Member member) {
+        List<Record> records = findRecordByQuizzes(member.getGeneration());
+        return records.stream()
+                .filter(record -> record.getMember().equals(member))
+                .toList()
+                .size();
     }
 
-    private List<HallOfFameInfo> makeAnswerHallOfFame(List<Quiz> quizzes) {
-        List<Record> recordList = findRecordByQuizzes(quizzes);
-
-        Map<Member, Long> countByMember = recordList.stream()
+    private List<HallOfFameInfo> makeRecordsHallOfFameInfo(Generation generation) {
+        List<Record> records = findRecordByQuizzes(generation);
+        Map<Member, Long> countByMember = records.stream()
                 .collect(Collectors.groupingBy(Record::getMember, Collectors.counting()));
         List<Entry<Member, Long>> sorted5MemberEntry = sorted5MemberEntry(countByMember);
-
         return sorted5MemberEntry.stream()
                 .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    private List<HallOfFameInfo> makeScorerHallOfFame(List<Quiz> quizzes) {
-        List<Scorer> scorerList = findScorerByQuizzes(quizzes);
-
-        Map<Member, Long> countByMember = scorerList.stream()
+    private List<HallOfFameInfo> makeScorerHallOfFame(Generation generation) {
+        List<Scorer> scorers = findScorersByQuizzes(generation);
+        Map<Member, Long> countByMember = scorers.stream()
                 .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
         List<Map.Entry<Member, Long>> sorted5MemberEntry = sorted5MemberEntry(countByMember);
-
         return sorted5MemberEntry.stream()
                 .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    private List<Scorer> findScorerByQuizzes(List<Quiz> quizzes) {
-        return quizzes.stream()
-                .flatMap(quiz -> scorerRepository.findAllByQuiz(quiz).stream())
+    private List<Scorer> findScorersByQuizzes(Generation generation) {
+        List<Quiz> quizzes = quizRepository.findAllFetchJoinByScorer();
+        return quizzes.stream().
+                filter(quiz -> quiz.getGeneration().equals(generation))
+                .map(Quiz::getScorer)
                 .toList();
     }
 
-    private List<Record> findRecordByQuizzes(List<Quiz> quizzes) {
-        return quizzes.stream()
-                .flatMap(quiz -> recordRepository.findAllByQuizAndIsCorrect(quiz, true).stream())
+    private List<Record> findRecordByQuizzes(Generation generation) {
+        List<Quiz> quizzes = quizRepository.findAllFetchJoinRecords();
+        List<Quiz> filteredQuizzes = quizzes.stream()
+                .filter(quiz -> quiz.getGeneration().equals(generation))
                 .toList();
+        List<Record> records = new ArrayList<>();
+        for (Quiz quiz : filteredQuizzes) {
+            records.addAll(quiz.getRecords().stream()
+                    .filter(Record::isCorrect)
+                    .toList());
+        }
+        return records;
     }
 
-    private static List<Entry<Member, Long>> sorted5MemberEntry(Map<Member, Long> countByMember) {
+    private List<Entry<Member, Long>> sorted5MemberEntry(Map<Member, Long> countByMember) {
         return countByMember.entrySet().stream()
                 .sorted(Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(SHOW_PEOPLE_COUNT)
