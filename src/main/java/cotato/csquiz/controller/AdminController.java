@@ -1,12 +1,12 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
+import cotato.csquiz.domain.dto.member.MemberApproveRequest;
 import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
+import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
 import cotato.csquiz.domain.dto.member.UpdateActiveMemberToOldMemberRequest;
 import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
-import cotato.csquiz.domain.dto.member.MemberApproveRequest;
-import cotato.csquiz.domain.dto.member.MemberRejectRequest;
 import cotato.csquiz.service.AdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +64,7 @@ public class AdminController {
     @GetMapping("/active-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getCurrentActiveMembers() {
         log.info("현재 활동 중인 부원 목록 조회 컨트롤러");
-        List<MemberEnrollInfoResponse> activeMembers = adminService.getCurrentActiveMembers();
+        List<MemberEnrollInfoResponse> activeMembers = adminService.findCurrentActiveMembers();
         return ResponseEntity.ok().body(activeMembers);
     }
 
@@ -79,7 +79,8 @@ public class AdminController {
     @PatchMapping("/active-members/to-old-members")
     public ResponseEntity<?> updateActiveMemberToOldMember(
             @RequestBody UpdateActiveMemberToOldMemberRequest updateActiveMemberToOldMemberRequest) {
-        log.info("현재 활동 중인 부원들을 OM으로 업데이트 하는 컨트롤러, 대상 member ids : {}", updateActiveMemberToOldMemberRequest.getMemberIds());
+        log.info("현재 활동 중인 부원들을 OM으로 업데이트 하는 컨트롤러, 대상 member ids : {}",
+                updateActiveMemberToOldMemberRequest.getMemberIds());
         adminService.updateActiveMemberToOldMember(updateActiveMemberToOldMemberRequest.getMemberIds());
         return ResponseEntity.ok().build();
     }

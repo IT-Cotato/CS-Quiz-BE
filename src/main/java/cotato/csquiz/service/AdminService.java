@@ -92,7 +92,7 @@ public class AdminService {
         }
     }
 
-    public List<MemberEnrollInfoResponse> getCurrentActiveMembers() {
+    public List<MemberEnrollInfoResponse> findCurrentActiveMembers() {
         List<Member> activeMembers = memberRepository.findAllByRole(MemberRole.MEMBER);
         return activeMembers.stream()
                 .map(MemberEnrollInfoResponse::from)
@@ -110,14 +110,13 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateActiveMemberToOldMember(List<Long> memberIds){
+    public void updateActiveMemberToOldMember(List<Long> memberIds) {
         for (Long memberId : memberIds) {
             Member member = findMember(memberId);
-            if (member.getRole() == MEMBER || member.getRole() == ADMIN || member.getRole() == EDUCATION ) {
+            if (member.getRole() == MEMBER || member.getRole() == ADMIN || member.getRole() == EDUCATION) {
                 member.updateRole(OLD_MEMBER);
                 memberRepository.save(member);
-            }
-            else {
+            } else {
                 throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
             }
         }
