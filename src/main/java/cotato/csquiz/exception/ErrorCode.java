@@ -51,7 +51,8 @@ public enum ErrorCode {
     EDUCATION_CLOSED(HttpStatus.BAD_REQUEST, "CS 퀴즈가 닫혀 있습니다 먼저 교육 시작 버튼을 눌러주세요"),
     SCORER_NOT_FOUND(HttpStatus.NOT_FOUND, "10번문제 득점자가 아직 존재하지 않습니다"),
     KING_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "아직 킹 멤버 풀사람을 계산 중입니다"),
-    WINNER_NOT_FOUND(HttpStatus.NOT_FOUND, "우승자가 존재하지 않습니다.");
+    WINNER_NOT_FOUND(HttpStatus.NOT_FOUND, "우승자가 존재하지 않습니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "유효하지 않은 패스워드입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

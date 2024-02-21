@@ -1,9 +1,6 @@
 package cotato.csquiz.domain.dto.member;
 
-import lombok.Getter;
-
-@Getter
-public class UpdatePasswordRequest {
-
-    private String password;
+public record UpdatePasswordRequest(
+        String password
+) {
 }

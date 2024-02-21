@@ -48,7 +48,7 @@ public class MemberController {
     public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
                                             @RequestBody UpdatePasswordRequest request) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
-        memberService.updatePassword(accessToken, request.getPassword());
+        memberService.updatePassword(accessToken, request.password());
         return ResponseEntity.ok().build();
     }
 
