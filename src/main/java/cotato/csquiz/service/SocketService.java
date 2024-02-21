@@ -90,6 +90,7 @@ public class SocketService {
         closeAllFlags();
         Education education = findEducationById(request.getEducationId());
         education.changeStatus(EducationStatus.CLOSED);
+        webSocketHandler.stopAllQuiz(education.getId());
     }
 
     @Transactional
