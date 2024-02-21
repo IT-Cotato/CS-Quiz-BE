@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.CorsFilter;
@@ -53,8 +52,7 @@ public class SecurityConfig {
         AuthenticationManagerBuilder sharedObject = http.getSharedObject(AuthenticationManagerBuilder.class);
         AuthenticationManager authenticationManager = sharedObject.build();
         http.authenticationManager(authenticationManager);
-        http.headers()
-                .referrerPolicy(ReferrerPolicy.UNSAFE_URL);
+        http.cors();
 
         http.csrf().disable()
                 .cors().disable()
