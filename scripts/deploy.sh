@@ -3,9 +3,9 @@
 PROJECT_NAME="CS-Quiz-BE"
 JAR_PATH="/home/ubuntu/backend/$PROJECT_NAME/build/libs/*.jar"
 DEPLOY_PATH=/home/ubuntu/backend/$PROJECT_NAME/
-DEPLOY_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy.log"
-DEPLOY_ERR_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy_err.log"
-APPLICATION_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/application.log"
+DEPLOY_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy_$(date +%Y%m%d).log"
+DEPLOY_ERR_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/deploy_err_$(date +%Y%m%d).log"
+APPLICATION_LOG_PATH="/home/ubuntu/backend/$PROJECT_NAME/application_$(date +%Y%m%d).log"
 BUILD_JAR=$(ls $JAR_PATH)
 JAR_NAME=$(basename $BUILD_JAR)
 
