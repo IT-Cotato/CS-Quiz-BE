@@ -2,6 +2,7 @@ package cotato.csquiz.domain.dto.member;
 
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.enums.MemberPosition;
+import cotato.csquiz.domain.enums.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,13 +18,15 @@ public class MemberEnrollInfoResponse {
     private String memberName;
     private MemberPosition position;
     private int generationNumber;
+    private MemberRole role;
 
     public static MemberEnrollInfoResponse from(Member member) {
         return new MemberEnrollInfoResponse(
                 member.getId(),
                 member.getName(),
                 member.getPosition(),
-                member.getGeneration().getNumber()
+                member.getGeneration().getNumber(),
+                member.getRole()
         );
     }
 }
