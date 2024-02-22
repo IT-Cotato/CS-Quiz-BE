@@ -120,11 +120,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private boolean updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
         return switch (role) {
-            case EDUCATION, ADMIN -> {
+            case EDUCATION -> {
                 updateManagerSession(memberEmail, session);
                 yield false;
             }
-            case MEMBER -> {
+            case MEMBER, ADMIN -> {
                 updateClientSession(memberEmail, session);
                 yield true;
             }
@@ -163,10 +163,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private void disconnectSession(String memberEmail, MemberRole role) {
         switch (role) {
-            case ADMIN, EDUCATION -> {
+            case EDUCATION -> {
                 MANAGERS.remove(memberEmail);
             }
-            case MEMBER -> {
+            case MEMBER, ADMIN -> {
                 CLIENTS.remove(memberEmail);
             }
             default -> {
