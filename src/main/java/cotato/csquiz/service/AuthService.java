@@ -92,12 +92,14 @@ public class AuthService {
     @Transactional
     public void logout(LogoutRequest request, String refreshToken, HttpServletResponse response) {
         String email = jwtUtil.getEmail(refreshToken);
-        RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
+        RefreshToken existRefreshTokenSet = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
-
         jwtUtil.setBlackList(refreshToken);
         log.info("[로그아웃 된 리프레시 토큰 블랙리스트 처리]");
-        refreshTokenRepository.delete(existRefreshToken);
+        if (!existRefreshTokenSet.getRefreshToken().contains(refreshToken)) {
+            throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
+        }
+        existRefreshTokenSet.getRefreshToken().remove(refreshToken);
         Cookie deleteCookie = new Cookie(REFRESH_TOKEN, null);
         deleteCookie.setMaxAge(0);
         deleteCookie.setSecure(true);
