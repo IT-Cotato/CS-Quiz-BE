@@ -93,14 +93,15 @@ public class AuthService {
         RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
         jwtUtil.setBlackList(existRefreshToken.getRefreshToken());
-        log.info("[로그아웃된 토큰 블랙리스트 처리]");
+        log.info("[로그아웃 된 리프레시 토큰 블랙리스트 처리]");
         refreshTokenRepository.delete(existRefreshToken);
-        Cookie cookie = new Cookie(REFRESH_TOKEN, refreshToken);
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        Cookie deleteCookie = new Cookie(REFRESH_TOKEN, null);
+        deleteCookie.setMaxAge(0);
+        deleteCookie.setSecure(true);
+        deleteCookie.setHttpOnly(true);
+        response.addCookie(deleteCookie);
         jwtUtil.setBlackList(request.accessToken());
+        log.info("[로그아웃 된 액세스 토큰 블랙리스트 처리]");
     }
 
     public void sendSignUpEmail(SendEmailRequest request) {
