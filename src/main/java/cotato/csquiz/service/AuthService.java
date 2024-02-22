@@ -49,6 +49,7 @@ public class AuthService {
     public void createLoginInfo(JoinRequest request) {
         validateService.checkDuplicateEmail(request.getEmail());
         validateService.checkDuplicatePhoneNumber(request.getPhoneNumber());
+        validateService.checkPassword(request.getPassword());
         log.info("[회원 가입 서비스]: {}, {}", request.getEmail(), request.getPassword());
         Member newMember = Member.builder()
                 .email(request.getEmail())
