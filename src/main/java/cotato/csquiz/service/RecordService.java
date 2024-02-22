@@ -50,7 +50,7 @@ public class RecordService {
         validateQuizOpen(findQuiz);
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
-//        validateAlreadyCorrect(findQuiz, findMember);
+        validateAlreadyCorrect(findQuiz, findMember);
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
@@ -151,9 +151,10 @@ public class RecordService {
     }
 
     private List<RecordResponse> getRecordByQuiz(Quiz quiz) {
-        List<Record> records = recordRepository.findAllFetchJoin(quiz);
+        List<Record> records = recordRepository.findAllFetchJoin();
         log.info("[문제에 모든 응답 반환 서비스]");
         return records.stream()
+                .filter(record -> record.getQuiz().equals(quiz))
                 .sorted(Comparator.comparing(Record::getTicketNumber))
                 .map(RecordResponse::from)
                 .toList();
