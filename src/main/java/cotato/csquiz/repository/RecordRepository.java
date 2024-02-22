@@ -12,8 +12,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
 
     List<Record> findAllByQuizAndReply(Quiz quiz, String answer);
 
-    @Query("select o from Record o join fetch o.quiz where o.isCorrect = true")
-    List<Record> findAllFetchJoin(Quiz quiz);
+    @Query("select o from Record o join fetch o.quiz")
+    List<Record> findAllFetchJoin();
 
     Optional<Record> findByQuizAndMemberAndIsCorrect(Quiz findQuiz, Member findMember, boolean isCorrect);
 }
