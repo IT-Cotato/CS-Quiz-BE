@@ -56,8 +56,8 @@ public class MyPageService {
 
     private MyHallOfFameInfo makeMyHallOfFameInfo(String email, Generation generation) {
         Member member = findMemberByEmail(email);
-        long scorerCount = countMyScorer(member);
-        long answerCount = countMyAnswer(member);
+        long scorerCount = countMyScorer(member, generation);
+        long answerCount = countMyAnswer(member, generation);
         return MyHallOfFameInfo.from(member, scorerCount, answerCount);
     }
 
@@ -66,20 +66,21 @@ public class MyPageService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    private long countMyScorer(Member member) {
+    private long countMyScorer(Member member, Generation generation) {
         List<Quiz> quizzes = quizRepository.findAllFetchJoinByScorer();
         List<Scorer> memberScorers = quizzes.stream()
-                .filter(quiz -> quiz.getGeneration().equals(member.getGeneration()))
+                .filter(quiz -> quiz.getGeneration().equals(generation))
                 .map(Quiz::getScorer)
                 .filter(scorer -> scorer.getMember().equals(member))
                 .toList();
         return memberScorers.size();
     }
 
-    private long countMyAnswer(Member member) {
+    private long countMyAnswer(Member member, Generation generation) {
         List<Record> records = findRecordByQuizzes(member.getGeneration());
         return records.stream()
                 .filter(record -> record.getMember().equals(member))
+                .filter(record -> record.getQuiz().getGeneration().equals(generation))
                 .toList()
                 .size();
     }
