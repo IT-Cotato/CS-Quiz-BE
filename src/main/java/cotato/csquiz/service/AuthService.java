@@ -97,6 +97,7 @@ public class AuthService {
         refreshTokenRepository.delete(existRefreshToken);
         Cookie cookie = new Cookie(REFRESH_TOKEN, refreshToken);
         cookie.setMaxAge(0);
+        response.addCookie(cookie);
         jwtUtil.setBlackList(request.accessToken());
     }
 
