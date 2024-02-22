@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.global.entity.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -71,11 +72,11 @@ public class Quiz extends BaseTimeEntity {
     @JoinColumn(name = "generation_id")
     private Generation generation;
 
-    @OneToMany(mappedBy = "quiz", orphanRemoval = true)
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.REFRESH)
     @JsonIgnore
     private List<Record> records = new ArrayList<>();
 
-    @OneToOne(mappedBy = "quiz", orphanRemoval = true)
+    @OneToOne(mappedBy = "quiz", cascade = CascadeType.REFRESH)
     @JsonIgnore
     private Scorer scorer;
 
