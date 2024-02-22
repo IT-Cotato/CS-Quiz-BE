@@ -59,8 +59,8 @@ public class SocketService {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
-        quiz.updateStart(true);
         sleepRandomTime(quiz);
+        quiz.updateStart(true);
         webSocketHandler.startQuiz(quiz.getId());
     }
 
