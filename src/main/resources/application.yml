@@ -61,3 +61,11 @@ cloud:
 
 springdoc:
   show-login-endpoint: true
+
+
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+
