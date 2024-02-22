@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.domain.dto.socket.CsQuizStopResponse;
 import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
-import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
@@ -41,7 +40,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if (isGeneral) {
             checkQuizAlreadyStart(session);
         }
-        log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
+        log.info("CLIENTS: {}", CLIENTS.keySet());
+        log.info("MANAGERS: {}", MANAGERS.keySet());
     }
 
     @Override
@@ -49,12 +49,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String memberEmail = findAttributeByToken(session, "email");
         if (memberEmail != null) {
             String roleString = findAttributeByToken(session, "role");
-            log.info("roleString {}", roleString);
+            log.info("[연결된 역할] {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
             disconnectSession(memberEmail, role);
         }
-        log.info("disconnect the session");
-        log.info("CLIENTS: {} MANAGERS: {}", CLIENTS, MANAGERS);
+        log.info("[disconnect the session]");
+        log.info("CLIENTS: {}", CLIENTS.keySet());
+        log.info("MANAGERS: {}", MANAGERS.keySet());
     }
 
     public void accessQuiz(long quizId) {
