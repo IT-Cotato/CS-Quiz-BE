@@ -38,14 +38,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        log.info("login POST 요청");
-
+        log.info("[로그인 요청 시도]");
         ObjectMapper mapper = new ObjectMapper();
         try {
             Member member = mapper.readValue(request.getInputStream(), Member.class);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     member.getEmail(), member.getPassword());
             //            PrincipalDetails principal = (PrincipalDetails) authenticate.getPrincipal();
+            log.info("[요청한 유저 {}]", member.getName());
             return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,8 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String accessToken = token.getAccessToken();
         response.addHeader("accessToken", accessToken);
 
-        RefreshToken refreshToken = new RefreshToken(principal.getMember().getEmail());
-        refreshToken.updateRefreshToken(token.getRefreshToken());
+        RefreshToken refreshToken = new RefreshToken(principal.getMember().getEmail(), token.getRefreshToken());
         refreshTokenRepository.save(refreshToken);
 
         Cookie cookie = new Cookie("refreshToken", token.getRefreshToken());

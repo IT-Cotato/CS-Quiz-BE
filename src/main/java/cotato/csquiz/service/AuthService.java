@@ -69,10 +69,10 @@ public class AuthService {
         String email = jwtUtil.getEmail(refreshToken);
         String role = jwtUtil.getRole(refreshToken);
         RefreshToken findToken = refreshTokenRepository.findById(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
-        if (!findToken.getRefreshToken().contains(refreshToken)) {
+                .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST));
+        if (!refreshToken.equals(findToken.getRefreshToken())) {
             log.warn("[쿠키로 들어온 토큰과 DB의 토큰이 일치하지 않음.]");
-            throw new AppException(ErrorCode.JWT_NOT_EXISTS);
+            throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
         }
         jwtUtil.setBlackList(refreshToken);
         Token token = jwtUtil.createToken(email, role);
@@ -84,6 +84,7 @@ public class AuthService {
         log.info("[리프레시 쿠키 발급, 발급시간 : {}]", refreshTokenAge / 1000);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
+        refreshCookie.setPath("/");
         response.addCookie(refreshCookie);
         return ReissueResponse.from(token.getAccessToken());
     }
@@ -91,18 +92,17 @@ public class AuthService {
     @Transactional
     public void logout(LogoutRequest request, String refreshToken, HttpServletResponse response) {
         String email = jwtUtil.getEmail(refreshToken);
-        RefreshToken existRefreshTokenSet = refreshTokenRepository.findById(email)
+        RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
+
         jwtUtil.setBlackList(refreshToken);
         log.info("[로그아웃 된 리프레시 토큰 블랙리스트 처리]");
-        if (!existRefreshTokenSet.getRefreshToken().contains(refreshToken)) {
-            throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
-        }
-        existRefreshTokenSet.getRefreshToken().remove(refreshToken);
+        refreshTokenRepository.delete(existRefreshToken);
         Cookie deleteCookie = new Cookie(REFRESH_TOKEN, null);
         deleteCookie.setMaxAge(0);
         deleteCookie.setSecure(true);
         deleteCookie.setHttpOnly(true);
+        deleteCookie.setPath("/");
         response.addCookie(deleteCookie);
         jwtUtil.setBlackList(request.accessToken());
         log.info("[로그아웃 된 액세스 토큰 블랙리스트 처리]");
