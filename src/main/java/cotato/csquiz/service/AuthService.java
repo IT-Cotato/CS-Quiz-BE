@@ -47,10 +47,8 @@ public class AuthService {
 
     @Transactional
     public void createLoginInfo(JoinRequest request) {
-
         validateService.checkDuplicateEmail(request.getEmail());
         validateService.checkDuplicatePhoneNumber(request.getPhoneNumber());
-
         log.info("[회원 가입 서비스]: {}, {}", request.getEmail(), request.getPassword());
         Member newMember = Member.builder()
                 .email(request.getEmail())
@@ -81,6 +79,7 @@ public class AuthService {
 
         Cookie refreshCookie = new Cookie(REFRESH_TOKEN, token.getRefreshToken());
         refreshCookie.setMaxAge(refreshTokenAge / 1000);
+        log.info("[리프레시 쿠키 발급, 발급시간 : {}]", refreshTokenAge / 1000);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         response.addCookie(refreshCookie);
@@ -92,10 +91,12 @@ public class AuthService {
         String email = jwtUtil.getEmail(refreshToken);
         RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.JWT_NOT_EXISTS));
-        log.info("로그아웃된 토큰 블랙리스트 처리");
         jwtUtil.setBlackList(existRefreshToken.getRefreshToken());
+        log.info("[로그아웃된 토큰 블랙리스트 처리]");
         refreshTokenRepository.delete(existRefreshToken);
         Cookie cookie = new Cookie(REFRESH_TOKEN, refreshToken);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
         jwtUtil.setBlackList(request.accessToken());

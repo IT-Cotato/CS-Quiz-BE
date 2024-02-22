@@ -33,16 +33,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String accessToken = jwtUtil.resolveAccessToken(request);
-        log.info("액세스토큰 반환 완료: {}", accessToken);
+        log.info("[{} 유저 액세스토큰 반환 완료]", jwtUtil.getEmail(accessToken));
         jwtUtil.validateAccessToken(accessToken);
         setAuthentication(accessToken);
         filterChain.doFilter(request, response);
     }
 
     private void setAuthentication(String accessToken) {
-        log.info("jwt 기반 인증 진행");
         String email = jwtUtil.getEmail(accessToken);
         String role = jwtUtil.getRole(accessToken);
+        log.info("[인증 필터 인증 진행, {}]", email);
         log.info("Member Role: {}", role);
         jwtUtil.validateMemberExist(email);
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, "",
