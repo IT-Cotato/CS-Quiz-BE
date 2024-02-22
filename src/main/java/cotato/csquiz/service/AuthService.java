@@ -71,6 +71,7 @@ public class AuthService {
         RefreshToken findToken = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
         if (!refreshToken.equals(findToken.getRefreshToken())) {
+            log.warn("[쿠키로 들어온 토큰과 DB의 토큰이 일치하지 않음.]");
             throw new AppException(ErrorCode.JWT_NOT_EXISTS);
         }
         jwtUtil.setBlackList(refreshToken);
