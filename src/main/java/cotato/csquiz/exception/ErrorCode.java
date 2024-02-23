@@ -53,7 +53,8 @@ public enum ErrorCode {
     KING_MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "아직 킹 멤버 풀사람을 계산 중입니다"),
     WINNER_NOT_FOUND(HttpStatus.NOT_FOUND, "우승자가 존재하지 않습니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "유효하지 않은 패스워드입니다."),
-    REFRESH_TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "RefreshToken is not in Repository.");
+    REFRESH_TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "RefreshToken is not in Repository."),
+    INVALID_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "Invalid Password");
 
     private final HttpStatus httpStatus;
     private final String message;

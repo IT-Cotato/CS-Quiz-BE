@@ -25,6 +25,9 @@ public class ValidateService {
     }
 
     public void checkDuplicatePhoneNumber(String phone) {
+        if (phone.length() <= 4) {
+            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
+        }
         if (memberRepository.findByPhoneNumber(phone).isPresent()) {
             log.error("[회원 가입 실패]: 존재하는 전화번호 " + phone);
             throw new AppException(ErrorCode.PHONE_NUMBER_DUPLICATED);
@@ -46,6 +49,7 @@ public class ValidateService {
     public void checkPassword(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
         Matcher matcher = pattern.matcher(password);
+        log.info("");
         if (!matcher.matches()) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
