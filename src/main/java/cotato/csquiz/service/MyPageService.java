@@ -45,7 +45,7 @@ public class MyPageService {
         List<HallOfFameInfo> answerHallOfFame = makeRecordsHallOfFameInfo(findGeneration);
         log.info("============{}기에 존재하는 모든 정답자 조회================", findGeneration.getNumber());
         Member member = findMemberByEmail(email);
-        MyHallOfFameInfo myHallOfFameInfo1 = makeMyHallOfFameInfo(member.getEmail(), findGeneration);
+        MyHallOfFameInfo myHallOfFameInfo1 = makeMyHallOfFameInfo(member, findGeneration);
         return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo1);
     }
 
@@ -54,8 +54,7 @@ public class MyPageService {
         return MyPageMemberInfoResponse.from(member);
     }
 
-    private MyHallOfFameInfo makeMyHallOfFameInfo(String email, Generation generation) {
-        Member member = findMemberByEmail(email);
+    private MyHallOfFameInfo makeMyHallOfFameInfo(Member member, Generation generation) {
         long scorerCount = countMyScorer(member, generation);
         long answerCount = countMyAnswer(member, generation);
         return MyHallOfFameInfo.from(member, scorerCount, answerCount);
