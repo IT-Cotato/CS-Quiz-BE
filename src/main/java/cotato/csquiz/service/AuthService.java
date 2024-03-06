@@ -71,6 +71,8 @@ public class AuthService {
         String role = jwtUtil.getRole(refreshToken);
         RefreshToken findToken = refreshTokenRepository.findById(email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+        log.info("[브라우저에서 들어온 쿠키], {}", refreshToken);
+        log.info("[DB에 저장된 토큰], {}", findToken.getRefreshToken());
         if (!refreshToken.equals(findToken.getRefreshToken())) {
             log.warn("[쿠키로 들어온 토큰과 DB의 토큰이 일치하지 않음.]");
             throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
