@@ -38,7 +38,7 @@ public class AuthController {
     @PostMapping("/reissue")
     public ResponseEntity<?> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken,
                                           HttpServletResponse response) {
-        log.info("[액세스 토큰 재발급 컨트롤러]:");
+        log.info("[액세스 토큰 재발급 컨트롤러]: 쿠키 존재 여부, {}", refreshToken);
         ReissueResponse reissue = authService.reissue(refreshToken, response);
         return ResponseEntity.ok().body(reissue);
     }
