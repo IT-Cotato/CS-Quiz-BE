@@ -85,6 +85,7 @@ public class AuthService {
         Cookie refreshCookie = new Cookie(REFRESH_TOKEN, token.getRefreshToken());
         refreshCookie.setMaxAge(refreshTokenAge / 1000);
         log.info("[리프레시 쿠키 발급, 발급시간 : {}]", refreshTokenAge / 1000);
+        refreshCookie.setPath("/");
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         response.addCookie(refreshCookie);
@@ -101,6 +102,7 @@ public class AuthService {
         refreshTokenRepository.delete(existRefreshToken);
         Cookie deleteCookie = new Cookie(REFRESH_TOKEN, null);
         deleteCookie.setMaxAge(0);
+        deleteCookie.setPath("/");
         deleteCookie.setSecure(true);
         deleteCookie.setHttpOnly(true);
         response.addCookie(deleteCookie);
