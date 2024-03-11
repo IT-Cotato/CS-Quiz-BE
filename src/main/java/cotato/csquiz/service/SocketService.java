@@ -49,7 +49,7 @@ public class SocketService {
     }
 
     private void checkEducationOpen(Education education) {
-        if (EducationStatus.CLOSED == education.getStatus()) {
+        if (EducationStatus.ONGOING != education.getStatus()) {
             throw new AppException(ErrorCode.EDUCATION_CLOSED);
         }
     }
@@ -60,7 +60,7 @@ public class SocketService {
         checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
         sleepRandomTime(quiz);
-        quiz.updateStart(true);
+        quiz.updateStart(QuizStatus.QUIZ_ON);
         webSocketHandler.startQuiz(quiz.getId());
     }
 
@@ -69,14 +69,14 @@ public class SocketService {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
         quiz.updateStatus(QuizStatus.QUIZ_OFF);
-        quiz.updateStart(false);
+        quiz.updateStart(QuizStatus.QUIZ_OFF);
     }
 
     @Transactional
     public void stopQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
         checkEducationOpen(quiz.getEducation());
-        quiz.updateStart(false);
+        quiz.updateStart(QuizStatus.QUIZ_OFF);
         if (quiz.getNumber() == 9) {
             kingMemberService.calculateKingMember(quiz);
         }
@@ -89,7 +89,7 @@ public class SocketService {
     public void stopAllQuiz(QuizCloseRequest request) {
         closeAllFlags();
         Education education = findEducationById(request.getEducationId());
-        education.changeStatus(EducationStatus.CLOSED);
+        education.changeStatus(EducationStatus.FINISHED);
         webSocketHandler.stopAllQuiz(education.getId());
     }
 
@@ -106,7 +106,7 @@ public class SocketService {
 
     private void makeAllStartFalse() {
         quizRepository.findByStart(QuizStatus.QUIZ_ON)
-                .forEach(quiz -> quiz.updateStart(false));
+                .forEach(quiz -> quiz.updateStart(QuizStatus.QUIZ_OFF));
     }
 
     private void isQuizStatusTrue(Quiz quiz) {
