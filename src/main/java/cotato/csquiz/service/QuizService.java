@@ -264,6 +264,7 @@ public class QuizService {
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
         List<String> answers = getAnswerList(quiz);
+
         return QuizInfoInCsQuizResponse.from(quiz, answers);
     }
 
@@ -277,6 +278,7 @@ public class QuizService {
     private List<String> getMultipleQuizAnswer(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
         return choices.stream()
+                .filter(choice -> choice.getIsCorrect() == ChoiceCorrect.ANSWER)
                 .map(choice -> String.valueOf(choice.getChoiceNumber()))
                 .toList();
     }
