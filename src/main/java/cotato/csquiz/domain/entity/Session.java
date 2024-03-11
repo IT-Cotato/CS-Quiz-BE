@@ -73,14 +73,12 @@ public class Session extends BaseTimeEntity {
         this.networking = networking;
     }
 
-    public int changeSessionNum(int sessionNumber) {
+    public void changeSessionNumber(int sessionNumber) {
         this.number = sessionNumber;
-        return this.number;
     }
 
-    public long changeDescription(String description) {
+    public void changeDescription(String description) {
         this.description = description;
-        return this.id;
     }
 
     public void changePhotoUrl(String photoUrl) {

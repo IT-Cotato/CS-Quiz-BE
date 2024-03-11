@@ -94,12 +94,8 @@ public class Quiz extends BaseTimeEntity {
         this.status = status;
     }
 
-    public void updateStart(boolean status) {
-        if (status) {
-            this.start = QuizStatus.QUIZ_ON;
-        } else {
-            this.start = QuizStatus.QUIZ_OFF;
-        }
+    public void updateStart(QuizStatus status) {
+        this.start = status;
     }
 
     public boolean isOff() {

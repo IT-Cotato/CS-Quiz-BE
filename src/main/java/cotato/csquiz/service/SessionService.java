@@ -82,7 +82,7 @@ public class SessionService {
     @Transactional
     public void changeSessionNumber(SessionNumRequest request) {
         Session session = findSessionById(request.getSessionId());
-        session.changeSessionNum(session.getNumber());
+        session.changeSessionNumber(session.getNumber());
     }
 
     @Transactional
