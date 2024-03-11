@@ -49,14 +49,12 @@ public class Generation extends BaseTimeEntity {
         isRecruit = false;
     }
 
-    public Long changeRecruit(boolean isRecruit){
+    public void changeRecruit(boolean isRecruit){
         this.isRecruit = isRecruit;
-        return this.getId();
     }
 
-    public Long changePeriod(LocalDate startDate, LocalDate endDate) {
+    public void changePeriod(LocalDate startDate, LocalDate endDate) {
         this.startDate=startDate;
         this.endDate = endDate;
-        return this.getId();
     }
 }
