@@ -72,11 +72,11 @@ public class Quiz extends BaseTimeEntity {
     @JoinColumn(name = "generation_id")
     private Generation generation;
 
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.REFRESH)
+    @OneToMany(mappedBy = "quiz", orphanRemoval = true)
     @JsonIgnore
     private List<Record> records = new ArrayList<>();
 
-    @OneToOne(mappedBy = "quiz", cascade = CascadeType.REFRESH)
+    @OneToOne(mappedBy = "quiz", orphanRemoval = true)
     @JsonIgnore
     private Scorer scorer;
 
