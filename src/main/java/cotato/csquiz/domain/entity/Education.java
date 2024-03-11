@@ -47,7 +47,7 @@ public class Education extends BaseTimeEntity {
         this.subject = subject;
         this.number = educationNum;
         this.session = session;
-        status = EducationStatus.CLOSED;
+        status = EducationStatus.BEFORE;
     }
 
     public void changeStatus(EducationStatus status) {

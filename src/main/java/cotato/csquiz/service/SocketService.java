@@ -49,7 +49,7 @@ public class SocketService {
     }
 
     private void checkEducationOpen(Education education) {
-        if (EducationStatus.CLOSED == education.getStatus()) {
+        if (EducationStatus.ONGOING != education.getStatus()) {
             throw new AppException(ErrorCode.EDUCATION_CLOSED);
         }
     }
@@ -89,7 +89,7 @@ public class SocketService {
     public void stopAllQuiz(QuizCloseRequest request) {
         closeAllFlags();
         Education education = findEducationById(request.getEducationId());
-        education.changeStatus(EducationStatus.CLOSED);
+        education.changeStatus(EducationStatus.FINISHED);
         webSocketHandler.stopAllQuiz(education.getId());
     }
 
