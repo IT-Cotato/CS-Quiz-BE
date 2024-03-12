@@ -11,12 +11,11 @@ import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.enums.CSEducation;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.global.S3.S3Uploader;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +40,8 @@ public class SessionService {
         if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), SESSION_BUCKET_DIRECTORY);
         }
-        Generation findGeneration = getGeneration(request.getGenerationId());
+        Generation findGeneration = generationRepository.findById(request.getGenerationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
 
         int sessionNumber = calculateLastSessionNumber(findGeneration);
         log.info("해당 기수에 추가된 마지막 세션 : {}", sessionNumber);
@@ -107,7 +107,7 @@ public class SessionService {
 
     public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
 
         List<Session> sessions = sessionRepository.findAllByGeneration(generation);
         return sessions.stream()
@@ -117,17 +117,12 @@ public class SessionService {
 
     public Session findSessionById(Long sessionId) {
         return sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new AppException(ErrorCode.SESSION_NOT_FOUND));
-    }
-
-    private Generation getGeneration(Long generationId) {
-        return generationRepository.findById(generationId)
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
     }
 
     public List<CsEducationOnSessionNumberResponse> findAllCsOnSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
         List<Session> sessions = sessionRepository.findAllByGeneration(generation);
         return sessions.stream()
                 .filter(session -> session.getCsEducation() == CSEducation.CS_ON)

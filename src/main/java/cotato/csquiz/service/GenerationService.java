@@ -9,7 +9,7 @@ import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
-import cotato.csquiz.repository.SessionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,16 +42,16 @@ public class GenerationService {
     }
 
     public void changeRecruiting(ChangeRecruitingRequest request) {
-        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        Generation generation = generationRepository.findById(request.getGenerationId())
+                .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
         generation.changeRecruit(request.isStatement());
         log.info("changeRecruiting success");
     }
 
     public void changePeriod(ChangePeriodRequest request) {
         checkPeriodValid(request.getStartDate(), request.getEndDate());
-        Generation generation = generationRepository.findById(request.getGenerationId()).orElseThrow(
-                () -> new AppException(ErrorCode.DATA_NOTFOUND));
+        Generation generation = generationRepository.findById(request.getGenerationId())
+                .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
         generation.changePeriod(request.getStartDate(), request.getEndDate());
         log.info("change date " + request.getStartDate() + " " + request.getEndDate());
     }
@@ -72,7 +72,7 @@ public class GenerationService {
 
     private void checkNumberValid(int generationNumber) {
         if (generationRepository.findByNumber(generationNumber).isPresent()) {
-            throw new AppException(ErrorCode.GENERATION_NUMBER_EXIST);
+            throw new AppException(ErrorCode.GENERATION_NUMBER_DUPLICATED);
         }
     }
 }

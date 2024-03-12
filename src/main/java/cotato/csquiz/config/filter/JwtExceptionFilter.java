@@ -29,7 +29,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
                     HttpStatus.UNAUTHORIZED,
-                    ErrorCode.JWT_EXPIRED.getMessage(),
+                    ErrorCode.TOKEN_EXPIRED.getMessage(),
                     request.getRequestURI()
             );
             setErrorResponse(response, errorResponse);

@@ -16,21 +16,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
-        log.error("발생한 에러: {}", e.getErrorCode().getMessage());
+        log.error("AppCustomException 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
-        ErrorResponse errorResponse = new ErrorResponse(
+        AppExceptionResponse appExceptionResponse = new AppExceptionResponse(
                 LocalDateTime.now(),
                 e.getErrorCode().getHttpStatus(),
+                e.getErrorCode(),
                 e.getErrorCode().getMessage(),
                 request.getRequestURI()
         );
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(errorResponse);
+                .body(appExceptionResponse);
     }
 
     @ExceptionHandler(ImageException.class)
     public ResponseEntity<?> handleImageException(ImageException e, HttpServletRequest request) {
-        log.error("발생한 에러: {}", e.getErrorCode().getMessage());
+        log.error("이미지 처리 실패 예외 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
@@ -43,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
-        log.error("Entity Not Found Exception 발생");
+        log.error("Entity Not Found Exception 발생: {}", e.getMessage());
         log.error("에러 요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
@@ -64,6 +65,6 @@ public class GlobalExceptionHandler {
                 "SQL Error",
                 request.getRequestURI()
         );
-        return ResponseEntity.status(500).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 }

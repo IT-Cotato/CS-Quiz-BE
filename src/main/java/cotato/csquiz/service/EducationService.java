@@ -20,6 +20,7 @@ import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.WinnerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +58,7 @@ public class EducationService {
     private void checkEducationExist(Session session) {
         Optional<Education> education = educationRepository.findEducationBySession(session);
         if (education.isPresent()) {
-            throw new AppException(ErrorCode.EDUCATION_EXIST);
+            throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
         }
     }
 
@@ -76,14 +77,14 @@ public class EducationService {
 
     private Education findEducation(long educationId) {
         return educationRepository.findById(educationId)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
     }
 
     @Transactional
     public void updateSubjectAndNumber(UpdateEducationRequest request) {
         validateNotEmpty(request.newSubject());
         Education education = educationRepository.findById(request.educationId())
-                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         education.updateSubject(request.newSubject());
         education.updateNumber(request.newNumber());
         educationRepository.save(education);
@@ -104,7 +105,7 @@ public class EducationService {
 
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
         Education findEducation = educationRepository.findById(educationId)
-                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
         validateEmpty(kingMembers);
         return kingMembers.stream()
@@ -115,22 +116,21 @@ public class EducationService {
 
     private void validateEmpty(List<KingMember> kingMembers) {
         if (kingMembers.isEmpty()) {
-            throw new AppException(ErrorCode.KING_MEMBER_NOT_FOUND);
+            throw new EntityNotFoundException("아직 결승 진출자가 결정되지 않았습니다.");
         }
     }
 
     public WinnerInfoResponse findWinner(Long educationId) {
         Education findEducation = educationRepository.findById(educationId)
-                .orElseThrow(() -> new AppException(ErrorCode.EDUCATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
-                .orElseThrow(() -> new AppException(ErrorCode.WINNER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
         return WinnerInfoResponse.from(findWinner);
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(() ->
-                new AppException(ErrorCode.QUIZ_NOT_FOUND)
-        );
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 문제를 찾을 수 없습니다."));
         return EducationIdOfQuizResponse.from(quiz);
     }
 }

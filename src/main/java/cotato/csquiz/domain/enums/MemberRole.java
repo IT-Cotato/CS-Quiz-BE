@@ -25,6 +25,6 @@ public enum MemberRole {
         return Arrays.stream(MemberRole.values())
                 .filter(memberRole -> memberRole.getKey().equals(key))
                 .findFirst()
-                .orElseThrow(() -> new AppException(ErrorCode.ENUM_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.ENUM_NOT_RESOLVED));
     }
 }
