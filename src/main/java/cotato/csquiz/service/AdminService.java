@@ -22,6 +22,7 @@ import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.RefusedMemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,7 @@ public class AdminService {
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getMemberId());
-        Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
+        Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
             member.updateRole(MEMBER);
@@ -62,7 +63,7 @@ public class AdminService {
     public void reapproveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getMemberId());
         if (member.getRole() == REFUSED) {
-            Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
+            Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
             member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
@@ -83,7 +84,7 @@ public class AdminService {
 
     private Member findMember(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원이 존재하지 않습니다."));
     }
 
     private void validateIsGeneral(Member member) {
@@ -154,13 +155,13 @@ public class AdminService {
 
     private void deleteRefusedMember(Member member) {
         RefusedMember refusedMember = refusedMemberRepository.findByMember(member)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("삭제하려는 멤버를 찾을 수 없습니다."));
         refusedMemberRepository.delete(refusedMember);
     }
 
-    private Generation getGeneration(Long generationId) {
+    private Generation findGeneration(Long generationId) {
         return generationRepository.findById(generationId)
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
     }
 
     private static List<ApplyMemberInfo> buildApplyInfoList(List<Member> applicantList) {

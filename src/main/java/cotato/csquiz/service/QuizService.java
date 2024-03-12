@@ -36,6 +36,7 @@ import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -334,7 +335,7 @@ public class QuizService {
 
     private Quiz findQuizById(Long quizId) {
         return quizRepository.findById(quizId)
-                .orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
     }
 
     private List<Quiz> findQuizzesFromEducationId(Long educationId) {
@@ -342,8 +343,7 @@ public class QuizService {
     }
 
     private Education findEducationById(Long educationId) {
-        return educationRepository.findById(educationId).orElseThrow(
-                () -> new AppException(ErrorCode.EDUCATION_NOT_FOUND)
-        );
+        return educationRepository.findById(educationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육 id:" + educationId + " 찾다가 에러 발생했습니다."));
     }
 }

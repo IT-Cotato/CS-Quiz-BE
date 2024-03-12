@@ -22,6 +22,7 @@ import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.utils.QuizAnswerRedisRepository;
 import cotato.csquiz.utils.ScorerExistRedisRepository;
 import cotato.csquiz.utils.TicketCountRedisRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public class RecordService {
         Quiz findQuiz = findQuizById(request.quizId());
         validateQuizOpen(findQuiz);
         Member findMember = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateAlreadyCorrect(findQuiz, findMember);
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
@@ -79,7 +80,8 @@ public class RecordService {
     }
 
     private Quiz findQuizById(Long quizId) {
-        return quizRepository.findById(quizId).orElseThrow(() -> new AppException(ErrorCode.QUIZ_NOT_FOUND));
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 문제를 찾을 수 없습니다."));
     }
 
     private void validateQuizOpen(Quiz findQuiz) {

@@ -16,6 +16,7 @@ import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -137,7 +138,7 @@ public class AuthService {
 
     public MemberEmailResponse findMemberEmail(String name, String phoneNumber) {
         Member findMember = memberRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 전화번호를 가진 회원을 찾을 수 없습니다."));
         validateMatchName(findMember.getName(), name);
         String maskedId = getMaskId(findMember.getEmail());
         return MemberEmailResponse.from(maskedId);
@@ -151,7 +152,7 @@ public class AuthService {
 
     private void validateMatchName(String originName, String requestName) {
         if (!originName.equals(requestName)) {
-            throw new AppException(ErrorCode.NAME_NOT_MATCH);
+            throw new EntityNotFoundException("해당 이름을 가진 회원을 찾을 수 없습니다.");
         }
     }
 }

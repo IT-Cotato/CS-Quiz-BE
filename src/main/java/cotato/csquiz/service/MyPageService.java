@@ -9,11 +9,10 @@ import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Record;
 import cotato.csquiz.domain.entity.Scorer;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
 import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.QuizRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +37,7 @@ public class MyPageService {
 
     public HallOfFameResponse getHallOfFame(Long generationId, String email) {
         Generation findGeneration = generationRepository.findById(generationId)
-                .orElseThrow(() -> new AppException(ErrorCode.GENERATION_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
         log.info("============{}기에 존재하는 모든 퀴즈 조회================", findGeneration.getNumber());
         List<HallOfFameInfo> scorerHallOfFame = makeScorerHallOfFame(findGeneration);
         log.info("============{}기에 존재하는 모든 득점자 조회================", findGeneration.getNumber());
@@ -62,7 +61,7 @@ public class MyPageService {
 
     private Member findMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 멤버를 찾을 수 없습니다."));
     }
 
     private long countMyScorer(Member member, Generation generation) {

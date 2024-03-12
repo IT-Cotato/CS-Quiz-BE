@@ -38,17 +38,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        log.info("login POST 요청");
-
+        log.info("[login 요청]");
         ObjectMapper mapper = new ObjectMapper();
         try {
             Member member = mapper.readValue(request.getInputStream(), Member.class);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     member.getEmail(), member.getPassword());
-            //            PrincipalDetails principal = (PrincipalDetails) authenticate.getPrincipal();
             return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new AppException(ErrorCode.LOGIN_FAIL);
         }
     }

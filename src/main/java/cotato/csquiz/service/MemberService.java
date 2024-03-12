@@ -7,6 +7,7 @@ import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,7 +27,7 @@ public class MemberService {
 
     public MemberInfoResponse getMemberInfo(String email) {
         Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
         log.info("이름 + 번호 4자리: {}({})", findMember.getName(), findMember.getBackFourNumber());
         return MemberInfoResponse.from(findMember);
     }
@@ -37,7 +38,7 @@ public class MemberService {
         }
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
         if (!bCryptPasswordEncoder.matches(password, findMember.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
@@ -50,7 +51,7 @@ public class MemberService {
         }
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
         validatePassword(findMember.getPassword(), password);
         findMember.updatePassword(bCryptPasswordEncoder.encode(password));
     }
@@ -70,7 +71,7 @@ public class MemberService {
 
     public MemberMyPageInfoResponse findMyPageInfo(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         return MemberMyPageInfoResponse.from(findMember);
     }
 }

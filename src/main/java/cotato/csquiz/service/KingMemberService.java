@@ -6,12 +6,11 @@ import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Scorer;
 import cotato.csquiz.domain.entity.Winner;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.WinnerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -70,7 +69,7 @@ public class KingMemberService {
         Education education = quiz.getEducation();
         if (winnerRepository.findByEducation(education).isEmpty()) {
             Scorer findScorer = scorerRepository.findByQuiz(quiz)
-                    .orElseThrow(() -> new AppException(ErrorCode.SCORER_NOT_FOUND));
+                    .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈엔 득점자가 존재하지 않습니다."));
             Winner winner = Winner.of(findScorer.getMember(), education);
             winnerRepository.save(winner);
         }
