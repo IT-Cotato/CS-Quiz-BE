@@ -31,8 +31,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> imageException(ImageException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(e.getErrorCode() + " " + e.getErrorCode().getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "이미지 처리에 실패했습니다.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(SQLException.class)
