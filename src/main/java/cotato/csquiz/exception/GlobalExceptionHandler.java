@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<?> appCustomException(AppException e, HttpServletRequest request) {
+    public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ImageException.class)
-    public ResponseEntity<?> imageException(ImageException e, HttpServletRequest request) {
+    public ResponseEntity<?> handleImageException(ImageException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
                 "이미지 처리에 실패했습니다.",
                 request.getRequestURI()
         );
-        return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<?> sqlException(SQLException e, HttpServletRequest request) {
+    public ResponseEntity<?> handleSQLException(SQLException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode());
         log.error("에러 요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
