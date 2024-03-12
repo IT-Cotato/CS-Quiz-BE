@@ -1,5 +1,6 @@
 package cotato.csquiz.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -38,6 +39,19 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(e.getErrorCode().getHttpStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
+        log.error("Entity Not Found Exception 발생");
+        log.error("에러 요청 uri: {}", request.getRequestURI());
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.NOT_FOUND,
+                e.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
     @ExceptionHandler(SQLException.class)
