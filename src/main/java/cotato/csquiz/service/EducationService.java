@@ -5,7 +5,6 @@ import cotato.csquiz.domain.dto.education.AddEducationRequest;
 import cotato.csquiz.domain.dto.education.AddEducationResponse;
 import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
 import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.PatchEducationRequest;
 import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
 import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
 import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
@@ -69,13 +68,7 @@ public class EducationService {
                 .build();
     }
 
-    @Transactional
-    public void patchEducationStatus(PatchEducationRequest request) {
-        Education education = findEducation(request.getEducationId());
-        education.changeStatus(request.getStatus());
-    }
-
-    private Education findEducation(long educationId) {
+    private Education findEducation(Long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
     }

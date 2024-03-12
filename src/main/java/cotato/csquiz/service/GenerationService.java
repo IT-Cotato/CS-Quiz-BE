@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Slf4j
 public class GenerationService {
 
     private final GenerationRepository generationRepository;
-    private final SessionRepository sessionRepository;
 
+    @Transactional
     public AddGenerationResponse addGeneration(AddGenerationRequest request) {
         checkPeriodValid(request.getStartDate(), request.getEndDate());
         checkNumberValid(request.getGenerationNumber());
@@ -41,19 +41,21 @@ public class GenerationService {
                 .build();
     }
 
+    @Transactional
     public void changeRecruiting(ChangeRecruitingRequest request) {
         Generation generation = generationRepository.findById(request.getGenerationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
         generation.changeRecruit(request.isStatement());
-        log.info("changeRecruiting success");
+        log.info("[기수 모집 상태 변경 성공]: {}", request.isStatement());
     }
 
+    @Transactional
     public void changePeriod(ChangePeriodRequest request) {
         checkPeriodValid(request.getStartDate(), request.getEndDate());
         Generation generation = generationRepository.findById(request.getGenerationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
         generation.changePeriod(request.getStartDate(), request.getEndDate());
-        log.info("change date " + request.getStartDate() + " " + request.getEndDate());
+        log.info("[기수 기간 변경 성공]: 시작: {} ~ 끝: {}", request.getStartDate(), request.getEndDate());
     }
 
     public List<GenerationInfoResponse> getGenerations() {
@@ -65,7 +67,6 @@ public class GenerationService {
 
     private void checkPeriodValid(LocalDate startDate, LocalDate endDate) {
         if (endDate.isBefore(startDate)) {
-            log.info("날짜 오류");
             throw new AppException(ErrorCode.DATE_INVALID);
         }
     }

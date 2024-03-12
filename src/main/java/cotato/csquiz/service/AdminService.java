@@ -49,7 +49,7 @@ public class AdminService {
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getMemberId());
-        Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
+        Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
             member.updateRole(MEMBER);
@@ -63,7 +63,7 @@ public class AdminService {
     public void reapproveApplicant(MemberApproveRequest memberApproveRequest) {
         Member member = findMember(memberApproveRequest.getMemberId());
         if (member.getRole() == REFUSED) {
-            Generation findGeneration = getGeneration(memberApproveRequest.getGenerationId());
+            Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
             member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
             member.updatePosition(memberApproveRequest.getPosition());
@@ -159,7 +159,7 @@ public class AdminService {
         refusedMemberRepository.delete(refusedMember);
     }
 
-    private Generation getGeneration(Long generationId) {
+    private Generation findGeneration(Long generationId) {
         return generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
     }

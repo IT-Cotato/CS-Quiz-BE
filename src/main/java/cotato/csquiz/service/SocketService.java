@@ -116,7 +116,7 @@ public class SocketService {
         }
     }
 
-    private Quiz findQuizById(long quizId) {
+    private Quiz findQuizById(Long quizId) {
         return quizRepository.findById(quizId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
     }
