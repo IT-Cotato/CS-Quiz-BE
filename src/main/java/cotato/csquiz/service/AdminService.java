@@ -7,16 +7,15 @@ import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
 import static cotato.csquiz.domain.enums.MemberRole.OLD_MEMBER;
 import static cotato.csquiz.domain.enums.MemberRole.REFUSED;
 
-import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
-import cotato.csquiz.domain.dto.member.MemberApproveRequest;
-import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
-import cotato.csquiz.domain.dto.member.MemberRejectRequest;
-import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
-import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
+import cotato.csquiz.controller.dto.auth.ApplyMemberInfo;
+import cotato.csquiz.controller.dto.member.MemberApproveRequest;
+import cotato.csquiz.controller.dto.member.MemberEnrollInfoResponse;
+import cotato.csquiz.controller.dto.member.MemberRejectRequest;
+import cotato.csquiz.controller.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.RefusedMember;
-import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
@@ -103,7 +102,7 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
-        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
+        if (member.getRole() == GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(updateActiveMemberRoleRequest.getRole());

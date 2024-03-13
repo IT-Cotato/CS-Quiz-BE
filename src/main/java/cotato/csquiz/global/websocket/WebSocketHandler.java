@@ -1,9 +1,9 @@
 package cotato.csquiz.global.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import cotato.csquiz.domain.dto.socket.CsQuizStopResponse;
-import cotato.csquiz.domain.dto.socket.QuizStartResponse;
-import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.controller.dto.socket.CsQuizStopResponse;
+import cotato.csquiz.controller.dto.socket.QuizStartResponse;
+import cotato.csquiz.controller.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;

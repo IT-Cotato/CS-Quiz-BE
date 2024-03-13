@@ -1,22 +1,22 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
-import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
-import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
-import cotato.csquiz.domain.dto.quiz.ChoiceResponse;
-import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
-import cotato.csquiz.domain.dto.quiz.CreateShortAnswerRequest;
-import cotato.csquiz.domain.dto.quiz.CreateShortQuizRequest;
-import cotato.csquiz.domain.dto.quiz.CsAdminQuizResponse;
-import cotato.csquiz.domain.dto.quiz.FindMultipleQuizResponse;
-import cotato.csquiz.domain.dto.quiz.MultipleChoiceQuizRequest;
-import cotato.csquiz.domain.dto.quiz.MultipleQuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
-import cotato.csquiz.domain.dto.quiz.ShortAnswerResponse;
-import cotato.csquiz.domain.dto.quiz.ShortQuizResponse;
-import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.controller.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.controller.dto.quiz.AllQuizzesInCsQuizResponse;
+import cotato.csquiz.controller.dto.quiz.AllQuizzesResponse;
+import cotato.csquiz.controller.dto.quiz.ChoiceResponse;
+import cotato.csquiz.controller.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.controller.dto.quiz.CreateShortAnswerRequest;
+import cotato.csquiz.controller.dto.quiz.CreateShortQuizRequest;
+import cotato.csquiz.controller.dto.quiz.CsAdminQuizResponse;
+import cotato.csquiz.controller.dto.quiz.FindMultipleQuizResponse;
+import cotato.csquiz.controller.dto.quiz.MultipleChoiceQuizRequest;
+import cotato.csquiz.controller.dto.quiz.MultipleQuizResponse;
+import cotato.csquiz.controller.dto.quiz.QuizInfoInCsQuizResponse;
+import cotato.csquiz.controller.dto.quiz.QuizResponse;
+import cotato.csquiz.controller.dto.quiz.QuizResultInfo;
+import cotato.csquiz.controller.dto.quiz.ShortAnswerResponse;
+import cotato.csquiz.controller.dto.quiz.ShortQuizResponse;
+import cotato.csquiz.controller.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Member;
@@ -68,6 +68,13 @@ public class QuizService {
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
         log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
+        // id 들을 찾아와서
+        List<Long> ids;
+
+        // jpql 삭제는 연관관계를 무시
+
+        quizRepository.deleteAllByIds(ids);
+
         quizRepository.deleteAllByEducationId(educationId);
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
@@ -109,6 +116,7 @@ public class QuizService {
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
+
         MultipleQuiz createdMultipleQuiz = MultipleQuiz.builder()
                 .education(findEducation)
                 .number(request.getNumber())
@@ -117,11 +125,14 @@ public class QuizService {
                 .appearSecond(generateRandomTime())
                 .generation(findEducation.getSession().getGeneration())
                 .build();
+
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
+
         List<Choice> choices = request.getChoices().stream()
                 .map(Choice::of)
                 .toList();
+
         choiceRepository.saveAll(choices);
         log.info("객관식 선지 생성 : {}개", choices.size());
         createdMultipleQuiz.addChoices(choices);
@@ -166,6 +177,7 @@ public class QuizService {
     }
 
     private int generateRandomTime() throws NoSuchAlgorithmException {
+        // ThreadLocalrandom
         Random random = SecureRandom.getInstanceStrong();
         return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
     }

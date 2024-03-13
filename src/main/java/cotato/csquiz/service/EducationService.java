@@ -1,13 +1,13 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.AllEducationResponse;
-import cotato.csquiz.domain.dto.education.AddEducationRequest;
-import cotato.csquiz.domain.dto.education.AddEducationResponse;
-import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
-import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
-import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
+import cotato.csquiz.controller.dto.AllEducationResponse;
+import cotato.csquiz.controller.dto.education.AddEducationRequest;
+import cotato.csquiz.controller.dto.education.AddEducationResponse;
+import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
+import cotato.csquiz.controller.dto.education.GetStatusResponse;
+import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
+import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
+import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Quiz;
@@ -43,18 +43,21 @@ public class EducationService {
     public AddEducationResponse addEducation(AddEducationRequest request) {
         Session session = sessionService.findSessionById(request.getSessionId());
         checkEducationExist(session);
+
         Education education = Education.builder()
                 .session(session)
                 .subject(request.getSubject())
                 .educationNum(request.getEducationNum())
                 .build();
         Education saveEducation = educationRepository.save(education);
+
         return AddEducationResponse.builder()
                 .educationId(saveEducation.getId())
                 .build();
     }
 
     private void checkEducationExist(Session session) {
+        //  TODO
         Optional<Education> education = educationRepository.findEducationBySession(session);
         if (education.isPresent()) {
             throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
@@ -63,6 +66,7 @@ public class EducationService {
 
     public GetStatusResponse getStatus(long educationId) {
         Education education = findEducation(educationId);
+
         return GetStatusResponse.builder()
                 .status(education.getStatus())
                 .build();
@@ -75,11 +79,13 @@ public class EducationService {
 
     @Transactional
     public void updateSubjectAndNumber(UpdateEducationRequest request) {
-        validateNotEmpty(request.newSubject());
+        validateNotEmpty(request.newSubject()); // -> valid
         Education education = educationRepository.findById(request.educationId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
+
         education.updateSubject(request.newSubject());
         education.updateNumber(request.newNumber());
+
         educationRepository.save(education);
     }
 
@@ -90,8 +96,8 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
-        List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
-        return educationList.stream()
+        return educationRepository.findBySession_Generation_Id(generationId)
+                .stream()
                 .map(AllEducationResponse::convertFromEducation)
                 .toList();
     }
@@ -116,14 +122,17 @@ public class EducationService {
     public WinnerInfoResponse findWinner(Long educationId) {
         Education findEducation = educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
+
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
+
         return WinnerInfoResponse.from(findWinner);
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 문제를 찾을 수 없습니다."));
+
         return EducationIdOfQuizResponse.from(quiz);
     }
 }

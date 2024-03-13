@@ -8,10 +8,11 @@ import lombok.Getter;
 @Getter
 public enum MemberRole {
 
-    REFUSED("ROLE_REFUSED"),
     GENERAL("ROLE_GENERAL"),
-    MEMBER("ROLE_MEMBER"),
+    REFUSED("ROLE_REFUSED"),
     OLD_MEMBER("ROLE_OM"),
+
+    MEMBER("ROLE_MEMBER"),
     ADMIN("ROLE_ADMIN"),
     EDUCATION("ROLE_EDUCATION");
 

@@ -54,7 +54,7 @@ public class Generation extends BaseTimeEntity {
     }
 
     public void changePeriod(LocalDate startDate, LocalDate endDate) {
-        this.startDate=startDate;
+        this.startDate = startDate;
         this.endDate = endDate;
     }
 }

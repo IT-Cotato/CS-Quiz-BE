@@ -1,13 +1,13 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.session.AddSessionRequest;
-import cotato.csquiz.domain.dto.session.AddSessionResponse;
-import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
-import cotato.csquiz.domain.dto.session.SessionListResponse;
-import cotato.csquiz.domain.dto.session.SessionNumRequest;
-import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
-import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionResponse;
+import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
+import cotato.csquiz.controller.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.controller.dto.session.SessionListResponse;
+import cotato.csquiz.controller.dto.session.SessionNumRequest;
+import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
 import java.util.List;

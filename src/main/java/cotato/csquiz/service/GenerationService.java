@@ -1,10 +1,10 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.generation.AddGenerationRequest;
-import cotato.csquiz.domain.dto.generation.AddGenerationResponse;
-import cotato.csquiz.domain.dto.generation.ChangePeriodRequest;
-import cotato.csquiz.domain.dto.generation.ChangeRecruitingRequest;
-import cotato.csquiz.domain.dto.generation.GenerationInfoResponse;
+import cotato.csquiz.controller.dto.generation.AddGenerationRequest;
+import cotato.csquiz.controller.dto.generation.AddGenerationResponse;
+import cotato.csquiz.controller.dto.generation.ChangePeriodRequest;
+import cotato.csquiz.controller.dto.generation.ChangeRecruitingRequest;
+import cotato.csquiz.controller.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -29,16 +29,17 @@ public class GenerationService {
     public AddGenerationResponse addGeneration(AddGenerationRequest request) {
         checkPeriodValid(request.getStartDate(), request.getEndDate());
         checkNumberValid(request.getGenerationNumber());
+
         Generation generation = Generation.builder()
                 .number(request.getGenerationNumber())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .sessionCount(request.getSessionCount())
                 .build();
+
         Generation savedGeneration = generationRepository.save(generation);
-        return AddGenerationResponse.builder()
-                .generationId(savedGeneration.getId())
-                .build();
+
+        return new AddGenerationResponse(savedGeneration.getId());
     }
 
     @Transactional

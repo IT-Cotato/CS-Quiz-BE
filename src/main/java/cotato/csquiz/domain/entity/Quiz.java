@@ -74,7 +74,7 @@ public class Quiz extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "quiz", orphanRemoval = true)
     @JsonIgnore
-    private List<Record> records = new ArrayList<>();
+    private final List<Record> records = new ArrayList<>();
 
     @OneToOne(mappedBy = "quiz", orphanRemoval = true)
     @JsonIgnore
@@ -88,6 +88,10 @@ public class Quiz extends BaseTimeEntity {
         this.education = education;
         this.appearSecond = appearSecond;
         this.generation = generation;
+    }
+
+    public List<Record> getRecords() {
+        return new ArrayList<>(this.records);
     }
 
     public void updateStatus(QuizStatus status) {

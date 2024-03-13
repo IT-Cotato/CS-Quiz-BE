@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,9 @@ public class Winner extends BaseTimeEntity {
     private Education education;
 
     public Winner(Member member, Education education) {
+        Objects.requireNonNull(member);
+        Objects.requireNonNull(education);
+
         this.member = member;
         this.education = education;
     }

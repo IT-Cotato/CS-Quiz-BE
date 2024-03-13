@@ -1,12 +1,12 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
-import cotato.csquiz.domain.dto.quiz.AllQuizzesInCsQuizResponse;
-import cotato.csquiz.domain.dto.quiz.AllQuizzesResponse;
-import cotato.csquiz.domain.dto.quiz.CreateQuizzesRequest;
-import cotato.csquiz.domain.dto.quiz.QuizInfoInCsQuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizResponse;
-import cotato.csquiz.domain.dto.quiz.QuizResultInfo;
+import cotato.csquiz.controller.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.controller.dto.quiz.AllQuizzesInCsQuizResponse;
+import cotato.csquiz.controller.dto.quiz.AllQuizzesResponse;
+import cotato.csquiz.controller.dto.quiz.CreateQuizzesRequest;
+import cotato.csquiz.controller.dto.quiz.QuizInfoInCsQuizResponse;
+import cotato.csquiz.controller.dto.quiz.QuizResponse;
+import cotato.csquiz.controller.dto.quiz.QuizResultInfo;
 import cotato.csquiz.service.QuizService;
 import cotato.csquiz.service.RecordService;
 import java.util.List;

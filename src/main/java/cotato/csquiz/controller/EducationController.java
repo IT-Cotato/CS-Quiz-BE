@@ -1,17 +1,19 @@
 package cotato.csquiz.controller;
-
-import cotato.csquiz.domain.dto.AllEducationResponse;
-import cotato.csquiz.domain.dto.education.AddEducationRequest;
-import cotato.csquiz.domain.dto.education.AddEducationResponse;
-import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
-import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
-import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
+// TODO :: package 정리
+import cotato.csquiz.controller.dto.AllEducationResponse;
+import cotato.csquiz.controller.dto.education.AddEducationRequest;
+import cotato.csquiz.controller.dto.education.AddEducationResponse;
+import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
+import cotato.csquiz.controller.dto.education.GetStatusResponse;
+import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
+import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
+import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.service.EducationService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,13 +46,14 @@ public class EducationController {
     @PostMapping("/add")
     public ResponseEntity<AddEducationResponse> addEducation(@RequestBody AddEducationRequest request) {
         AddEducationResponse response = educationService.addEducation(request);
-        return ResponseEntity.ok().body(response);
+        // TODO :: 201 상태코드를 반환하도록 변경
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<?> updateEducation(@RequestBody UpdateEducationRequest request) {
+    public ResponseEntity<Void> updateEducation(@RequestBody @Valid UpdateEducationRequest request) {
         educationService.updateSubjectAndNumber(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/from")

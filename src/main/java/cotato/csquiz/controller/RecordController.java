@@ -1,9 +1,9 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
-import cotato.csquiz.domain.dto.record.RegradeRequest;
-import cotato.csquiz.domain.dto.record.ReplyRequest;
-import cotato.csquiz.domain.dto.record.ReplyResponse;
+import cotato.csquiz.controller.dto.record.RecordsAndScorerResponse;
+import cotato.csquiz.controller.dto.record.RegradeRequest;
+import cotato.csquiz.controller.dto.record.ReplyRequest;
+import cotato.csquiz.controller.dto.record.ReplyResponse;
 import cotato.csquiz.service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

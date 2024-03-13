@@ -44,7 +44,7 @@ public class Member extends BaseTimeEntity {
     private String password;
 
     @Column(name = "member_phone")
-    private String phoneNumber;
+    private String phoneNumber; // 개인정보 암호화
 
     @Column(name = "member_name")
     private String name;

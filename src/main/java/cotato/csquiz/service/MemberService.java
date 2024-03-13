@@ -1,8 +1,8 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
-import cotato.csquiz.domain.dto.member.MemberMyPageInfoResponse;
+import cotato.csquiz.controller.dto.auth.MemberInfoResponse;
+import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;

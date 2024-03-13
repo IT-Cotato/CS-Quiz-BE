@@ -1,10 +1,10 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
-import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
-import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
-import cotato.csquiz.domain.dto.socket.SocketTokenDto;
+import cotato.csquiz.controller.dto.socket.QuizCloseRequest;
+import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
+import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
+import cotato.csquiz.controller.dto.socket.SocketTokenDto;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.EducationStatus;
