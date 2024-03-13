@@ -35,6 +35,7 @@ public class SocketController {
     @PatchMapping("/access")
     public ResponseEntity<?> accessQuiz(@RequestBody QuizSocketRequest request) {
         socketService.accessQuiz(request);
+        recordService.saveAnswer(request);
         return ResponseEntity.ok().build();
     }
 

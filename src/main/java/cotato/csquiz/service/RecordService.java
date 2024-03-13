@@ -8,6 +8,7 @@ import cotato.csquiz.domain.dto.record.ReplyRequest;
 import cotato.csquiz.domain.dto.record.ReplyResponse;
 import cotato.csquiz.domain.dto.record.ScorerResponse;
 import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
+import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
@@ -52,8 +53,8 @@ public class RecordService {
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateAlreadyCorrect(findQuiz, findMember);
-        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
+        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
             Scorer scorer = Scorer.of(findMember, findQuiz);
@@ -160,5 +161,11 @@ public class RecordService {
                 .sorted(Comparator.comparing(Record::getTicketNumber))
                 .map(RecordResponse::from)
                 .toList();
+    }
+
+    public void saveAnswer(QuizSocketRequest request) {
+        Quiz findQuiz = quizRepository.findById(request.getQuizId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
+        quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
     }
 }
