@@ -67,7 +67,7 @@ public class QuizAnswerRedisRepository {
         redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
-    private void saveQuizAnswer(Quiz quiz) {
+    public void saveQuizAnswer(Quiz quiz) {
         if (quiz instanceof ShortQuiz) {
             saveShortAnswer(quiz);
         }
