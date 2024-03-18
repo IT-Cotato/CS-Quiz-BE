@@ -53,6 +53,7 @@ public class RecordService {
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateAlreadyCorrect(findQuiz, findMember);
+
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
@@ -61,6 +62,7 @@ public class RecordService {
             log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
             scorerRepository.save(scorer);
         }
+
         Record createdRecord = Record.of(request.input(), isCorrect, findMember, findQuiz, ticketNumber);
         recordRepository.save(createdRecord);
         return ReplyResponse.from(isCorrect);
@@ -104,9 +106,11 @@ public class RecordService {
         List<Record> correctRecords = recordRepository.findAllByQuizAndReply(quiz, request.newAnswer());
         correctRecords.forEach(record -> record.changeCorrect(true));
         recordRepository.saveAll(correctRecords);
+
         Record fastestRecord = correctRecords.stream()
                 .min(Comparator.comparing(Record::getTicketNumber))
                 .orElseThrow(() -> new AppException(ErrorCode.REGRADE_FAIL));
+
         scorerRepository.findByQuiz(quiz)
                 .ifPresentOrElse(
                         scorer -> changeScorer(scorer, fastestRecord),
