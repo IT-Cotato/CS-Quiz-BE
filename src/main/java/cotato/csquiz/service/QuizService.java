@@ -308,9 +308,7 @@ public class QuizService {
 
     private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
         checkAnswerAlreadyExist(shortQuiz, answer);
-        ShortAnswer shortAnswer = ShortAnswer.builder()
-                .content(answer)
-                .build();
+        ShortAnswer shortAnswer = ShortAnswer.of(answer);
         shortAnswer.matchShortQuiz(shortQuiz);
         shortAnswerRepository.save(shortAnswer);
     }

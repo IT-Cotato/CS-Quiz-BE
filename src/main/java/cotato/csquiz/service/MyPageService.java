@@ -119,7 +119,7 @@ public class MyPageService {
         List<Record> records = new ArrayList<>();
         for (Quiz quiz : filteredQuizzes) {
             records.addAll(quiz.getRecords().stream()
-                    .filter(Record::isCorrect)
+                    .filter(Record::getIsCorrect)
                     .toList());
         }
         return records;

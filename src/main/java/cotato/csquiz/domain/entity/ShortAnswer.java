@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -36,8 +35,7 @@ public class ShortAnswer extends BaseTimeEntity {
         this.shortQuiz = shortQuiz;
     }
 
-    @Builder
-    public ShortAnswer(String content) {
+    private ShortAnswer(String content) {
         this.content = content;
     }
 

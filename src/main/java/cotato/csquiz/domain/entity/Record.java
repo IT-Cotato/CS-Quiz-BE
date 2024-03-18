@@ -31,7 +31,7 @@ public class Record extends BaseTimeEntity {
     private Long ticketNumber;
 
     @Column(name = "record_is_correct")
-    private boolean isCorrect;
+    private Boolean isCorrect;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
@@ -41,7 +41,7 @@ public class Record extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
-    public Record(String reply, Boolean isCorrect, Member member, Quiz quiz, Long ticketNumber) {
+    private Record(String reply, Boolean isCorrect, Member member, Quiz quiz, Long ticketNumber) {
         this.reply = reply;
         this.isCorrect = isCorrect;
         this.member = member;
