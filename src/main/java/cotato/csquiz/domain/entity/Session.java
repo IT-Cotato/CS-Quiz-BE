@@ -34,7 +34,7 @@ public class Session extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "session_number")
-    private int number;
+    private Integer number;
 
     @Column(name = "session_photo_url")
     private String photoUrl;

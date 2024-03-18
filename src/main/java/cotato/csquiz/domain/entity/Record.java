@@ -31,7 +31,7 @@ public class Record extends BaseTimeEntity {
     private Long ticketNumber;
 
     @Column(name = "record_is_correct")
-    private boolean isCorrect;
+    private Boolean isCorrect;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
