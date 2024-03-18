@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.global.entity.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -88,6 +87,10 @@ public class Quiz extends BaseTimeEntity {
         this.education = education;
         this.appearSecond = appearSecond;
         this.generation = generation;
+    }
+
+    public List<Record> getRecords() {
+        return new ArrayList<>(this.records);
     }
 
     public void updateStatus(QuizStatus status) {
