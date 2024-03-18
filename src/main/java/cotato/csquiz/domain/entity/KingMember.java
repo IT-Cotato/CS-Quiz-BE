@@ -38,7 +38,7 @@ public class KingMember extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education;
 
-    public KingMember(Member member, Education education) {
+    private KingMember(Member member, Education education) {
         this.member = member;
         this.education = education;
     }

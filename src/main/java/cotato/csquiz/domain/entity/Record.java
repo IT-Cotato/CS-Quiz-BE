@@ -41,7 +41,7 @@ public class Record extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
-    public Record(String reply, Boolean isCorrect, Member member, Quiz quiz, Long ticketNumber) {
+    private Record(String reply, Boolean isCorrect, Member member, Quiz quiz, Long ticketNumber) {
         this.reply = reply;
         this.isCorrect = isCorrect;
         this.member = member;
