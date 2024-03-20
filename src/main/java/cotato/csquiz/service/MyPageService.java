@@ -34,6 +34,7 @@ public class MyPageService {
     private final GenerationRepository generationRepository;
     private final QuizRepository quizRepository;
     private final MemberRepository memberRepository;
+    private final EncryptService encryptService;
 
     public HallOfFameResponse getHallOfFame(Long generationId, String email) {
         Generation findGeneration = generationRepository.findById(generationId)
@@ -50,7 +51,8 @@ public class MyPageService {
 
     public MyPageMemberInfoResponse getMemberInfo(String email) {
         Member member = findMemberByEmail(email);
-        return MyPageMemberInfoResponse.from(member);
+        String originPhoneNumber = encryptService.decryptPhoneNumber(member.getPhoneNumber());
+        return MyPageMemberInfoResponse.from(member, originPhoneNumber);
     }
 
     private MyHallOfFameInfo makeMyHallOfFameInfo(Member member, Generation generation) {
