@@ -11,8 +11,12 @@ public enum ErrorCode {
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "Token Already Expired"),
     REFRESH_TOKEN_NOT_EXIST(HttpStatus.UNAUTHORIZED, "RefreshToken is not in Repository."),
     LOGIN_FAIL(HttpStatus.UNAUTHORIZED, "로그인 요청에 실패했습니다."),
+    REISSUE_FAIL(HttpStatus.UNAUTHORIZED, "재발급 요청 실패"),
+    FILTER_EXCEPTION(HttpStatus.UNAUTHORIZED, "필터 내부에러 발생"),
+    JWT_FORM_ERROR(HttpStatus.UNAUTHORIZED, "jwt 형식 에러 발생"),
 
     EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 이메일이 존재하지 않습니다."),
+    ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 entity를 찾을 수 없습니다."),
 
     EMAIL_DUPLICATED(HttpStatus.CONFLICT, "존재하는 이메일 입니다."),
     SAME_PASSWORD(HttpStatus.CONFLICT, "이전과 같은 비밀번호로 변경할 수 없습니다."),
@@ -45,7 +49,8 @@ public enum ErrorCode {
     WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
     CREATE_VERIFY_CODE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "코드 생성에 실패했습니다."),
-    RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패");
+    RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
+    INTERNAL_SQL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SQL 관련 에러 발생");
 
     private final HttpStatus httpStatus;
     private final String message;

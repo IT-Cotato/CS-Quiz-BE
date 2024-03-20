@@ -32,9 +32,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String accessToken = jwtUtil.resolveAccessToken(request);
-        log.info("[{} 유저 액세스토큰 반환 완료]", jwtUtil.getEmail(accessToken));
+        String authorizationHeader = request.getHeader("Authorization");
+        String accessToken = jwtUtil.resolveAccessToken(authorizationHeader);
         jwtUtil.validateAccessToken(accessToken);
+
+        log.info("[{} 유저 액세스토큰 반환 완료]", jwtUtil.getEmail(accessToken));
         setAuthentication(accessToken);
         filterChain.doFilter(request, response);
     }

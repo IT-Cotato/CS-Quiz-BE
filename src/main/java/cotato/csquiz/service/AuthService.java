@@ -66,7 +66,7 @@ public class AuthService {
     public ReissueResponse reissue(String refreshToken, HttpServletResponse response) {
         if (jwtUtil.isExpired(refreshToken) || blackListRepository.existsById(refreshToken)) {
             log.warn("블랙리스트에 존재하는 토큰: {}", blackListRepository.existsById(refreshToken));
-            throw new AppException(ErrorCode.TOKEN_EXPIRED);
+            throw new AppException(ErrorCode.REISSUE_FAIL);
         }
         String email = jwtUtil.getEmail(refreshToken);
         String role = jwtUtil.getRole(refreshToken);

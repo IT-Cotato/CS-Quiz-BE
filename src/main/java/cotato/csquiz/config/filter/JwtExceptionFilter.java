@@ -29,6 +29,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
                     HttpStatus.UNAUTHORIZED,
+                    ErrorCode.TOKEN_EXPIRED,
                     ErrorCode.TOKEN_EXPIRED.getMessage(),
                     request.getRequestURI()
             );
@@ -37,7 +38,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
                     HttpStatus.UNAUTHORIZED,
-                    "jwt 토큰 형식으로 입력해주세요.",
+                    ErrorCode.JWT_FORM_ERROR,
+                    ErrorCode.JWT_FORM_ERROR.getMessage(),
                     request.getRequestURI()
             );
             setErrorResponse(response, errorResponse);
@@ -45,6 +47,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = new ErrorResponse(
                     LocalDateTime.now(),
                     HttpStatus.UNAUTHORIZED,
+                    ErrorCode.FILTER_EXCEPTION,
                     e.getMessage(),
                     request.getRequestURI()
             );

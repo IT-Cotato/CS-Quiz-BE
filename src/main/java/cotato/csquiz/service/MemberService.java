@@ -33,9 +33,6 @@ public class MemberService {
     }
 
     public void checkCorrectPassword(String accessToken, String password) {
-        if (jwtUtil.isExpired(accessToken)) {
-            throw new AppException(ErrorCode.TOKEN_EXPIRED);
-        }
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
@@ -46,9 +43,6 @@ public class MemberService {
 
     @Transactional
     public void updatePassword(String accessToken, String password) {
-        if (jwtUtil.isExpired(accessToken)) {
-            throw new AppException(ErrorCode.TOKEN_EXPIRED);
-        }
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
