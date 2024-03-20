@@ -8,12 +8,12 @@ public record ScorerResponse(
         String memberName,
         String backFourNumber
 ) {
-    public static ScorerResponse from(Scorer scorer) {
+    public static ScorerResponse from(Scorer scorer, String backFourNumber) {
         return new ScorerResponse(
                 scorer.getId(),
                 scorer.getMember().getId(),
                 scorer.getMember().getName(),
-                scorer.getMember().getBackFourNumber()
+                backFourNumber
         );
     }
 }

@@ -7,11 +7,11 @@ public record KingMemberInfo(
         String memberName,
         String backFourNumber
 ) {
-    public static KingMemberInfo from(Member member) {
+    public static KingMemberInfo from(Member member, String backFourNumber) {
         return new KingMemberInfo(
                 member.getId(),
                 member.getName(),
-                member.getBackFourNumber()
+                backFourNumber
         );
     }
 }

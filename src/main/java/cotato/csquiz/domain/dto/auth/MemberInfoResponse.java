@@ -9,11 +9,11 @@ public record MemberInfoResponse(
         String backFourNumber,
         MemberRole role
 ) {
-    public static MemberInfoResponse from(Member member) {
+    public static MemberInfoResponse from(Member member, String backFourNumber) {
         return new MemberInfoResponse(
                 member.getId(),
                 member.getName(),
-                member.getBackFourNumber(),
+                backFourNumber,
                 member.getRole()
         );
     }

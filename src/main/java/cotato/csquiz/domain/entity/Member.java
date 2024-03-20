@@ -87,11 +87,6 @@ public class Member extends BaseTimeEntity {
         this.position = position;
     }
 
-    public String getBackFourNumber() {
-        int numberLength = phoneNumber.length();
-        return phoneNumber.substring(numberLength - 4);
-    }
-
     public boolean isActiveRole() {
         return role == ADMIN || role == EDUCATION || role == MEMBER;
     }

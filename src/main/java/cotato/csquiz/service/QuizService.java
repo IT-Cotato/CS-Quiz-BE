@@ -55,6 +55,7 @@ public class QuizService {
 
     private static final String QUIZ_BUCKET_DIRECTORY = "quiz";
     private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
+    private final MemberService memberService;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
     private final ScorerRepository scorerRepository;
@@ -85,7 +86,7 @@ public class QuizService {
         Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
         if (scorerOptional.isPresent()) {
             Member member = scorerOptional.get().getMember();
-            return QuizResultInfo.from(quiz, member);
+            return QuizResultInfo.from(quiz, member, memberService.getBackFourNumber(member));
         }
         return QuizResultInfo.noScorer(quiz);
     }
