@@ -16,16 +16,15 @@ public class EncryptService {
     public String encryptPhoneNumber(final String rawPhoneNumber) {
         byte[] encrypt = aesBytesEncryptor.encrypt(rawPhoneNumber.getBytes(StandardCharsets.UTF_8));
         System.out.println(Arrays.toString(encrypt));
-        return byteArrayToString(encrypt);//base64로 인코딩
+        return byteArrayToString(encrypt);
     }
 
     public String decryptPhoneNumber(final String encryptedPhoneNumber) {
-        byte[] bytes = stringToByteArray(encryptedPhoneNumber);//다시 bytes로 변환
-        byte[] decrypt = aesBytesEncryptor.decrypt(bytes);//원래 bytes로 변경
+        byte[] bytes = stringToByteArray(encryptedPhoneNumber);
+        byte[] decrypt = aesBytesEncryptor.decrypt(bytes);
         System.out.println(Arrays.toString(bytes));
         System.out.println(Arrays.toString(decrypt));
-//        return byteArrayToString(decrypt);
-        return new String(decrypt, StandardCharsets.UTF_8);//String으로 변환
+        return new String(decrypt, StandardCharsets.UTF_8);
     }
 
     public String byteArrayToString(byte[] bytes) {
