@@ -11,14 +11,14 @@ public record MemberMyPageInfoResponse(
         MemberPosition memberPosition,
         String phoneNumber
 ) {
-    public static MemberMyPageInfoResponse from(Member member) {
+    public static MemberMyPageInfoResponse from(Member member, String originPhoneNumber) {
         return new MemberMyPageInfoResponse(
                 member.getId(),
                 member.getEmail(),
                 member.getName(),
                 member.getGeneration().getNumber(),
                 member.getPosition(),
-                member.getPhoneNumber()
+                originPhoneNumber
         );
     }
 }
