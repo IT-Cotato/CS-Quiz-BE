@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
         log.error("AppCustomException 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
-        AppExceptionResponse appExceptionResponse = new AppExceptionResponse(
+        ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 e.getErrorCode().getHttpStatus(),
                 e.getErrorCode(),
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
                 request.getRequestURI()
         );
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
-                .body(appExceptionResponse);
+                .body(errorResponse);
     }
 
     @ExceptionHandler(ImageException.class)
@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCode.IMAGE_PROCESSING_FAIL,
                 "이미지 처리에 실패했습니다.",
                 request.getRequestURI()
         );
@@ -49,6 +50,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND,
+                ErrorCode.ENTITY_NOT_FOUND,
                 e.getMessage(),
                 request.getRequestURI()
         );
@@ -62,7 +64,8 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "SQL Error",
+                ErrorCode.INTERNAL_SQL_ERROR,
+                ErrorCode.INTERNAL_SQL_ERROR.getMessage(),
                 request.getRequestURI()
         );
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);

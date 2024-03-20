@@ -13,6 +13,7 @@ public record ErrorResponse(
         )
         LocalDateTime time,
         HttpStatus status,
+        ErrorCode errorCode,
         String message,
         String requestURI
 ) {
