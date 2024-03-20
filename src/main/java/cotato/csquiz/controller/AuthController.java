@@ -29,7 +29,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> joinAuth(@RequestBody JoinRequest request) {
+    public ResponseEntity<?> joinAuth(@RequestBody @Valid JoinRequest request) {
         log.info("[회원 가입 컨트롤러]: {}, {}", request.getEmail(), request.getName());
         authService.createLoginInfo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
