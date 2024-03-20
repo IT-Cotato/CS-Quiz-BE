@@ -69,3 +69,7 @@ server:
       cookie:
         same-site: none
 
+aes:
+  secret:
+    key: ${AES_SECRET_KEY}
+    salt: ${AES_SECRET_SALT}
