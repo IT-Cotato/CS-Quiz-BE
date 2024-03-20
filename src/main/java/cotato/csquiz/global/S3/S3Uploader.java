@@ -1,5 +1,6 @@
 package cotato.csquiz.global.S3;
 
+import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -34,6 +35,16 @@ public class S3Uploader {
         return upload(uploadFile, dirName, multipartFile.getOriginalFilename());
     }
 
+    public void deleteFile(String fileUrl) throws ImageException {
+        String[] splitFile = fileUrl.split("/");
+        String fileName = splitFile[splitFile.length - 2] + "/" + splitFile[splitFile.length - 1];
+        try {
+            amazonS3.deleteObject(bucket, fileName);
+        } catch (SdkClientException e) {
+            throw new ImageException(ErrorCode.IMAGE_DELETE_FAIL);
+        }
+    }
+
     private String upload(File uploadFile, String dirName, String originalName) {
         String fileName = dirName + "/" + UUID.randomUUID() + originalName;
         String uploadUrl = putS3(uploadFile, fileName);
@@ -57,7 +68,7 @@ public class S3Uploader {
     }
 
     private Optional<File> convert(MultipartFile file) throws ImageException {
-        File convertFile = new File(System.getProperty("user.dir") + "/" +  UUID.randomUUID());
+        File convertFile = new File(System.getProperty("user.dir") + "/" + UUID.randomUUID());
         log.info("original file name: {}", convertFile.getName());
 
         try {

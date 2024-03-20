@@ -37,7 +37,7 @@ public class SessionService {
     @Transactional
     public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
         String imageUrl = null;
-        if (request.getSessionImage() != null && !request.getSessionImage().isEmpty()) {
+        if (isImageExist(request.getSessionImage())) {
             imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), SESSION_BUCKET_DIRECTORY);
         }
         Generation findGeneration = generationRepository.findById(request.getGenerationId())
@@ -98,9 +98,14 @@ public class SessionService {
     }
 
     private Session changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
-        if (sessionImage != null && !sessionImage.isEmpty()) {
+        if (isImageExist(sessionImage)) {
             String imageUrl = s3Uploader.uploadFiles(sessionImage, SESSION_BUCKET_DIRECTORY);
+            deleteOldImage(session);
             session.changePhotoUrl(imageUrl);
+        }
+        if (!isImageExist(sessionImage)) {
+            deleteOldImage(session);
+            session.changePhotoUrl(null);
         }
         return session;
     }
@@ -128,5 +133,15 @@ public class SessionService {
                 .filter(session -> session.getCsEducation() == CSEducation.CS_ON)
                 .map(CsEducationOnSessionNumberResponse::from)
                 .toList();
+    }
+
+    private void deleteOldImage(Session session) throws ImageException {
+        if (session.getPhotoUrl() != null) {
+            s3Uploader.deleteFile(session.getPhotoUrl());
+        }
+    }
+
+    private boolean isImageExist(MultipartFile sessionImage) {
+        return sessionImage != null && !sessionImage.isEmpty();
     }
 }

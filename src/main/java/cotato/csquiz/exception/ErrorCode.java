@@ -48,6 +48,7 @@ public enum ErrorCode {
 
     WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
+    IMAGE_DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "s3 이미지 삭제처리를 실패했습니다"),
     CREATE_VERIFY_CODE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "코드 생성에 실패했습니다."),
     RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
     INTERNAL_SQL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SQL 관련 에러 발생");
