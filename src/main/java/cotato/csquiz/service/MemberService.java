@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -24,12 +25,22 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EncryptService encryptService;
 
     public MemberInfoResponse getMemberInfo(String email) {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
-        log.info("이름 + 번호 4자리: {}({})", findMember.getName(), findMember.getBackFourNumber());
-        return MemberInfoResponse.from(findMember);
+
+        String rawBackFourNumber = getBackFourNumber(findMember);
+        log.info("이름 + 번호 4자리: {}({})", findMember.getName(), rawBackFourNumber);
+        return MemberInfoResponse.from(findMember, rawBackFourNumber);
+    }
+
+    public String getBackFourNumber(Member member) {
+        String decryptedPhone = member.getPhoneNumber();
+        String originPhoneNumber = encryptService.decryptPhoneNumber(decryptedPhone);
+        int numberLength = originPhoneNumber.length();
+        return originPhoneNumber.substring(numberLength - 4);
     }
 
     public void checkCorrectPassword(String accessToken, String password) {

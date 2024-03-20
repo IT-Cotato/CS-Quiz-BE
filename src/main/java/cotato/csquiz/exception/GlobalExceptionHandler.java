@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
-        log.error("AppCustomException 발생: {}", e.getErrorCode().getMessage());
+        log.error("AppException 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),

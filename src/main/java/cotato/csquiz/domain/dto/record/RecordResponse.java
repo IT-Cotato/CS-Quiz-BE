@@ -12,13 +12,13 @@ public record RecordResponse(
         String reply
 ) implements Serializable {
 
-    public static RecordResponse from(Record record) {
+    public static RecordResponse from(Record record, String backFourNumber) {
         return new RecordResponse(
                 record.getId(),
                 record.getTicketNumber(),
                 record.getMember().getId(),
                 record.getMember().getName(),
-                record.getMember().getBackFourNumber(),
+                backFourNumber,
                 record.getReply()
         );
     }

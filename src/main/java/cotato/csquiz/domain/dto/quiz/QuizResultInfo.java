@@ -10,13 +10,13 @@ public record QuizResultInfo(
         String scorerName,
         String backFourNumber
 ) {
-    public static QuizResultInfo from(Quiz quiz, Member member) {
+    public static QuizResultInfo from(Quiz quiz, Member member, String backFourNumber) {
         return new QuizResultInfo(
                 quiz.getId(),
                 quiz.getNumber(),
                 member.getId(),
                 member.getName(),
-                member.getBackFourNumber()
+                backFourNumber
         );
     }
 

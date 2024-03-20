@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RecordService {
 
+    private final MemberService memberService;
     private final RecordRepository recordRepository;
     private final QuizRepository quizRepository;
     private final MemberRepository memberRepository;
@@ -151,7 +152,7 @@ public class RecordService {
         if (scorer.isPresent()) {
             log.info("[기존 득점자 존재]: {}", scorer.get().getMember().getName());
             return RecordsAndScorerResponse.from(records,
-                    ScorerResponse.from(scorer.get()));
+                    ScorerResponse.from(scorer.get(), memberService.getBackFourNumber(scorer.get().getMember())));
         }
         log.info("[응답과 득점자 반환 서비스]");
         return RecordsAndScorerResponse.from(records, null);
@@ -163,7 +164,7 @@ public class RecordService {
         return records.stream()
                 .filter(record -> record.getQuiz().equals(quiz))
                 .sorted(Comparator.comparing(Record::getTicketNumber))
-                .map(RecordResponse::from)
+                .map(record -> RecordResponse.from(record, memberService.getBackFourNumber(record.getMember())))
                 .toList();
     }
 

@@ -16,11 +16,11 @@ public class ApplyMemberInfo {
     private String name;
     private String backFourNumber;
 
-    public static ApplyMemberInfo from(Member member) {
+    public static ApplyMemberInfo from(Member member, String backFourNumber) {
         return new ApplyMemberInfo(
                 member.getId(),
                 member.getName(),
-                member.getBackFourNumber()
+                backFourNumber
         );
     }
 }

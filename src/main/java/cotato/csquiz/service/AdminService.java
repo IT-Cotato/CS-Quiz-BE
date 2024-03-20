@@ -32,9 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class AdminService {
+
     private final MemberRepository memberRepository;
     private final GenerationRepository generationRepository;
     private final RefusedMemberRepository refusedMemberRepository;
+    private final MemberService memberService;
 
     public List<ApplyMemberInfo> getApplicantList() {
         List<Member> applicantList = memberRepository.findAllByRole(GENERAL);
@@ -164,9 +166,9 @@ public class AdminService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
     }
 
-    private static List<ApplyMemberInfo> buildApplyInfoList(List<Member> applicantList) {
+    private List<ApplyMemberInfo> buildApplyInfoList(List<Member> applicantList) {
         return applicantList.stream()
-                .map(ApplyMemberInfo::from)
+                .map(member -> ApplyMemberInfo.from(member, memberService.getBackFourNumber(member)))
                 .toList();
     }
 }

@@ -43,6 +43,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
     private final EmailVerificationService emailVerificationService;
+    private final EncryptService encryptService;
 
     @Value("${jwt.refresh.expiration}")
     private int refreshTokenAge;
@@ -50,14 +51,17 @@ public class AuthService {
     @Transactional
     public void createLoginInfo(JoinRequest request) {
         validateService.checkDuplicateEmail(request.getEmail());
-        validateService.checkDuplicatePhoneNumber(request.getPhoneNumber());
         validateService.checkPassword(request.getPassword());
+
+        String encryptedPhoneNumber = encryptService.encryptPhoneNumber(request.getPhoneNumber());
+        validateService.checkDuplicatePhoneNumber(encryptedPhoneNumber);
         log.info("[회원 가입 서비스]: {}, {}", request.getEmail(), request.getName());
+
         Member newMember = Member.builder()
                 .email(request.getEmail())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
                 .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
+                .phoneNumber(encryptedPhoneNumber)
                 .build();
         memberRepository.save(newMember);
     }

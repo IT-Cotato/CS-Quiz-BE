@@ -10,12 +10,12 @@ public record WinnerInfoResponse(
         String backFourNumber,
         MemberPosition memberPosition
 ) {
-    public static WinnerInfoResponse from(Winner winner) {
+    public static WinnerInfoResponse from(Winner winner, String backFourNumber) {
         return new WinnerInfoResponse(
                 winner.getMember().getId(),
                 winner.getMember().getName(),
                 winner.getEducation().getId(),
-                winner.getMember().getBackFourNumber(),
+                backFourNumber,
                 winner.getMember().getPosition()
         );
     }
