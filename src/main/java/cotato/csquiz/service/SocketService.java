@@ -136,7 +136,7 @@ public class SocketService {
 
     @Transactional
     public SocketTokenDto createSocketToken(String authorizationHeader) {
-        String token = jwtUtil.resolveWithAccessToken(authorizationHeader);
+        String token = jwtUtil.resolveAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
         String email = jwtUtil.getEmail(token);
         jwtUtil.validateMemberExist(email);

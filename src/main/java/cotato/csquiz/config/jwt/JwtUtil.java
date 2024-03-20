@@ -7,7 +7,6 @@ import cotato.csquiz.repository.MemberRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,19 +45,11 @@ public class JwtUtil {
                 .getBody().get("email", String.class);
     }
 
-    public String resolveAccessToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+    public String resolveAccessToken(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new FilterAuthenticationException("Bearer 토큰이 존재하지 않습니다.");
         }
-        return getBearer(header);
-    }
-
-    public String resolveWithAccessToken(String token) {
-        if (token == null || !token.startsWith("Bearer ")) {
-            throw new FilterAuthenticationException("토큰 형태 오류");
-        }
-        return getBearer(token);
+        return getBearer(authorizationHeader);
     }
 
     public String getBearer(String authorizationHeader) {
