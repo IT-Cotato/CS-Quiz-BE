@@ -14,8 +14,7 @@ public class EncodeConfig {
 
     @Value("${aes.secret.salt}")
     String salt;
-
-
+    
     @Bean
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
