@@ -26,9 +26,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
-
     private static final String KING_COMMAND = "king";
-
     private static final String WINNER_COMMAND = "winner";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final QuizService quizService;
