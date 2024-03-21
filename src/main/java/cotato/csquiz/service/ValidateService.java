@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ValidateService {
 
-    private static final String PASSWORD_PATTERN = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d가-힣]{8,16}$";
+    private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.])[A-Za-z\\d@$!%*#?&.]{8,16}$";
     private final MemberRepository memberRepository;
 
     public void checkDuplicateEmail(String email) {
@@ -49,7 +49,6 @@ public class ValidateService {
     public void checkPassword(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
         Matcher matcher = pattern.matcher(password);
-        log.info("");
         if (!matcher.matches()) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
         }
