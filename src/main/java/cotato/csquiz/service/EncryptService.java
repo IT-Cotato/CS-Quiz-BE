@@ -1,7 +1,6 @@
 package cotato.csquiz.service;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
@@ -15,15 +14,12 @@ public class EncryptService {
 
     public String encryptPhoneNumber(final String rawPhoneNumber) {
         byte[] encrypt = aesBytesEncryptor.encrypt(rawPhoneNumber.getBytes(StandardCharsets.UTF_8));
-        System.out.println(Arrays.toString(encrypt));
         return byteArrayToString(encrypt);
     }
 
     public String decryptPhoneNumber(final String encryptedPhoneNumber) {
         byte[] bytes = stringToByteArray(encryptedPhoneNumber);
         byte[] decrypt = aesBytesEncryptor.decrypt(bytes);
-        System.out.println(Arrays.toString(bytes));
-        System.out.println(Arrays.toString(decrypt));
         return new String(decrypt, StandardCharsets.UTF_8);
     }
 
