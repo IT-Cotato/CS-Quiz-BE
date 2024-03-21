@@ -51,12 +51,14 @@ public class RecordService {
     public ReplyResponse replyToQuiz(ReplyRequest request) {
         Quiz findQuiz = findQuizById(request.quizId());
         validateQuizOpen(findQuiz);
+
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateAlreadyCorrect(findQuiz, findMember);
 
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
-        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, request.input());
+        String cleanedAnswer = toLowerCaseTrimAnswer(request.input());
+        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, cleanedAnswer);
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
             Scorer scorer = Scorer.of(findMember, findQuiz);
@@ -64,7 +66,7 @@ public class RecordService {
             scorerRepository.save(scorer);
         }
 
-        Record createdRecord = Record.of(request.input(), isCorrect, findMember, findQuiz, ticketNumber);
+        Record createdRecord = Record.of(cleanedAnswer, isCorrect, findMember, findQuiz, ticketNumber);
         recordRepository.save(createdRecord);
         return ReplyResponse.from(isCorrect);
     }
@@ -80,7 +82,8 @@ public class RecordService {
     @Transactional
     public void addAdditionalAnswerToRedis(AddAdditionalAnswerRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
-        quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, request.getAnswer());
+        String cleanedAnswer = toLowerCaseTrimAnswer(request.getAnswer());
+        quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, cleanedAnswer);
     }
 
     private Quiz findQuizById(Long quizId) {
@@ -168,9 +171,14 @@ public class RecordService {
                 .toList();
     }
 
+    @Transactional
     public void saveAnswer(QuizSocketRequest request) {
         Quiz findQuiz = quizRepository.findById(request.getQuizId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
         quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
+    }
+
+    private String toLowerCaseTrimAnswer(String answer) {
+        return answer.toLowerCase().trim();
     }
 }
