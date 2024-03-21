@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.domain.dto.socket.CsQuizStopResponse;
 import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStopResponse;
+import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
@@ -24,6 +26,8 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
+    private static final String KING_COMMAND = "king";
+    private static final String WINNER_COMMAND = "winner";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final QuizService quizService;
 
@@ -82,6 +86,26 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     .quizId(quizId)
                     .command("start")
                     .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    public void stopQuiz(Quiz quiz) {
+        String command = "";
+        if (quiz.getNumber() == 9) {
+            command = KING_COMMAND;
+        }
+        if (quiz.getNumber() == 10) {
+            command = WINNER_COMMAND;
+        }
+        try {
+            QuizStopResponse response = QuizStopResponse.from(command, quiz.getId());
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
             for (WebSocketSession clientSession : CLIENTS.values()) {
