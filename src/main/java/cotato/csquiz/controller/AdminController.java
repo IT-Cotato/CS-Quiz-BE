@@ -28,14 +28,12 @@ public class AdminController {
 
     @GetMapping("/applicants")
     public ResponseEntity<?> getApplicantList() {
-        log.info("[가입자 확인 컨트롤러]");
         List<ApplyMemberInfo> applicantList = adminService.getApplicantList();
         return ResponseEntity.ok().body(applicantList);
     }
 
     @GetMapping("/reject-applicants")
     public ResponseEntity<?> rejectApplicantList() {
-        log.info("[거절자 확인 컨트롤러]");
         List<ApplyMemberInfo> applicantList = adminService.getRejectApplicantList();
         return ResponseEntity.ok().body(applicantList);
     }
@@ -63,7 +61,6 @@ public class AdminController {
 
     @GetMapping("/active-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getCurrentActiveMembers() {
-        log.info("[현재 활동 중인 부원 목록 조회 컨트롤러]");
         List<MemberEnrollInfoResponse> activeMembers = adminService.findCurrentActiveMembers();
         return ResponseEntity.ok().body(activeMembers);
     }
@@ -87,7 +84,6 @@ public class AdminController {
 
     @GetMapping("/old-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getOldMembersList() {
-        log.info("[OM 목록 조회 컨트롤러]");
         List<MemberEnrollInfoResponse> oldMembersList = adminService.getOldMembersList();
         return ResponseEntity.ok().body(oldMembersList);
     }
