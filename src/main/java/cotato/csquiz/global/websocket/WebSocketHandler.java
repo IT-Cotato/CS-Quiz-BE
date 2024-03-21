@@ -26,6 +26,10 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
+
+    private static final String KING_COMMAND = "king";
+
+    private static final String WINNER_COMMAND = "winner";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final QuizService quizService;
 
@@ -94,22 +98,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    public void stop9Quiz(Long quizId) {
-        try {
-            QuizStopResponse response = QuizStopResponse.from("king", quizId);
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-            for (WebSocketSession clientSession : CLIENTS.values()) {
-                clientSession.sendMessage(responseMessage);
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+    public void stopQuiz(Quiz quiz) {
+        String command = "";
+        if (quiz.getNumber() == 9) {
+            command = KING_COMMAND;
         }
-    }
-
-    public void stop10Quiz(Long quizId) {
+        if (quiz.getNumber() == 10) {
+            command = WINNER_COMMAND;
+        }
         try {
-            QuizStopResponse response = QuizStopResponse.from("winner", quizId);
+            QuizStopResponse response = QuizStopResponse.from(command, quiz.getId());
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
             for (WebSocketSession clientSession : CLIENTS.values()) {
