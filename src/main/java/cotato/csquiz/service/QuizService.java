@@ -147,6 +147,7 @@ public class QuizService {
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
+
         ShortQuiz createdShortQuiz = ShortQuiz.builder()
                 .education(findEducation)
                 .question(request.getQuestion())
@@ -157,11 +158,15 @@ public class QuizService {
                 .build();
         log.info("주관식 문제 생성 : 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);
+
         List<ShortAnswer> shortAnswers = request.getShortAnswers().stream()
                 .map(CreateShortAnswerRequest::getAnswer)
+                .map(String::toLowerCase)
+                .map(String::trim)
                 .map(ShortAnswer::of)
                 .toList();
         shortAnswerRepository.saveAll(shortAnswers);
+
         log.info("주관식 정답 생성 : {}개", shortAnswers.size());
         createdShortQuiz.addShortAnswers(shortAnswers);
     }
@@ -309,7 +314,9 @@ public class QuizService {
 
     private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
         checkAnswerAlreadyExist(shortQuiz, answer);
-        ShortAnswer shortAnswer = ShortAnswer.of(answer);
+        String cleanedAnswer = answer.toLowerCase()
+                .trim();
+        ShortAnswer shortAnswer = ShortAnswer.of(cleanedAnswer);
         shortAnswer.matchShortQuiz(shortQuiz);
         shortAnswerRepository.save(shortAnswer);
     }
