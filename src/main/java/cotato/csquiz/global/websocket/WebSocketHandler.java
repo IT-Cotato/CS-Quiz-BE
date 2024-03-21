@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.domain.dto.socket.CsQuizStopResponse;
 import cotato.csquiz.domain.dto.socket.QuizStartResponse;
 import cotato.csquiz.domain.dto.socket.QuizStatusResponse;
+import cotato.csquiz.domain.dto.socket.QuizStopResponse;
+import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
@@ -82,6 +84,32 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     .quizId(quizId)
                     .command("start")
                     .build();
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    public void stop9Quiz(Long quizId) {
+        try {
+            QuizStopResponse response = QuizStopResponse.from("king", quizId);
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+            for (WebSocketSession clientSession : CLIENTS.values()) {
+                clientSession.sendMessage(responseMessage);
+            }
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    public void stop10Quiz(Long quizId) {
+        try {
+            QuizStopResponse response = QuizStopResponse.from("winner", quizId);
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
             for (WebSocketSession clientSession : CLIENTS.values()) {

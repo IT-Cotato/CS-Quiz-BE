@@ -80,9 +80,11 @@ public class SocketService {
         quiz.updateStart(QuizStatus.QUIZ_OFF);
         if (quiz.getNumber() == 9) {
             kingMemberService.calculateKingMember(quiz);
+            webSocketHandler.stop9Quiz(quiz.getId());
         }
         if (quiz.getNumber() == 10) {
             kingMemberService.saveWinner(quiz);
+            webSocketHandler.stop10Quiz(quiz.getId());
         }
     }
 
