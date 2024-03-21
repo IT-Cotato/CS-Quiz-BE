@@ -140,7 +140,8 @@ public class AuthService {
     }
 
     public MemberEmailResponse findMemberEmail(String name, String phoneNumber) {
-        Member findMember = memberRepository.findByPhoneNumber(phoneNumber)
+        String encryptedPhoneNumber = encryptService.encryptPhoneNumber(phoneNumber);
+        Member findMember = memberRepository.findByPhoneNumber(encryptedPhoneNumber)
                 .orElseThrow(() -> new EntityNotFoundException("해당 전화번호를 가진 회원을 찾을 수 없습니다."));
         validateMatchName(findMember.getName(), name);
         String maskedId = getMaskId(findMember.getEmail());
