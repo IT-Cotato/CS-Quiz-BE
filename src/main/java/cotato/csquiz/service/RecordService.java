@@ -57,7 +57,9 @@ public class RecordService {
         validateAlreadyCorrect(findQuiz, findMember);
 
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
-        String cleanedAnswer = toLowerCaseTrimAnswer(request.input());
+        String cleanedAnswer = request.input()
+                .toLowerCase()
+                .trim();
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, cleanedAnswer);
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
@@ -82,7 +84,9 @@ public class RecordService {
     @Transactional
     public void addAdditionalAnswerToRedis(AddAdditionalAnswerRequest request) {
         Quiz quiz = findQuizById(request.getQuizId());
-        String cleanedAnswer = toLowerCaseTrimAnswer(request.getAnswer());
+        String cleanedAnswer = request.getAnswer()
+                .toLowerCase()
+                .trim();
         quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, cleanedAnswer);
     }
 
@@ -176,9 +180,5 @@ public class RecordService {
         Quiz findQuiz = quizRepository.findById(request.getQuizId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
         quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
-    }
-
-    private String toLowerCaseTrimAnswer(String answer) {
-        return answer.toLowerCase().trim();
     }
 }

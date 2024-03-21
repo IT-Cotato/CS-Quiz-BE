@@ -314,7 +314,8 @@ public class QuizService {
 
     private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
         checkAnswerAlreadyExist(shortQuiz, answer);
-        String cleanedAnswer = toLowerCaseTrimAnswer(answer);
+        String cleanedAnswer = answer.toLowerCase()
+                .trim();
         ShortAnswer shortAnswer = ShortAnswer.of(cleanedAnswer);
         shortAnswer.matchShortQuiz(shortQuiz);
         shortAnswerRepository.save(shortAnswer);
@@ -350,9 +351,5 @@ public class QuizService {
     private Education findEducationById(Long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육 id:" + educationId + " 찾다가 에러 발생했습니다."));
-    }
-
-    private String toLowerCaseTrimAnswer(String answer) {
-        return answer.toLowerCase().trim();
     }
 }
