@@ -18,6 +18,7 @@ import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.KingMemberRepository;
 import cotato.csquiz.repository.QuizRepository;
+import cotato.csquiz.repository.SessionRepository;
 import cotato.csquiz.repository.WinnerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -39,6 +40,7 @@ public class EducationService {
     private final KingMemberRepository kingMemberRepository;
     private final QuizRepository quizRepository;
     private final WinnerRepository winnerRepository;
+    private final SessionRepository sessionRepository;
 
     @Transactional
     public AddEducationResponse addEducation(AddEducationRequest request) {
@@ -56,13 +58,14 @@ public class EducationService {
     }
 
     private void checkEducationExist(Session session) {
-        Optional<Education> education = educationRepository.findEducationBySession(session);
-        if (education.isPresent()) {
-            throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
-        }
+        educationRepository.findBySession(session).ifPresent(
+                education -> {
+                    throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
+                }
+        );
     }
 
-    public GetStatusResponse getStatus(long educationId) {
+    public GetStatusResponse getStatus(Long educationId) {
         Education education = findEducation(educationId);
         return GetStatusResponse.builder()
                 .status(education.getStatus())
@@ -91,8 +94,10 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
-        List<Education> educationList = educationRepository.findBySession_Generation_Id(generationId);
-        return educationList.stream()
+        return sessionRepository.findAllByGenerationId(generationId).stream()
+                .map(educationRepository::findBySession)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .map(AllEducationResponse::convertFromEducation)
                 .toList();
     }
