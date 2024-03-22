@@ -46,7 +46,7 @@ public class ValidateService {
         }
     }
 
-    public void checkPassword(String password) {
+    public void checkPasswordPattern(String password) {
         Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
         Matcher matcher = pattern.matcher(password);
         if (!matcher.matches()) {
