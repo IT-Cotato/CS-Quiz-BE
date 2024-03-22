@@ -58,13 +58,14 @@ public class EducationService {
     }
 
     private void checkEducationExist(Session session) {
-        Optional<Education> education = educationRepository.findEducationBySession(session);
-        if (education.isPresent()) {
-            throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
-        }
+        educationRepository.findBySession(session).ifPresent(
+                education -> {
+                    throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
+                }
+        );
     }
 
-    public GetStatusResponse getStatus(long educationId) {
+    public GetStatusResponse getStatus(Long educationId) {
         Education education = findEducation(educationId);
         return GetStatusResponse.builder()
                 .status(education.getStatus())
