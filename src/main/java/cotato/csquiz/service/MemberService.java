@@ -68,10 +68,6 @@ public class MemberService {
         }
     }
 
-    private boolean isProperLength(String newPassword) {
-        return MIN_LENGTH <= newPassword.length() && newPassword.length() <= MAX_LENGTH;
-    }
-
     public MemberMyPageInfoResponse findMyPageInfo(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
