@@ -20,12 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private static final int MIN_LENGTH = 8;
-    private static final int MAX_LENGTH = 16;
     private final MemberRepository memberRepository;
-    private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtUtil jwtUtil;
     private final EncryptService encryptService;
+    private final ValidateService validateService;
 
     public MemberInfoResponse getMemberInfo(String email) {
         Member findMember = memberRepository.findByEmail(email)
@@ -57,21 +56,16 @@ public class MemberService {
         String email = jwtUtil.getEmail(accessToken);
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
-        validatePassword(findMember.getPassword(), password);
+        validateService.checkPasswordPattern(password);
+        validateIsSameBefore(findMember.getPassword(), password);
+        
         findMember.updatePassword(bCryptPasswordEncoder.encode(password));
     }
 
-    private void validatePassword(String originPassword, String newPassword) {
-        if (!isProperLength(newPassword)) {
-            throw new AppException(ErrorCode.INVALID_PASSWORD);
-        }
+    private void validateIsSameBefore(String originPassword, String newPassword) {
         if (bCryptPasswordEncoder.matches(newPassword, originPassword)) {
             throw new AppException(ErrorCode.SAME_PASSWORD);
         }
-    }
-
-    private boolean isProperLength(String newPassword) {
-        return MIN_LENGTH <= newPassword.length() && newPassword.length() <= MAX_LENGTH;
     }
 
     public MemberMyPageInfoResponse findMyPageInfo(Long memberId) {
