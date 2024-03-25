@@ -50,20 +50,15 @@ public class QuizAnswerRedisRepository {
         }
     }
 
-    private void saveAdditionalMultipleQuizAnswer(Quiz quiz, int answerNumber) {
+    private void saveAdditionalMultipleQuizAnswer(Quiz quiz, Integer answerNumber) {
         String quizKey = KEY_PREFIX + quiz.getId();
-        redisTemplate.opsForValue().set(
-                quizKey,
-                answerNumber,
-                QUIZ_ANSWER_EXPIRATION_TIME,
-                TimeUnit.MINUTES
-        );
+        redisTemplate.opsForList().rightPush(quizKey, answerNumber);
+        redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
     private void saveAdditionalShortQuizAnswer(Quiz quiz, String answer) {
         String quizKey = KEY_PREFIX + quiz.getId();
-        redisTemplate.opsForList()
-                .rightPush(quizKey, answer);
+        redisTemplate.opsForList().rightPush(quizKey, answer);
         redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
@@ -81,6 +76,7 @@ public class QuizAnswerRedisRepository {
         List<String> answers = shortAnswers.stream()
                 .map(ShortAnswer::getContent)
                 .toList();
+
         String quizKey = KEY_PREFIX + quiz.getId();
         for (String answer : answers) {
             redisTemplate.opsForList()
@@ -91,18 +87,17 @@ public class QuizAnswerRedisRepository {
 
     private void saveChoices(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
-        int answerNumber = choices.stream()
+        List<Integer> answerNumbers = choices.stream()
                 .filter(choice -> choice.getIsCorrect() == ChoiceCorrect.ANSWER)
-                .mapToInt(Choice::getChoiceNumber)
-                .findAny()
-                .orElse(0);
+                .map(Choice::getChoiceNumber)
+                .toList();
+
         String quizKey = KEY_PREFIX + quiz.getId();
-        redisTemplate.opsForValue().set(
-                quizKey,
-                answerNumber,
-                QUIZ_ANSWER_EXPIRATION_TIME,
-                TimeUnit.MINUTES
-        );
+        for (Integer answerNumber : answerNumbers) {
+            redisTemplate.opsForList()
+                    .rightPush(quizKey, answerNumber);
+        }
+        redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
     public boolean isCorrect(final Quiz quiz, final String input) {
@@ -117,14 +112,14 @@ public class QuizAnswerRedisRepository {
     }
 
     private boolean isCorrectChoices(String input, String quizKey) {
-        Object answer = redisTemplate.opsForValue().get(quizKey);
-        log.info("찾은 퀴즈 정답 : {}", answer);
-        return Objects.equals(answer, Integer.parseInt(input));
+        List<Object> range = redisTemplate.opsForList().range(quizKey, 0, -1);
+        Objects.requireNonNull(range);
+        return range.contains(Integer.parseInt(input));
     }
 
     private boolean hasShortAnswers(String input, String quizKey) {
         List<Object> range = redisTemplate.opsForList().range(quizKey, 0, -1);
-        assert range != null;
+        Objects.requireNonNull(range);
         return range.contains(input);
     }
 }
