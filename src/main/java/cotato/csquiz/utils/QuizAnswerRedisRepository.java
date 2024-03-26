@@ -13,6 +13,7 @@ import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,12 @@ public class QuizAnswerRedisRepository {
     private final ShortAnswerRepository shortAnswerRepository;
     private final ChoiceRepository choiceRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+
+//    public static void main(String[] args) {
+//        List<Integer> answers = List.of(1, 2, 3, 4);
+//        List<Object> objects = List.of(1, 2, 4, 3);
+//        System.out.println(answers.equals(objects));
+//    }
 
     public void saveAllQuizAnswers(Long educationId) {
         List<Quiz> allQuizzes = quizRepository.findAllByEducationId(educationId);
@@ -87,34 +94,42 @@ public class QuizAnswerRedisRepository {
 
     private void saveChoices(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
-        List<Integer> answerNumbers = choices.stream()
-                .filter(choice -> choice.getIsCorrect() == ChoiceCorrect.ANSWER)
-                .map(Choice::getChoiceNumber)
-                .toList();
+        List<Integer> answerNumbers = choices.stream().filter(choice -> choice.getIsCorrect() == ChoiceCorrect.ANSWER)
+                .map(Choice::getChoiceNumber).toList();
 
         String quizKey = KEY_PREFIX + quiz.getId();
         for (Integer answerNumber : answerNumbers) {
-            redisTemplate.opsForList()
-                    .rightPush(quizKey, answerNumber);
+            redisTemplate.opsForSet().add(quizKey, answerNumber);
         }
         redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
-    public boolean isCorrect(final Quiz quiz, final String input) {
+    public boolean isCorrect(final Quiz quiz, final List<String> inputs) {
         String quizKey = KEY_PREFIX + quiz.getId();
         if (quiz instanceof ShortQuiz) {
-            return hasShortAnswers(input, quizKey);
+            return hasShortAnswers(inputs.get(0), quizKey);
         }
         if (quiz instanceof MultipleQuiz) {
-            return isCorrectChoices(input, quizKey);
+            return isCorrectChoices(inputs, quizKey);
         }
         return false;
     }
 
-    private boolean isCorrectChoices(String input, String quizKey) {
-        List<Object> range = redisTemplate.opsForList().range(quizKey, 0, -1);
-        Objects.requireNonNull(range);
-        return range.contains(Integer.parseInt(input));
+    private boolean isCorrectChoices(List<String> inputs, String quizKey) {
+        Set<Object> redis = redisTemplate.opsForSet().members(quizKey);
+        Objects.requireNonNull(redis);
+        log.info("[입력한 정답]: {}", inputs);
+        List<Integer> enrolledAnswer = redis.stream()
+                .map(object -> (Integer) object)
+                .sorted()
+                .toList();
+        log.info("[등록된 정답]: {}", enrolledAnswer);
+        List<Integer> answers = inputs.stream()
+                .map(Integer::parseInt)
+                .sorted()
+                .toList();
+        log.info("[입력한 정수 정답]: {}", answers);
+        return enrolledAnswer.equals(answers);
     }
 
     private boolean hasShortAnswers(String input, String quizKey) {
