@@ -5,6 +5,7 @@ import cotato.csquiz.domain.dto.record.RegradeRequest;
 import cotato.csquiz.domain.dto.record.ReplyRequest;
 import cotato.csquiz.domain.dto.record.ReplyResponse;
 import cotato.csquiz.service.RecordService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +25,8 @@ public class RecordController {
     private final RecordService recordService;
 
     @PostMapping("/reply")
-    public ResponseEntity<?> replyToQuiz(@RequestBody ReplyRequest request) {
-        log.info("정답 제출 컨트롤러, 제출한 정답 : {}", request.input());
+    public ResponseEntity<?> replyToQuiz(@RequestBody @Valid ReplyRequest request) {
+        log.info("정답 제출 컨트롤러, 제출한 정답 : {}", request.inputs());
         ReplyResponse replyResponse = recordService.replyToQuiz(request);
         return ResponseEntity.ok().body(replyResponse);
     }

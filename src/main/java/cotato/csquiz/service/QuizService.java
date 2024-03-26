@@ -69,7 +69,9 @@ public class QuizService {
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
         log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
+
         quizRepository.deleteAllByEducationId(educationId);
+
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
     }
