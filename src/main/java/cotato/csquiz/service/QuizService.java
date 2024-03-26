@@ -195,15 +195,15 @@ public class QuizService {
     }
 
     @Transactional
-    public QuizStatusResponse checkQuizStarted() {
-        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.QUIZ_ON);
-        log.info("by Status {}", byStatus);
-        if (byStatus.isEmpty()) {
+    public QuizStatusResponse checkQuizStarted(Long educationId) {
+        Education education = findEducationById(educationId);
+        List<Quiz> byStatusAndEducation = quizRepository.findByStatusAndEducation(QuizStatus.QUIZ_ON, education);
+        if (byStatusAndEducation.isEmpty()) {
             return QuizStatusResponse.builder()
                     .command("show")
                     .build();
         }
-        Quiz quiz = byStatus.get(0);
+        Quiz quiz = byStatusAndEducation.get(0);
         return QuizStatusResponse.builder()
                 .command("show")
                 .quizId(quiz.getId())

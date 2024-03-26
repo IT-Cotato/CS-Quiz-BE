@@ -39,10 +39,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         String memberEmail = findAttributeByToken(session, "email");
+        String educationId = findAttributeByToken(session, "educationId");
         log.info(memberEmail);
         boolean isGeneral = connectSession(session, memberEmail); //true : 일반 회원 false : 관리자
         if (isGeneral) {
-            checkQuizAlreadyStart(session);
+            checkQuizAlreadyStart(session, Long.parseLong(educationId));
         }
         log.info("CLIENTS: {}", CLIENTS.keySet());
         log.info("MANAGERS: {}", MANAGERS.keySet());
@@ -173,10 +174,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         return (String) session.getAttributes().get(key);
     }
 
-    private void checkQuizAlreadyStart(WebSocketSession session) {
+    private void checkQuizAlreadyStart(WebSocketSession session, Long educationId) {
         log.info("checkQuizAlreadyStart Start");
         try {
-            QuizStatusResponse response = quizService.checkQuizStarted();
+            QuizStatusResponse response = quizService.checkQuizStarted(educationId);
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
             session.sendMessage(responseMessage);
