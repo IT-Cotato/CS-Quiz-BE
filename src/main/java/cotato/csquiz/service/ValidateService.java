@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 public class ValidateService {
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.])[A-Za-z\\d@$!%*#?&.]{8,16}$";
+    private static final int PHONE_NUMBER_LENGTH = 11;
+    private static final String PHONE_NUMBER_PREFIX = "010";
     private final MemberRepository memberRepository;
 
     public void checkDuplicateEmail(String email) {
@@ -25,9 +27,6 @@ public class ValidateService {
     }
 
     public void checkDuplicatePhoneNumber(String phone) {
-        if (phone.length() <= 4) {
-            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
-        }
         if (memberRepository.findByPhoneNumber(phone).isPresent()) {
             log.error("[회원 가입 실패]: 존재하는 전화번호 " + phone);
             throw new AppException(ErrorCode.PHONE_NUMBER_DUPLICATED);
@@ -51,6 +50,23 @@ public class ValidateService {
         Matcher matcher = pattern.matcher(password);
         if (!matcher.matches()) {
             throw new AppException(ErrorCode.INVALID_PASSWORD);
+        }
+    }
+
+    public void checkPhoneNumber(String phoneNumber) {
+        if (phoneNumber.length() != PHONE_NUMBER_LENGTH) {
+            log.error("[전화번호 에러]: 적당하지 않은 길이");
+            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
+        }
+        if (!phoneNumber.startsWith(PHONE_NUMBER_PREFIX)) {
+            log.error("[전화번호 에러]: 010으로 시작하지 않음");
+            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
+        }
+        try {
+            Integer.parseInt(phoneNumber);
+        } catch (Exception e) {
+            log.error("[전화번호 에러]: 문자열 파싱 에러");
+            throw new AppException(ErrorCode.INVALID_PHONE_NUMBER);
         }
     }
 }

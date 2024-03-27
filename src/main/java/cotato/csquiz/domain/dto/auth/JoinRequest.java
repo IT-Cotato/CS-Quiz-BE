@@ -16,5 +16,6 @@ public class JoinRequest {
     @NotNull
     private String name;
     @NotNull
+    @Size(min = 11, max = 11, message = "전화번호는 11자리여야합니다.")
     private String phoneNumber;
 }
