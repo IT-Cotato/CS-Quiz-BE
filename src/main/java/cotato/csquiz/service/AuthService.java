@@ -52,6 +52,7 @@ public class AuthService {
     public void createLoginInfo(JoinRequest request) {
         validateService.checkDuplicateEmail(request.getEmail());
         validateService.checkPasswordPattern(request.getPassword());
+        validateService.checkPhoneNumber(request.getPhoneNumber());
 
         String encryptedPhoneNumber = encryptService.encryptPhoneNumber(request.getPhoneNumber());
         validateService.checkDuplicatePhoneNumber(encryptedPhoneNumber);
