@@ -68,9 +68,13 @@ public class SessionService {
         Session session = findSessionById(request.getSessionId());
 
         session.changeDescription(request.getDescription());
-        session.updateToggle(request.getItIssue(), request.getCsEducation(), request.getNetworking());
-        Session updateSession = changePhoto(session, request.getSessionImage());
-        sessionRepository.save(updateSession);
+        session.updateToggle(request.getItIssue(), request.getCsEducation(),
+                request.getNetworking());
+        if (request.getIsPhotoUpdated()) {
+            changePhoto(session, request.getSessionImage());
+        }
+
+        sessionRepository.save(session);
     }
 
     private int calculateLastSessionNumber(Generation generation) {
@@ -97,7 +101,7 @@ public class SessionService {
         changePhoto(session, request.getSessionImage());
     }
 
-    private Session changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
+    private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
         if (isImageExist(sessionImage)) {
             String imageUrl = s3Uploader.uploadFiles(sessionImage, SESSION_BUCKET_DIRECTORY);
             deleteOldImage(session);
@@ -107,7 +111,6 @@ public class SessionService {
             deleteOldImage(session);
             session.changePhotoUrl(null);
         }
-        return session;
     }
 
     public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
