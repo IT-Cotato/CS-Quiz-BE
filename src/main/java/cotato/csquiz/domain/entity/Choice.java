@@ -29,7 +29,7 @@ public class Choice extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "choice_number")
-    private int choiceNumber;
+    private Integer choiceNumber;
 
     @Column(name = "choice_content")
     private String content;
@@ -42,7 +42,7 @@ public class Choice extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private MultipleQuiz multipleQuiz;
 
-    private Choice(int choiceNumber, String content, ChoiceCorrect isCorrect) {
+    private Choice(Integer choiceNumber, String content, ChoiceCorrect isCorrect) {
         this.choiceNumber = choiceNumber;
         this.content = content;
         this.isCorrect = isCorrect;

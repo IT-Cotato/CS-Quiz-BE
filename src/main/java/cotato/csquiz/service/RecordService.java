@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class RecordService {
 
+    private static final String INPUT_DELIMITER = ",";
     private final MemberService memberService;
     private final RecordRepository recordRepository;
     private final QuizRepository quizRepository;
@@ -51,24 +52,28 @@ public class RecordService {
     public ReplyResponse replyToQuiz(ReplyRequest request) {
         Quiz findQuiz = findQuizById(request.quizId());
         validateQuizOpen(findQuiz);
-
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateAlreadyCorrect(findQuiz, findMember);
 
         Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
-        String cleanedAnswer = request.input()
-                .toLowerCase()
-                .trim();
-        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, cleanedAnswer);
+
+        List<String> inputs = request.inputs().stream()
+                .map(String::toLowerCase)
+                .map(String::trim)
+                .sorted()
+                .toList();
+
+        boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, inputs);
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
             Scorer scorer = Scorer.of(findMember, findQuiz);
             log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
             scorerRepository.save(scorer);
         }
+        String reply = String.join(INPUT_DELIMITER, inputs);
 
-        Record createdRecord = Record.of(cleanedAnswer, isCorrect, findMember, findQuiz, ticketNumber);
+        Record createdRecord = Record.of(reply, isCorrect, findMember, findQuiz, ticketNumber);
         recordRepository.save(createdRecord);
         return ReplyResponse.from(isCorrect);
     }
