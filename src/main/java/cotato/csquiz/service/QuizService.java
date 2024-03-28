@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -197,21 +198,18 @@ public class QuizService {
     }
 
     @Transactional
-    public QuizStatusResponse checkQuizStarted() {
-        List<Quiz> byStatus = quizRepository.findByStatus(QuizStatus.QUIZ_ON);
-        log.info("by Status {}", byStatus);
-        if (byStatus.isEmpty()) {
-            return QuizStatusResponse.builder()
-                    .command("show")
-                    .build();
-        }
-        Quiz quiz = byStatus.get(0);
-        return QuizStatusResponse.builder()
-                .command("show")
-                .quizId(quiz.getId())
-                .status(quiz.getStatus())
-                .start(quiz.getStart())
-                .build();
+    public QuizStatusResponse checkQuizStarted(Long educationId) {
+        Education education = findEducationById(educationId);
+        return quizRepository.findByStatusAndEducation(QuizStatus.QUIZ_ON, education)
+                .map(quiz -> QuizStatusResponse.builder()
+                        .command("show")
+                        .quizId(quiz.getId())
+                        .status(quiz.getStatus())
+                        .start(quiz.getStart())
+                        .build())
+                .orElse(QuizStatusResponse.builder()
+                        .command("show")
+                        .build());
     }
 
     @Transactional
