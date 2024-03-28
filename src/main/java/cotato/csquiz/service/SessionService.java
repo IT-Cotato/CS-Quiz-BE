@@ -70,7 +70,7 @@ public class SessionService {
         session.changeDescription(request.getDescription());
         Session updateSession = session.updateToggle(request.getItIssue(), request.getCsEducation(),
                 request.getNetworking());
-        if (request.getPhotoChange()) {
+        if (request.getIsPhotoUpdated()) {
             updateSession = changePhoto(session, request.getSessionImage());
         }
 
