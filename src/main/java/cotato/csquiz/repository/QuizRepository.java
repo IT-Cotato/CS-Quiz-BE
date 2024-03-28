@@ -4,6 +4,7 @@ import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.QuizStatus;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,7 +16,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findByStatus(QuizStatus status);
 
-    List<Quiz> findByStatusAndEducation(QuizStatus status, Education education);
+    Optional<Quiz> findByStatusAndEducation(QuizStatus status, Education education);
 
     List<Quiz> findByStart(QuizStatus quizStatus);
 
