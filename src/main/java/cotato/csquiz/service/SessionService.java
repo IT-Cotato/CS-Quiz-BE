@@ -68,8 +68,12 @@ public class SessionService {
         Session session = findSessionById(request.getSessionId());
 
         session.changeDescription(request.getDescription());
-        session.updateToggle(request.getItIssue(), request.getCsEducation(), request.getNetworking());
-        Session updateSession = changePhoto(session, request.getSessionImage());
+        Session updateSession = session.updateToggle(request.getItIssue(), request.getCsEducation(),
+                request.getNetworking());
+        if (request.getPhotoChange()) {
+            updateSession = changePhoto(session, request.getSessionImage());
+        }
+
         sessionRepository.save(updateSession);
     }
 

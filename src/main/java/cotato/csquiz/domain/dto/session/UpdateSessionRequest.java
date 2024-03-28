@@ -11,6 +11,7 @@ public class UpdateSessionRequest {
 
     private Long sessionId;
     private MultipartFile sessionImage;
+    private Boolean photoChange;
     private String description;
     private ItIssue itIssue;
     private Networking networking;
