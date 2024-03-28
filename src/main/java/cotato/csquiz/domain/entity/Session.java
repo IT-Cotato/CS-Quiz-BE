@@ -85,9 +85,10 @@ public class Session extends BaseTimeEntity {
         this.photoUrl = photoUrl;
     }
 
-    public void updateToggle(ItIssue itIssue, CSEducation csEducation, Networking networking) {
+    public Session updateToggle(ItIssue itIssue, CSEducation csEducation, Networking networking) {
         this.itIssue = itIssue;
         this.csEducation = csEducation;
         this.networking = networking;
+        return this;
     }
 }
