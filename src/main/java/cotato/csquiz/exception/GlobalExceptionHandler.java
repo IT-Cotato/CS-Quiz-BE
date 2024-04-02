@@ -3,7 +3,6 @@ package cotato.csquiz.exception;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,13 +26,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAppCustomException(AppException e, HttpServletRequest request) {
         log.error("AppException 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                e.getErrorCode().getHttpStatus(),
-                e.getErrorCode(),
-                e.getErrorCode().getMessage(),
-                request.getRequestURI()
-        );
+        ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode(), request);
         return ResponseEntity.status(e.getErrorCode().getHttpStatus())
                 .body(errorResponse);
     }
@@ -42,13 +35,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ErrorResponse> handleImageException(ImageException e, HttpServletRequest request) {
         log.error("이미지 처리 실패 예외 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ErrorCode.IMAGE_PROCESSING_FAIL,
-                "이미지 처리에 실패했습니다.",
-                request.getRequestURI()
-        );
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.IMAGE_PROCESSING_FAIL, request);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
@@ -68,8 +55,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("에러 발생 요청 경로: {}", requestURI);
         log.error("에러 발생 요청 메서드: {}", httpServletRequest.getMethod());
 
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, requestURI, bindingResult);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+        ErrorResponse errorResponse = ErrorResponse.of(httpServletRequest, errorFields);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)

@@ -1,33 +1,24 @@
 package cotato.csquiz.exception;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import java.time.LocalDateTime;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 public record ErrorResponse(
-        @JsonFormat(
-                shape = Shape.STRING,
-                pattern = "yyyy-MM-dd HH:mm:ss",
-                locale = "Asia/Seoul"
-        )
-        LocalDateTime time,
         HttpStatus status,
         ErrorCode errorCode,
         String message,
+        String method,
         String requestURI
 ) {
 
-    public static ErrorResponse of(HttpStatus status, ErrorCode errorCode, String requestURI) {
+    public static ErrorResponse of(ErrorCode errorCode, HttpServletRequest request) {
         return new ErrorResponse(
-                LocalDateTime.now(),
-                status,
+                errorCode.getHttpStatus(),
                 errorCode,
                 errorCode.getMessage(),
-                requestURI
+                request.getMethod(),
+                request.getRequestURI()
         );
     }
 
@@ -46,8 +37,7 @@ public record ErrorResponse(
                     .append("]");
         }
         return new ErrorResponse(
-                LocalDateTime.now(),
-                status,
+                HttpStatus.BAD_REQUEST,
                 ErrorCode.INVALID_INPUT,
                 message.toString(),
                 requestURI
