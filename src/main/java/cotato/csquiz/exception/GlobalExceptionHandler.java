@@ -24,7 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AppException.class)
-    public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleAppCustomException(AppException e, HttpServletRequest request) {
         log.error("AppException 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
@@ -39,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(ImageException.class)
-    public ResponseEntity<?> handleImageException(ImageException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleImageException(ImageException e, HttpServletRequest request) {
         log.error("이미지 처리 실패 예외 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
@@ -73,7 +73,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e,
+                                                                       HttpServletRequest request) {
         log.error("Entity Not Found Exception 발생: {}", e.getMessage());
         log.error("에러 요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SQLException.class)
-    public ResponseEntity<?> handleSQLException(SQLException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleSQLException(SQLException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode());
         log.error("에러 요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = new ErrorResponse(
