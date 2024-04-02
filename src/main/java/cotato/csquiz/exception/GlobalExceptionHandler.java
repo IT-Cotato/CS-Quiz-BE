@@ -36,7 +36,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("이미지 처리 실패 예외 발생: {}", e.getErrorCode().getMessage());
         log.error("요청 uri: {}", request.getRequestURI());
         ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.IMAGE_PROCESSING_FAIL, request);
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     @Override
@@ -55,8 +55,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("에러 발생 요청 경로: {}", requestURI);
         log.error("에러 발생 요청 메서드: {}", httpServletRequest.getMethod());
 
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
         ErrorResponse errorResponse = ErrorResponse.of(httpServletRequest, errorFields);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -64,27 +64,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                                                        HttpServletRequest request) {
         log.error("Entity Not Found Exception 발생: {}", e.getMessage());
         log.error("에러 요청 uri: {}", request.getRequestURI());
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND,
-                ErrorCode.ENTITY_NOT_FOUND,
-                e.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.ENTITY_NOT_FOUND, request);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException e, HttpServletRequest request) {
         log.error("발생한 에러: {}", e.getErrorCode());
         log.error("에러 요청 uri: {}", request.getRequestURI());
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ErrorCode.INTERNAL_SQL_ERROR,
-                ErrorCode.INTERNAL_SQL_ERROR.getMessage(),
-                request.getRequestURI()
-        );
-        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SQL_ERROR, request);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

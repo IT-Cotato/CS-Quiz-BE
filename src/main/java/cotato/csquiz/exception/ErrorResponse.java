@@ -22,25 +22,14 @@ public record ErrorResponse(
         );
     }
 
-    public static ErrorResponse of(HttpStatus status, String requestURI, final BindingResult bindingResult) {
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        StringBuilder message = new StringBuilder();
-        boolean isFirst = true;
-        for (FieldError fieldError : fieldErrors) {
-            if (!isFirst) {
-                message.append(", ");
-            }
-            isFirst = false;
-            String field = fieldError.getField();
-            message.append("[")
-                    .append(field)
-                    .append("]");
-        }
+    //method argument 예외에 사용
+    public static ErrorResponse of(HttpServletRequest request, final List<String> errorFields) {
         return new ErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 ErrorCode.INVALID_INPUT,
-                message.toString(),
-                requestURI
+                errorFields.toString(),
+                request.getMethod(),
+                request.getRequestURI()
         );
     }
 }
