@@ -4,15 +4,24 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AppException.class)
     public ResponseEntity<?> handleAppCustomException(AppException e, HttpServletRequest request) {
@@ -40,6 +49,26 @@ public class GlobalExceptionHandler {
                 "이미지 처리에 실패했습니다.",
                 request.getRequestURI()
         );
+        return ResponseEntity.status(errorResponse.status()).body(errorResponse);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers, HttpStatusCode status,
+                                                                  WebRequest request) {
+        ServletWebRequest servletWebRequest = (ServletWebRequest) request;
+        HttpServletRequest httpServletRequest = servletWebRequest.getRequest();
+        String requestURI = httpServletRequest.getRequestURI();
+        BindingResult bindingResult = ex.getBindingResult();
+        List<String> errorFields = bindingResult.getFieldErrors().stream()
+                .map(FieldError::getField)
+                .toList();
+
+        log.error("[Method Argument Not Valid Execption 발생]: {}", errorFields);
+        log.error("에러 발생 요청 경로: {}", requestURI);
+        log.error("에러 발생 요청 메서드: {}", httpServletRequest.getMethod());
+
+        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, requestURI, bindingResult);
         return ResponseEntity.status(errorResponse.status()).body(errorResponse);
     }
 
