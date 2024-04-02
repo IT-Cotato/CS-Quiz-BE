@@ -32,7 +32,6 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             setErrorResponse(response, errorResponse);
         } catch (FilterAuthenticationException e) {
             ErrorResponse errorResponse = new ErrorResponse(
-                    HttpStatus.UNAUTHORIZED,
                     ErrorCode.FILTER_EXCEPTION,
                     e.getMessage(),
                     request.getMethod(),
