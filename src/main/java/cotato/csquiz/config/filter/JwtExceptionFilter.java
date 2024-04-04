@@ -31,12 +31,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.JWT_FORM_ERROR, request);
             setErrorResponse(response, errorResponse);
         } catch (FilterAuthenticationException e) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    ErrorCode.FILTER_EXCEPTION,
-                    e.getMessage(),
-                    request.getMethod(),
-                    request.getRequestURI()
-            );
+            ErrorResponse errorResponse = ErrorResponse.of(request, ErrorCode.FILTER_EXCEPTION, e.getMessage());
             setErrorResponse(response, errorResponse);
         }
     }

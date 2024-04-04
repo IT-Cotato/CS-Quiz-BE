@@ -27,4 +27,13 @@ public record ErrorResponse(
                 request.getRequestURI()
         );
     }
+
+    public static ErrorResponse of(HttpServletRequest request, ErrorCode errorCode, final String errorMessage) {
+        return new ErrorResponse(
+                errorCode,
+                errorMessage,
+                request.getMethod(),
+                request.getRequestURI()
+        );
+    }
 }
