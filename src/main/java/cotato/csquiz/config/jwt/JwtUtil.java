@@ -140,14 +140,8 @@ public class JwtUtil {
     }
 
     public void validateAccessToken(String accessToken) {
-        if (accessToken == null || accessToken.isEmpty()) {
-            throw new FilterAuthenticationException("액세스 토큰을 넣고 요청해주세요.");
-        }
         if (!TokenConstants.ACCESS_TOKEN.equals(getType(accessToken))) {
             throw new FilterAuthenticationException("액세스 토큰을 사용해주세요.");
-        }
-        if (isExpired(accessToken)) {
-            throw new FilterAuthenticationException("토큰이 만료되었습니다.");
         }
         if (isBlocked(accessToken)) {
             throw new FilterAuthenticationException("차단된 토큰입니다.");

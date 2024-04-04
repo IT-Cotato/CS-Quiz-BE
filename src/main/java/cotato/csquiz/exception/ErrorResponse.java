@@ -1,20 +1,39 @@
 package cotato.csquiz.exception;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import java.time.LocalDateTime;
-import org.springframework.http.HttpStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 
 public record ErrorResponse(
-        @JsonFormat(
-                shape = Shape.STRING,
-                pattern = "yyyy-MM-dd HH:mm:ss",
-                locale = "Asia/Seoul"
-        )
-        LocalDateTime time,
-        HttpStatus status,
         ErrorCode errorCode,
         String message,
+        String method,
         String requestURI
 ) {
+
+    public static ErrorResponse of(ErrorCode errorCode, HttpServletRequest request) {
+        return new ErrorResponse(
+                errorCode,
+                errorCode.getMessage(),
+                request.getMethod(),
+                request.getRequestURI()
+        );
+    }
+
+    public static ErrorResponse of(HttpServletRequest request, final List<String> errorFields) {
+        return new ErrorResponse(
+                ErrorCode.INVALID_INPUT,
+                errorFields.toString(),
+                request.getMethod(),
+                request.getRequestURI()
+        );
+    }
+
+    public static ErrorResponse of(HttpServletRequest request, ErrorCode errorCode, final String errorMessage) {
+        return new ErrorResponse(
+                errorCode,
+                errorMessage,
+                request.getMethod(),
+                request.getRequestURI()
+        );
+    }
 }

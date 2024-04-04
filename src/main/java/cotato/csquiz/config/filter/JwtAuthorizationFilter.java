@@ -55,7 +55,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        log.info("진입한 path : {}", path);
+        log.info("요청 경로: {}", path);
+        log.info("요청 메서드: {}", request.getMethod());
         return path.startsWith(AUTH_PATH) || path.startsWith(LOGIN_PATH)
                 || path.startsWith(SWAGGER_PATH) || path.startsWith(SWAGGER_PATH_3) || path.startsWith(WS);
     }

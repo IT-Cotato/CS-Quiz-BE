@@ -14,7 +14,7 @@ public record SessionListResponse(
         ItIssue itIssue,
         Networking networking,
         CSEducation csEducation
-){
+) {
     public static SessionListResponse from(Session session) {
         return new SessionListResponse(
                 session.getId(),

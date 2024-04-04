@@ -25,6 +25,7 @@ public enum ErrorCode {
     QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."),
     PHONE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "존재하는 전화번호입니다."),
 
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 잘못되었습니다."),
     ENUM_NOT_RESOLVED(HttpStatus.BAD_REQUEST, "입력한 Enum이 존재하지 않습니다."),
     DATE_INVALID(HttpStatus.BAD_REQUEST, "시작날짜가 끝 날짜보다 뒤입니다"),
     ROLE_IS_NOT_MATCH(HttpStatus.BAD_REQUEST, "해당 ROLE은 변경할 수 없습니다."),

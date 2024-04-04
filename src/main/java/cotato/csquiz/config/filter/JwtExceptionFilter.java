@@ -13,7 +13,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,31 +25,13 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    LocalDateTime.now(),
-                    HttpStatus.UNAUTHORIZED,
-                    ErrorCode.TOKEN_EXPIRED,
-                    ErrorCode.TOKEN_EXPIRED.getMessage(),
-                    request.getRequestURI()
-            );
+            ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.TOKEN_EXPIRED, request);
             setErrorResponse(response, errorResponse);
         } catch (MalformedJwtException | SignatureException e) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    LocalDateTime.now(),
-                    HttpStatus.UNAUTHORIZED,
-                    ErrorCode.JWT_FORM_ERROR,
-                    ErrorCode.JWT_FORM_ERROR.getMessage(),
-                    request.getRequestURI()
-            );
+            ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.JWT_FORM_ERROR, request);
             setErrorResponse(response, errorResponse);
         } catch (FilterAuthenticationException e) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    LocalDateTime.now(),
-                    HttpStatus.UNAUTHORIZED,
-                    ErrorCode.FILTER_EXCEPTION,
-                    e.getMessage(),
-                    request.getRequestURI()
-            );
+            ErrorResponse errorResponse = ErrorResponse.of(request, ErrorCode.FILTER_EXCEPTION, e.getMessage());
             setErrorResponse(response, errorResponse);
         }
     }
@@ -59,7 +40,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             throws IOException {
         log.error("jwt토큰 인증 에러 발생, 타입 {}", errorResponse.message());
         ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        response.setStatus(errorResponse.status().value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json; charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }

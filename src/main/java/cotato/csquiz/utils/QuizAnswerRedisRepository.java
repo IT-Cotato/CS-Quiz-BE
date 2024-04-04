@@ -32,12 +32,6 @@ public class QuizAnswerRedisRepository {
     private final ChoiceRepository choiceRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
-//    public static void main(String[] args) {
-//        List<Integer> answers = List.of(1, 2, 3, 4);
-//        List<Object> objects = List.of(1, 2, 4, 3);
-//        System.out.println(answers.equals(objects));
-//    }
-
     public void saveAllQuizAnswers(Long educationId) {
         List<Quiz> allQuizzes = quizRepository.findAllByEducationId(educationId);
         allQuizzes.forEach(this::saveQuizAnswer);
