@@ -1,8 +1,8 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.dto.mypage.HallOfFameResponse;
-import cotato.csquiz.domain.dto.mypage.MyPageMemberInfoResponse;
+import cotato.csquiz.controller.dto.mypage.HallOfFameResponse;
+import cotato.csquiz.controller.dto.mypage.MyPageMemberInfoResponse;
 import cotato.csquiz.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

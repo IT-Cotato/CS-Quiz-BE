@@ -1,12 +1,12 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.auth.ApplyMemberInfo;
-import cotato.csquiz.domain.dto.member.MemberApproveRequest;
-import cotato.csquiz.domain.dto.member.MemberEnrollInfoResponse;
-import cotato.csquiz.domain.dto.member.MemberRejectRequest;
-import cotato.csquiz.domain.dto.member.UpdateActiveMemberRoleRequest;
-import cotato.csquiz.domain.dto.member.UpdateActiveMemberToOldMemberRequest;
-import cotato.csquiz.domain.dto.member.UpdateOldMemberRoleRequest;
+import cotato.csquiz.controller.dto.auth.ApplyMemberInfo;
+import cotato.csquiz.controller.dto.member.MemberApproveRequest;
+import cotato.csquiz.controller.dto.member.MemberEnrollInfoResponse;
+import cotato.csquiz.controller.dto.member.MemberRejectRequest;
+import cotato.csquiz.controller.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.controller.dto.member.UpdateActiveMemberToOldMemberRequest;
+import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.service.AdminService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

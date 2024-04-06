@@ -1,10 +1,10 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.domain.dto.auth.MemberInfoResponse;
-import cotato.csquiz.domain.dto.member.CheckPasswordRequest;
-import cotato.csquiz.domain.dto.member.MemberMyPageInfoResponse;
-import cotato.csquiz.domain.dto.member.UpdatePasswordRequest;
+import cotato.csquiz.controller.dto.auth.MemberInfoResponse;
+import cotato.csquiz.controller.dto.member.CheckPasswordRequest;
+import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
+import cotato.csquiz.controller.dto.member.UpdatePasswordRequest;
 import cotato.csquiz.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

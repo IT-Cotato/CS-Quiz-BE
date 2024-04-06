@@ -1,10 +1,10 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.auth.JoinRequest;
-import cotato.csquiz.domain.dto.auth.LogoutRequest;
-import cotato.csquiz.domain.dto.auth.ReissueResponse;
-import cotato.csquiz.domain.dto.email.SendEmailRequest;
-import cotato.csquiz.domain.dto.member.MemberEmailResponse;
+import cotato.csquiz.controller.dto.auth.JoinRequest;
+import cotato.csquiz.controller.dto.auth.LogoutRequest;
+import cotato.csquiz.controller.dto.auth.ReissueResponse;
+import cotato.csquiz.controller.dto.email.SendEmailRequest;
+import cotato.csquiz.controller.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

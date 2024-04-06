@@ -1,14 +1,14 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
-import cotato.csquiz.domain.dto.record.RecordResponse;
-import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
-import cotato.csquiz.domain.dto.record.RegradeRequest;
-import cotato.csquiz.domain.dto.record.ReplyRequest;
-import cotato.csquiz.domain.dto.record.ReplyResponse;
-import cotato.csquiz.domain.dto.record.ScorerResponse;
-import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
-import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.controller.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.controller.dto.record.RecordResponse;
+import cotato.csquiz.controller.dto.record.RecordsAndScorerResponse;
+import cotato.csquiz.controller.dto.record.RegradeRequest;
+import cotato.csquiz.controller.dto.record.ReplyRequest;
+import cotato.csquiz.controller.dto.record.ReplyResponse;
+import cotato.csquiz.controller.dto.record.ScorerResponse;
+import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
+import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;

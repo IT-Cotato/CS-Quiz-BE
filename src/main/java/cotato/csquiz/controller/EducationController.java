@@ -1,13 +1,13 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.AllEducationResponse;
-import cotato.csquiz.domain.dto.education.AddEducationRequest;
-import cotato.csquiz.domain.dto.education.AddEducationResponse;
-import cotato.csquiz.domain.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.domain.dto.education.GetStatusResponse;
-import cotato.csquiz.domain.dto.education.UpdateEducationRequest;
-import cotato.csquiz.domain.dto.education.WinnerInfoResponse;
-import cotato.csquiz.domain.dto.quiz.KingMemberInfo;
+import cotato.csquiz.controller.dto.AllEducationResponse;
+import cotato.csquiz.controller.dto.education.AddEducationRequest;
+import cotato.csquiz.controller.dto.education.AddEducationResponse;
+import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
+import cotato.csquiz.controller.dto.education.GetStatusResponse;
+import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
+import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
+import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.service.EducationService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
