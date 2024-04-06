@@ -39,7 +39,7 @@ public class RecordController {
     }
 
     @PostMapping("/regrade")
-    public ResponseEntity<?> regradeQuiz(@RequestBody RegradeRequest request) {
+    public ResponseEntity<?> regradeQuiz(@RequestBody @Valid RegradeRequest request) {
         log.info("[재채점 컨트롤러] 새로운 정답: {}", request.newAnswer());
         recordService.regradeRecords(request);
         return ResponseEntity.ok().build();

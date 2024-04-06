@@ -27,13 +27,13 @@ public class GenerationService {
 
     @Transactional
     public AddGenerationResponse addGeneration(AddGenerationRequest request) {
-        checkPeriodValid(request.getStartDate(), request.getEndDate());
-        checkNumberValid(request.getGenerationNumber());
+        checkPeriodValid(request.startDate(), request.endDate());
+        checkNumberValid(request.generationNumber());
         Generation generation = Generation.builder()
-                .number(request.getGenerationNumber())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .sessionCount(request.getSessionCount())
+                .number(request.generationNumber())
+                .startDate(request.startDate())
+                .endDate(request.endDate())
+                .sessionCount(request.sessionCount())
                 .build();
         Generation savedGeneration = generationRepository.save(generation);
         return AddGenerationResponse.builder()
@@ -43,19 +43,19 @@ public class GenerationService {
 
     @Transactional
     public void changeRecruiting(ChangeRecruitingRequest request) {
-        Generation generation = generationRepository.findById(request.getGenerationId())
+        Generation generation = generationRepository.findById(request.generationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
-        generation.changeRecruit(request.isStatement());
-        log.info("[기수 모집 상태 변경 성공]: {}", request.isStatement());
+        generation.changeRecruit(request.statement());
+        log.info("[기수 모집 상태 변경 성공]: {}", request.statement());
     }
 
     @Transactional
     public void changePeriod(ChangePeriodRequest request) {
-        checkPeriodValid(request.getStartDate(), request.getEndDate());
-        Generation generation = generationRepository.findById(request.getGenerationId())
+        checkPeriodValid(request.startDate(), request.endDate());
+        Generation generation = generationRepository.findById(request.generationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
-        generation.changePeriod(request.getStartDate(), request.getEndDate());
-        log.info("[기수 기간 변경 성공]: 시작: {} ~ 끝: {}", request.getStartDate(), request.getEndDate());
+        generation.changePeriod(request.startDate(), request.endDate());
+        log.info("[기수 기간 변경 성공]: 시작: {} ~ 끝: {}", request.startDate(), request.endDate());
     }
 
     public List<GenerationInfoResponse> getGenerations() {

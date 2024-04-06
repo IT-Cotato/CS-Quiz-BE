@@ -1,11 +1,13 @@
 package cotato.csquiz.controller.dto.session;
 
-import lombok.Getter;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
-public class SessionPhotoUrlRequest {
-
-    private Long sessionId;
-    private MultipartFile sessionImage;
+@Valid
+public record SessionPhotoUrlRequest(
+        @NotNull
+        Long sessionId,
+        MultipartFile sessionImage
+) {
 }

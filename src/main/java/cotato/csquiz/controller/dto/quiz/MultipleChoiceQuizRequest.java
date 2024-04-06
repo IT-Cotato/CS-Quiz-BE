@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 public class MultipleChoiceQuizRequest {
 
-    private int number;
+    private Integer number;
     private String question;
     private MultipartFile image;
     private List<CreateChoiceRequest> choices;

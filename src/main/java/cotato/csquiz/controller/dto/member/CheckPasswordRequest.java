@@ -1,9 +1,9 @@
 package cotato.csquiz.controller.dto.member;
 
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-public class CheckPasswordRequest {
-
-    private String password;
+public record CheckPasswordRequest(
+        @NotNull
+        String password
+) {
 }

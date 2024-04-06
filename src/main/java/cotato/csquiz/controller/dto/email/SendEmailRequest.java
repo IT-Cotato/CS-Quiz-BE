@@ -1,11 +1,11 @@
 package cotato.csquiz.controller.dto.email;
 
 import jakarta.validation.constraints.Email;
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-public class SendEmailRequest {
-
-    @Email
-    private String email;
+public record SendEmailRequest(
+        @Email
+        @NotNull
+        String email
+) {
 }

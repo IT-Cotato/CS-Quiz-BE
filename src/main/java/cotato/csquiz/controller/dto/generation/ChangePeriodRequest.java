@@ -1,12 +1,14 @@
 package cotato.csquiz.controller.dto.generation;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import lombok.Getter;
 
-@Getter
-public class ChangePeriodRequest {
-
-    private Long generationId;
-    private LocalDate startDate;
-    private LocalDate endDate;
+public record ChangePeriodRequest(
+        @NotNull
+        Long generationId,
+        @NotNull
+        LocalDate startDate,
+        @NotNull
+        LocalDate endDate
+) {
 }

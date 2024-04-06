@@ -1,12 +1,16 @@
 package cotato.csquiz.controller.dto.generation;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import lombok.Getter;
 
-@Getter
-public class AddGenerationRequest {
-    private int generationNumber;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private int sessionCount;
+public record AddGenerationRequest(
+        @NotNull
+        Integer generationNumber,
+        @NotNull
+        LocalDate startDate,
+        @NotNull
+        LocalDate endDate,
+        @NotNull
+        Integer sessionCount
+) {
 }

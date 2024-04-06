@@ -1,10 +1,11 @@
 package cotato.csquiz.controller.dto.session;
 
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-public class SessionNumRequest {
-
-    private Long sessionId;
-    private int sessionNum;
+public record SessionNumRequest(
+        @NotNull
+        Long sessionId,
+        @NotNull
+        Integer sessionNum
+) {
 }

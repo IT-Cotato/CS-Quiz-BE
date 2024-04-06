@@ -1,9 +1,11 @@
 package cotato.csquiz.controller.dto.quiz;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class AddAdditionalAnswerRequest {
-    private Long quizId;
-    private String answer;
+public record AddAdditionalAnswerRequest(
+        @NotNull
+        Long quizId,
+        @NotNull
+        String answer
+) {
 }

@@ -85,20 +85,20 @@ public class SessionService {
 
     @Transactional
     public void changeSessionNumber(SessionNumRequest request) {
-        Session session = findSessionById(request.getSessionId());
+        Session session = findSessionById(request.sessionId());
         session.changeSessionNumber(session.getNumber());
     }
 
     @Transactional
     public void changeDescription(SessionDescriptionRequest request) {
-        Session session = findSessionById(request.getSessionId());
-        session.changeDescription(request.getDescription());
+        Session session = findSessionById(request.sessionId());
+        session.changeDescription(request.description());
     }
 
     @Transactional
     public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
-        Session session = findSessionById(request.getSessionId());
-        changePhoto(session, request.getSessionImage());
+        Session session = findSessionById(request.sessionId());
+        changePhoto(session, request.sessionImage());
     }
 
     private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {

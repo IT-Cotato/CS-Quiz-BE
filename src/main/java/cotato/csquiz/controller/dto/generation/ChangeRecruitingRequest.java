@@ -1,10 +1,12 @@
 package cotato.csquiz.controller.dto.generation;
 
-import lombok.Getter;
 
-@Getter
-public class ChangeRecruitingRequest {
+import jakarta.validation.constraints.NotNull;
 
-    private Long generationId;
-    private boolean statement;
+public record ChangeRecruitingRequest(
+        @NotNull
+        Long generationId,
+        @NotNull
+        boolean statement
+) {
 }

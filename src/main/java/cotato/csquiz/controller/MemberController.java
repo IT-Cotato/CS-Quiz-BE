@@ -6,6 +6,7 @@ import cotato.csquiz.controller.dto.member.CheckPasswordRequest;
 import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
 import cotato.csquiz.controller.dto.member.UpdatePasswordRequest;
 import cotato.csquiz.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -37,15 +38,15 @@ public class MemberController {
 
     @PostMapping("/check/password")
     public ResponseEntity<?> checkPassword(@RequestHeader("Authorization") String authorizationHeader,
-                                           @RequestBody CheckPasswordRequest request) {
+                                           @RequestBody @Valid CheckPasswordRequest request) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
-        memberService.checkCorrectPassword(accessToken, request.getPassword());
+        memberService.checkCorrectPassword(accessToken, request.password());
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/update/password")
     public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
-                                            @RequestBody UpdatePasswordRequest request) {
+                                            @RequestBody @Valid UpdatePasswordRequest request) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
         memberService.updatePassword(accessToken, request.password());
         return ResponseEntity.ok().build();

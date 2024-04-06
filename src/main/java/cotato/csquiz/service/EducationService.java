@@ -44,12 +44,12 @@ public class EducationService {
 
     @Transactional
     public AddEducationResponse addEducation(AddEducationRequest request) {
-        Session session = sessionService.findSessionById(request.getSessionId());
+        Session session = sessionService.findSessionById(request.sessionId());
         checkEducationExist(session);
         Education education = Education.builder()
                 .session(session)
-                .subject(request.getSubject())
-                .educationNum(request.getEducationNum())
+                .subject(request.subject())
+                .educationNum(request.educationNum())
                 .build();
         Education saveEducation = educationRepository.save(education);
         return AddEducationResponse.builder()

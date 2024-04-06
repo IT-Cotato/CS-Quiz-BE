@@ -6,6 +6,7 @@ import cotato.csquiz.controller.dto.generation.ChangePeriodRequest;
 import cotato.csquiz.controller.dto.generation.ChangeRecruitingRequest;
 import cotato.csquiz.controller.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.service.GenerationService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,19 +34,19 @@ public class GenerationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addGeneration(@RequestBody AddGenerationRequest request) {
+    public ResponseEntity<?> addGeneration(@RequestBody @Valid AddGenerationRequest request) {
         AddGenerationResponse response = generationService.addGeneration(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/recruiting")
-    public ResponseEntity<?> changeRecruiting(@RequestBody ChangeRecruitingRequest request) {
+    public ResponseEntity<?> changeRecruiting(@RequestBody @Valid ChangeRecruitingRequest request) {
         generationService.changeRecruiting(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<?> changePeriod(@RequestBody ChangePeriodRequest request) {
+    public ResponseEntity<?> changePeriod(@RequestBody @Valid ChangePeriodRequest request) {
         generationService.changePeriod(request);
         return ResponseEntity.ok().build();
     }

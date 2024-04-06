@@ -10,6 +10,7 @@ import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,13 +53,13 @@ public class SessionController {
     }
 
     @PatchMapping("/number")
-    public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request) {
+    public ResponseEntity<?> changeSessionNum(@RequestBody @Valid SessionNumRequest request) {
         sessionService.changeSessionNumber(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/description")
-    public ResponseEntity<?> changeContent(@RequestBody SessionDescriptionRequest request) {
+    public ResponseEntity<?> changeContent(@RequestBody @Valid SessionDescriptionRequest request) {
         sessionService.changeDescription(request);
         return ResponseEntity.ok().build();
     }

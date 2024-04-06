@@ -1,17 +1,12 @@
 package cotato.csquiz.controller.dto.member;
 
 import cotato.csquiz.domain.enums.MemberRole;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class UpdateActiveMemberRoleRequest {
-
-    private Long memberId;
-    private MemberRole role;
+public record UpdateActiveMemberRoleRequest(
+        @NotNull
+        Long memberId,
+        @NotNull
+        MemberRole role
+) {
 }

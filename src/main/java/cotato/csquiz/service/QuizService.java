@@ -298,8 +298,8 @@ public class QuizService {
 
     @Transactional
     public void addAdditionalAnswer(AddAdditionalAnswerRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
-        addAnswerInRepository(quiz, request.getAnswer());
+        Quiz quiz = findQuizById(request.quizId());
+        addAnswerInRepository(quiz, request.answer());
     }
 
     private void addAnswerInRepository(Quiz quiz, String answer) {

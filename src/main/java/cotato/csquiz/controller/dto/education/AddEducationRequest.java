@@ -1,12 +1,13 @@
 package cotato.csquiz.controller.dto.education;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-public class AddEducationRequest {
-
-    private String subject;
-    private Long sessionId;
-    private int educationNum;
-
+public record AddEducationRequest(
+        @NotNull
+        String subject,
+        @NotNull
+        Long sessionId,
+        @NotNull
+        Integer educationNum
+) {
 }

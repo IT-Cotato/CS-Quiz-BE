@@ -35,13 +35,13 @@ public class SocketService {
 
     @Transactional
     public void openCSQuiz(QuizOpenRequest request) {
-        Education education = findEducationById(request.getEducationId());
+        Education education = findEducationById(request.educationId());
         education.changeStatus(EducationStatus.ONGOING);
     }
 
     @Transactional
     public void accessQuiz(QuizSocketRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
+        Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
         makeAllStartFalse();
         makeAllStatusFalse();
@@ -57,7 +57,7 @@ public class SocketService {
 
     @Transactional
     public void startQuiz(QuizSocketRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
+        Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
         sleepRandomTime(quiz);
@@ -67,7 +67,7 @@ public class SocketService {
 
     @Transactional
     public void denyQuiz(QuizSocketRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
+        Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
         quiz.updateStatus(QuizStatus.QUIZ_OFF);
         quiz.updateStart(QuizStatus.QUIZ_OFF);
@@ -75,7 +75,7 @@ public class SocketService {
 
     @Transactional
     public void stopQuiz(QuizSocketRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
+        Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
         quiz.updateStart(QuizStatus.QUIZ_OFF);
         if (quiz.getNumber() == 9) {
@@ -91,7 +91,7 @@ public class SocketService {
     @Transactional
     public void stopAllQuiz(QuizCloseRequest request) {
         closeAllFlags();
-        Education education = findEducationById(request.getEducationId());
+        Education education = findEducationById(request.educationId());
         education.changeStatus(EducationStatus.FINISHED);
         webSocketHandler.stopAllQuiz(education.getId());
     }

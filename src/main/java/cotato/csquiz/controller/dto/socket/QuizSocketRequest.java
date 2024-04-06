@@ -1,9 +1,9 @@
 package cotato.csquiz.controller.dto.socket;
 
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-public class QuizSocketRequest {
-
-    private Long quizId;
+public record QuizSocketRequest(
+        @NotNull
+        Long quizId
+) {
 }

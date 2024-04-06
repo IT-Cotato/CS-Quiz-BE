@@ -7,6 +7,6 @@ import lombok.Data;
 public class CreateChoiceRequest {
 
     private String content;
-    private int number;
+    private Integer number;
     private ChoiceCorrect isAnswer;
 }

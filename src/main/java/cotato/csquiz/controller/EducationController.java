@@ -9,6 +9,7 @@ import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
 import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.service.EducationService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,13 +43,13 @@ public class EducationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<AddEducationResponse> addEducation(@RequestBody AddEducationRequest request) {
+    public ResponseEntity<AddEducationResponse> addEducation(@RequestBody @Valid AddEducationRequest request) {
         AddEducationResponse response = educationService.addEducation(request);
         return ResponseEntity.ok().body(response);
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<?> updateEducation(@RequestBody UpdateEducationRequest request) {
+    public ResponseEntity<?> updateEducation(@RequestBody @Valid UpdateEducationRequest request) {
         educationService.updateSubjectAndNumber(request);
         return ResponseEntity.ok().build();
     }

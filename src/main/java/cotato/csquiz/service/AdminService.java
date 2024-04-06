@@ -12,6 +12,7 @@ import cotato.csquiz.controller.dto.member.MemberApproveRequest;
 import cotato.csquiz.controller.dto.member.MemberEnrollInfoResponse;
 import cotato.csquiz.controller.dto.member.MemberRejectRequest;
 import cotato.csquiz.controller.dto.member.UpdateActiveMemberRoleRequest;
+import cotato.csquiz.controller.dto.member.UpdateActiveMemberToOldMemberRequest;
 import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
@@ -50,32 +51,32 @@ public class AdminService {
 
     @Transactional
     public void approveApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getMemberId());
-        Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
+        Member member = findMember(memberApproveRequest.memberId());
+        Generation findGeneration = findGeneration(memberApproveRequest.generationId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
             member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
-            member.updatePosition(memberApproveRequest.getPosition());
+            member.updatePosition(memberApproveRequest.position());
             memberRepository.save(member);
         }
     }
 
     @Transactional
-    public void reapproveApplicant(MemberApproveRequest memberApproveRequest) {
-        Member member = findMember(memberApproveRequest.getMemberId());
+    public void reApproveApplicant(MemberApproveRequest memberApproveRequest) {
+        Member member = findMember(memberApproveRequest.memberId());
         if (member.getRole() == REFUSED) {
-            Generation findGeneration = findGeneration(memberApproveRequest.getGenerationId());
+            Generation findGeneration = findGeneration(memberApproveRequest.generationId());
             member.updateRole(MEMBER);
             member.updateGeneration(findGeneration);
-            member.updatePosition(memberApproveRequest.getPosition());
+            member.updatePosition(memberApproveRequest.position());
             deleteRefusedMember(member);
         }
     }
 
     @Transactional
     public void rejectApplicant(MemberRejectRequest memberRejectRequest) {
-        Member member = findMember(memberRejectRequest.getMemberId());
+        Member member = findMember(memberRejectRequest.memberId());
         validateIsGeneral(member);
         if (member.getRole() == GENERAL) {
             member.updateRole(REFUSED);
@@ -104,17 +105,17 @@ public class AdminService {
 
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
-        Member member = findMember(updateActiveMemberRoleRequest.getMemberId());
+        Member member = findMember(updateActiveMemberRoleRequest.memberId());
         if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
-        member.updateRole(updateActiveMemberRoleRequest.getRole());
+        member.updateRole(updateActiveMemberRoleRequest.role());
         memberRepository.save(member);
     }
 
     @Transactional
-    public void updateActiveMemberToOldMember(List<Long> memberIds) {
-        for (Long memberId : memberIds) {
+    public void updateActiveMemberToOldMember(UpdateActiveMemberToOldMemberRequest request) {
+        for (Long memberId : request.memberIds()) {
             Member member = findMember(memberId);
             if (member.getRole() == MEMBER || member.getRole() == ADMIN || member.getRole() == EDUCATION) {
                 member.updateRole(OLD_MEMBER);
@@ -134,7 +135,7 @@ public class AdminService {
 
     @Transactional
     public void updateOldMemberToActiveGeneration(UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
-        Member member = findMember(updateOldMemberRoleRequest.getMemberId());
+        Member member = findMember(updateOldMemberRoleRequest.memberId());
         validateIsOldMember(member);
         if (member.getRole() == OLD_MEMBER) {
             member.updateRole(MEMBER);

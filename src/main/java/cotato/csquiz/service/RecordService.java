@@ -88,8 +88,8 @@ public class RecordService {
 
     @Transactional
     public void addAdditionalAnswerToRedis(AddAdditionalAnswerRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
-        String cleanedAnswer = request.getAnswer()
+        Quiz quiz = findQuizById(request.quizId());
+        String cleanedAnswer = request.answer()
                 .toLowerCase()
                 .trim();
         quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, cleanedAnswer);
@@ -108,8 +108,8 @@ public class RecordService {
 
     @Transactional
     public void saveAnswers(QuizOpenRequest request) {
-        scorerExistRedisRepository.saveAllScorerNone(request.getEducationId());
-        quizAnswerRedisRepository.saveAllQuizAnswers(request.getEducationId());
+        scorerExistRedisRepository.saveAllScorerNone(request.educationId());
+        quizAnswerRedisRepository.saveAllQuizAnswers(request.educationId());
     }
 
     @Transactional
@@ -182,7 +182,7 @@ public class RecordService {
 
     @Transactional
     public void saveAnswer(QuizSocketRequest request) {
-        Quiz findQuiz = quizRepository.findById(request.getQuizId())
+        Quiz findQuiz = quizRepository.findById(request.quizId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
         quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
     }

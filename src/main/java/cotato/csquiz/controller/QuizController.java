@@ -9,6 +9,7 @@ import cotato.csquiz.controller.dto.quiz.QuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizResultInfo;
 import cotato.csquiz.service.QuizService;
 import cotato.csquiz.service.RecordService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +64,7 @@ public class QuizController {
     }
 
     @PostMapping("/cs-admin/answer/add")
-    public ResponseEntity<?> addAnswer(@RequestBody AddAdditionalAnswerRequest request) {
+    public ResponseEntity<?> addAnswer(@RequestBody @Valid AddAdditionalAnswerRequest request) {
         quizService.addAdditionalAnswer(request);
         recordService.addAdditionalAnswerToRedis(request);
         return ResponseEntity.ok().build();

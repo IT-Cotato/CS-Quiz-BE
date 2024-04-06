@@ -1,15 +1,9 @@
 package cotato.csquiz.controller.dto.member;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class UpdateOldMemberRoleRequest {
-
-    private Long memberId;
+public record UpdateOldMemberRoleRequest(
+        @NotNull
+        Long memberId
+) {
 }
