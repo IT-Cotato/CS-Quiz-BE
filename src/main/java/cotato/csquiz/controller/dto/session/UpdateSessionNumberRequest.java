@@ -2,7 +2,7 @@ package cotato.csquiz.controller.dto.session;
 
 import jakarta.validation.constraints.NotNull;
 
-public record SessionNumRequest(
+public record UpdateSessionNumberRequest(
         @NotNull
         Long sessionId,
         @NotNull

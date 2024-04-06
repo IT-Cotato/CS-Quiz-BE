@@ -3,16 +3,17 @@ package cotato.csquiz.controller.dto.session;
 import cotato.csquiz.domain.enums.CSEducation;
 import cotato.csquiz.domain.enums.ItIssue;
 import cotato.csquiz.domain.enums.Networking;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
-@Data
-public class AddSessionRequest {
-
-    private Long generationId;
-    private MultipartFile sessionImage;
-    private String description;
-    private ItIssue itIssue;
-    private Networking networking;
-    private CSEducation csEducation;
+public record AddSessionRequest(
+        @NotNull
+        Long generationId,
+        MultipartFile sessionImage,
+        @NotNull
+        String description,
+        ItIssue itIssue,
+        Networking networking,
+        CSEducation csEducation
+) {
 }
