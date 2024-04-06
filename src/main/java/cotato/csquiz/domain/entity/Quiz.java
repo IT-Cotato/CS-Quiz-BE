@@ -2,7 +2,6 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.domain.enums.QuizType;
 import cotato.csquiz.global.entity.BaseTimeEntity;
@@ -44,7 +43,7 @@ public class Quiz extends BaseTimeEntity {
     @Column(name = "quiz_number", nullable = false)
     private int number;
 
-    @Column(name = "quiz_question")
+    @Column(name = "quiz_question", nullable = false, length = 500)
     private String question;
 
     @Column(name = "quiz_photo_url")
@@ -72,11 +71,9 @@ public class Quiz extends BaseTimeEntity {
     private Generation generation;
 
     @OneToMany(mappedBy = "quiz", orphanRemoval = true)
-    @JsonIgnore
     private List<Record> records = new ArrayList<>();
 
     @OneToOne(mappedBy = "quiz", orphanRemoval = true)
-    @JsonIgnore
     private Scorer scorer;
 
     public Quiz(int number, String question, String photoUrl, Education education, int appearSecond,
