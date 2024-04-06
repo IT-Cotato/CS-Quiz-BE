@@ -1,6 +1,6 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.controller.dto.socket.QuizCloseRequest;
+import cotato.csquiz.controller.dto.socket.EducationCloseRequest;
 import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
 import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
 import cotato.csquiz.controller.dto.socket.SocketTokenDto;
@@ -59,7 +59,7 @@ public class SocketController {
     }
 
     @PatchMapping("/close/csquiz")
-    public ResponseEntity<?> stopAllQuiz(@RequestBody @Valid QuizCloseRequest request) {
+    public ResponseEntity<?> stopAllQuiz(@RequestBody @Valid EducationCloseRequest request) {
         socketService.stopAllQuiz(request);
         return ResponseEntity.ok().build();
     }

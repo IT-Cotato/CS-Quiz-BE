@@ -1,7 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtUtil;
-import cotato.csquiz.controller.dto.socket.QuizCloseRequest;
+import cotato.csquiz.controller.dto.socket.EducationCloseRequest;
 import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
 import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
 import cotato.csquiz.controller.dto.socket.SocketTokenDto;
@@ -89,7 +89,7 @@ public class SocketService {
     }
 
     @Transactional
-    public void stopAllQuiz(QuizCloseRequest request) {
+    public void stopAllQuiz(EducationCloseRequest request) {
         closeAllFlags();
         Education education = findEducationById(request.educationId());
         education.changeStatus(EducationStatus.FINISHED);
