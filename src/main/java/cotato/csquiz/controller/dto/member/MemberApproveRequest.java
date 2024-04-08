@@ -11,5 +11,4 @@ public record MemberApproveRequest(
         @NotNull
         Long generationId
 ) {
-
 }
