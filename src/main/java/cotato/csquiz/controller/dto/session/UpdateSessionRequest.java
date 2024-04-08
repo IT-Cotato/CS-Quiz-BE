@@ -13,8 +13,11 @@ public record UpdateSessionRequest(
         @NotNull
         Boolean isPhotoUpdated,
         String description,
+        @NotNull
         ItIssue itIssue,
+        @NotNull
         Networking networking,
+        @NotNull
         CSEducation csEducation
 ) {
 }
