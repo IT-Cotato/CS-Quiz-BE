@@ -1,13 +1,13 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.session.AddSessionRequest;
-import cotato.csquiz.domain.dto.session.AddSessionResponse;
-import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
-import cotato.csquiz.domain.dto.session.SessionListResponse;
-import cotato.csquiz.domain.dto.session.SessionNumRequest;
-import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
-import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionResponse;
+import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
+import cotato.csquiz.controller.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.controller.dto.session.SessionListResponse;
+import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.enums.CSEducation;
@@ -37,10 +37,10 @@ public class SessionService {
     @Transactional
     public AddSessionResponse addSession(AddSessionRequest request) throws ImageException {
         String imageUrl = null;
-        if (isImageExist(request.getSessionImage())) {
-            imageUrl = s3Uploader.uploadFiles(request.getSessionImage(), SESSION_BUCKET_DIRECTORY);
+        if (isImageExist(request.sessionImage())) {
+            imageUrl = s3Uploader.uploadFiles(request.sessionImage(), SESSION_BUCKET_DIRECTORY);
         }
-        Generation findGeneration = generationRepository.findById(request.getGenerationId())
+        Generation findGeneration = generationRepository.findById(request.generationId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
 
         int sessionNumber = calculateLastSessionNumber(findGeneration);
@@ -48,11 +48,11 @@ public class SessionService {
         Session session = Session.builder()
                 .number(sessionNumber + 1)
                 .photoUrl(imageUrl)
-                .description(request.getDescription())
+                .description(request.description())
                 .generation(findGeneration)
-                .itIssue(request.getItIssue())
-                .csEducation(request.getCsEducation())
-                .networking(request.getNetworking())
+                .itIssue(request.itIssue())
+                .csEducation(request.csEducation())
+                .networking(request.networking())
                 .build();
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
@@ -65,13 +65,13 @@ public class SessionService {
 
     @Transactional
     public void updateSession(UpdateSessionRequest request) throws ImageException {
-        Session session = findSessionById(request.getSessionId());
+        Session session = findSessionById(request.sessionId());
 
-        session.changeDescription(request.getDescription());
-        session.updateToggle(request.getItIssue(), request.getCsEducation(),
-                request.getNetworking());
-        if (request.getIsPhotoUpdated()) {
-            changePhoto(session, request.getSessionImage());
+        session.changeDescription(request.description());
+        session.updateToggle(request.itIssue(), request.csEducation(),
+                request.networking());
+        if (request.isPhotoUpdated()) {
+            changePhoto(session, request.sessionImage());
         }
 
         sessionRepository.save(session);
@@ -84,21 +84,21 @@ public class SessionService {
     }
 
     @Transactional
-    public void changeSessionNumber(SessionNumRequest request) {
-        Session session = findSessionById(request.getSessionId());
+    public void changeSessionNumber(UpdateSessionNumberRequest request) {
+        Session session = findSessionById(request.sessionId());
         session.changeSessionNumber(session.getNumber());
     }
 
     @Transactional
     public void changeDescription(SessionDescriptionRequest request) {
-        Session session = findSessionById(request.getSessionId());
-        session.changeDescription(request.getDescription());
+        Session session = findSessionById(request.sessionId());
+        session.changeDescription(request.description());
     }
 
     @Transactional
     public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
-        Session session = findSessionById(request.getSessionId());
-        changePhoto(session, request.getSessionImage());
+        Session session = findSessionById(request.sessionId());
+        changePhoto(session, request.sessionImage());
     }
 
     private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {

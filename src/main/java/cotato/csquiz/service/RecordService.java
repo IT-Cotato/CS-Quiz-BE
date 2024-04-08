@@ -1,14 +1,14 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.quiz.AddAdditionalAnswerRequest;
-import cotato.csquiz.domain.dto.record.RecordResponse;
-import cotato.csquiz.domain.dto.record.RecordsAndScorerResponse;
-import cotato.csquiz.domain.dto.record.RegradeRequest;
-import cotato.csquiz.domain.dto.record.ReplyRequest;
-import cotato.csquiz.domain.dto.record.ReplyResponse;
-import cotato.csquiz.domain.dto.record.ScorerResponse;
-import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
-import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
+import cotato.csquiz.controller.dto.quiz.AddAdditionalAnswerRequest;
+import cotato.csquiz.controller.dto.record.RecordResponse;
+import cotato.csquiz.controller.dto.record.RecordsAndScorerResponse;
+import cotato.csquiz.controller.dto.record.RegradeRequest;
+import cotato.csquiz.controller.dto.record.ReplyRequest;
+import cotato.csquiz.controller.dto.record.ReplyResponse;
+import cotato.csquiz.controller.dto.record.ScorerResponse;
+import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
+import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.MultipleQuiz;
 import cotato.csquiz.domain.entity.Quiz;
@@ -88,8 +88,8 @@ public class RecordService {
 
     @Transactional
     public void addAdditionalAnswerToRedis(AddAdditionalAnswerRequest request) {
-        Quiz quiz = findQuizById(request.getQuizId());
-        String cleanedAnswer = request.getAnswer()
+        Quiz quiz = findQuizById(request.quizId());
+        String cleanedAnswer = request.answer()
                 .toLowerCase()
                 .trim();
         quizAnswerRedisRepository.saveAdditionalQuizAnswer(quiz, cleanedAnswer);
@@ -108,8 +108,8 @@ public class RecordService {
 
     @Transactional
     public void saveAnswers(QuizOpenRequest request) {
-        scorerExistRedisRepository.saveAllScorerNone(request.getEducationId());
-        quizAnswerRedisRepository.saveAllQuizAnswers(request.getEducationId());
+        scorerExistRedisRepository.saveAllScorerNone(request.educationId());
+        quizAnswerRedisRepository.saveAllQuizAnswers(request.educationId());
     }
 
     @Transactional
@@ -182,7 +182,7 @@ public class RecordService {
 
     @Transactional
     public void saveAnswer(QuizSocketRequest request) {
-        Quiz findQuiz = quizRepository.findById(request.getQuizId())
+        Quiz findQuiz = quizRepository.findById(request.quizId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
         quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
     }

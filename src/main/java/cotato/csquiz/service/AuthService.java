@@ -5,13 +5,13 @@ import cotato.csquiz.config.jwt.JwtUtil;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
+import cotato.csquiz.controller.dto.auth.FindPasswordResponse;
+import cotato.csquiz.controller.dto.auth.JoinRequest;
+import cotato.csquiz.controller.dto.auth.LogoutRequest;
+import cotato.csquiz.controller.dto.auth.ReissueResponse;
+import cotato.csquiz.controller.dto.email.SendEmailRequest;
+import cotato.csquiz.controller.dto.member.MemberEmailResponse;
 import cotato.csquiz.domain.constant.EmailConstants;
-import cotato.csquiz.domain.dto.auth.FindPasswordResponse;
-import cotato.csquiz.domain.dto.auth.JoinRequest;
-import cotato.csquiz.domain.dto.auth.LogoutRequest;
-import cotato.csquiz.domain.dto.auth.ReissueResponse;
-import cotato.csquiz.domain.dto.email.SendEmailRequest;
-import cotato.csquiz.domain.dto.member.MemberEmailResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -50,18 +50,18 @@ public class AuthService {
 
     @Transactional
     public void createLoginInfo(JoinRequest request) {
-        validateService.checkDuplicateEmail(request.getEmail());
-        validateService.checkPasswordPattern(request.getPassword());
-        validateService.checkPhoneNumber(request.getPhoneNumber());
+        validateService.checkDuplicateEmail(request.email());
+        validateService.checkPasswordPattern(request.password());
+        validateService.checkPhoneNumber(request.phoneNumber());
 
-        String encryptedPhoneNumber = encryptService.encryptPhoneNumber(request.getPhoneNumber());
+        String encryptedPhoneNumber = encryptService.encryptPhoneNumber(request.phoneNumber());
         validateService.checkDuplicatePhoneNumber(encryptedPhoneNumber);
-        log.info("[회원 가입 서비스]: {}, {}", request.getEmail(), request.getName());
+        log.info("[회원 가입 서비스]: {}, {}", request.email(), request.name());
 
         Member newMember = Member.builder()
-                .email(request.getEmail())
-                .password(bCryptPasswordEncoder.encode(request.getPassword()))
-                .name(request.getName())
+                .email(request.email())
+                .password(bCryptPasswordEncoder.encode(request.password()))
+                .name(request.name())
                 .phoneNumber(encryptedPhoneNumber)
                 .build();
         memberRepository.save(newMember);
@@ -116,8 +116,8 @@ public class AuthService {
     }
 
     public void sendSignUpEmail(SendEmailRequest request) {
-        validateService.emailNotExist(request.getEmail());
-        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.SIGNUP_SUBJECT);
+        validateService.emailNotExist(request.email());
+        emailVerificationService.sendVerificationCodeToEmail(request.email(), EmailConstants.SIGNUP_SUBJECT);
     }
 
     public void verifySingUpCode(String email, String code) {
@@ -125,8 +125,8 @@ public class AuthService {
     }
 
     public void sendFindPasswordEmail(SendEmailRequest request) {
-        validateService.emailExist(request.getEmail());
-        emailVerificationService.sendVerificationCodeToEmail(request.getEmail(), EmailConstants.PASSWORD_SUBJECT);
+        validateService.emailExist(request.email());
+        emailVerificationService.sendVerificationCodeToEmail(request.email(), EmailConstants.PASSWORD_SUBJECT);
     }
 
     public FindPasswordResponse verifyPasswordCode(String email, String code) {

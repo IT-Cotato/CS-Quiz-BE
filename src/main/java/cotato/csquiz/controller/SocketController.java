@@ -1,11 +1,12 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.socket.QuizCloseRequest;
-import cotato.csquiz.domain.dto.socket.QuizOpenRequest;
-import cotato.csquiz.domain.dto.socket.QuizSocketRequest;
-import cotato.csquiz.domain.dto.socket.SocketTokenDto;
+import cotato.csquiz.controller.dto.socket.EducationCloseRequest;
+import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
+import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
+import cotato.csquiz.controller.dto.socket.SocketTokenDto;
 import cotato.csquiz.service.RecordService;
 import cotato.csquiz.service.SocketService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,39 +27,39 @@ public class SocketController {
     private final RecordService recordService;
 
     @PatchMapping("/start/csquiz")
-    public ResponseEntity<?> openCSQuiz(@RequestBody QuizOpenRequest request) {
+    public ResponseEntity<?> openCSQuiz(@RequestBody @Valid QuizOpenRequest request) {
         socketService.openCSQuiz(request);
         recordService.saveAnswers(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/access")
-    public ResponseEntity<?> accessQuiz(@RequestBody QuizSocketRequest request) {
+    public ResponseEntity<?> accessQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.accessQuiz(request);
         recordService.saveAnswer(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/start")
-    public ResponseEntity<?> startQuiz(@RequestBody QuizSocketRequest request) {
+    public ResponseEntity<?> startQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.startQuiz(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/deny")
-    public ResponseEntity<?> denyQuiz(@RequestBody QuizSocketRequest request) {
+    public ResponseEntity<?> denyQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.denyQuiz(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/stop")
-    public ResponseEntity<?> stopQuiz(@RequestBody QuizSocketRequest request) {
+    public ResponseEntity<?> stopQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.stopQuiz(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/close/csquiz")
-    public ResponseEntity<?> stopAllQuiz(@RequestBody QuizCloseRequest request) {
+    public ResponseEntity<?> stopAllQuiz(@RequestBody @Valid EducationCloseRequest request) {
         socketService.stopAllQuiz(request);
         return ResponseEntity.ok().build();
     }

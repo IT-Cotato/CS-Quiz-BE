@@ -1,10 +1,10 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.auth.JoinRequest;
-import cotato.csquiz.domain.dto.auth.LogoutRequest;
-import cotato.csquiz.domain.dto.auth.ReissueResponse;
-import cotato.csquiz.domain.dto.email.SendEmailRequest;
-import cotato.csquiz.domain.dto.member.MemberEmailResponse;
+import cotato.csquiz.controller.dto.auth.JoinRequest;
+import cotato.csquiz.controller.dto.auth.LogoutRequest;
+import cotato.csquiz.controller.dto.auth.ReissueResponse;
+import cotato.csquiz.controller.dto.email.SendEmailRequest;
+import cotato.csquiz.controller.dto.member.MemberEmailResponse;
 import cotato.csquiz.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,7 +30,7 @@ public class AuthController {
 
     @PostMapping("/join")
     public ResponseEntity<?> joinAuth(@RequestBody @Valid JoinRequest request) {
-        log.info("[회원 가입 컨트롤러]: {}, {}", request.getEmail(), request.getName());
+        log.info("[회원 가입 컨트롤러]: {}, {}", request.email(), request.name());
         authService.createLoginInfo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
     }
@@ -45,14 +45,14 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken,
-                                    @RequestBody LogoutRequest request, HttpServletResponse response) {
+                                    @RequestBody @Valid LogoutRequest request, HttpServletResponse response) {
         authService.logout(request, refreshToken, response);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping(value = "/verification", params = "type=sign-up")
     public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
-        log.info("[회원 가입 시 이메일 인증 요청 컨트롤러]: 요청된 이메일 {}", request.getEmail());
+        log.info("[회원 가입 시 이메일 인증 요청 컨트롤러]: 요청된 이메일 {}", request.email());
         authService.sendSignUpEmail(request);
         return ResponseEntity.ok().build();
     }
@@ -66,7 +66,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/verification", params = "type=find-password")
-    public ResponseEntity<?> sendFindPasswordVerificationCode(@RequestBody SendEmailRequest request) {
+    public ResponseEntity<?> sendFindPasswordVerificationCode(@RequestBody @Valid SendEmailRequest request) {
         authService.sendFindPasswordEmail(request);
         return ResponseEntity.ok().build();
     }

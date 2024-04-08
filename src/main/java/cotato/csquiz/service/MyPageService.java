@@ -1,9 +1,9 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.domain.dto.mypage.HallOfFameInfo;
-import cotato.csquiz.domain.dto.mypage.HallOfFameResponse;
-import cotato.csquiz.domain.dto.mypage.MyHallOfFameInfo;
-import cotato.csquiz.domain.dto.mypage.MyPageMemberInfoResponse;
+import cotato.csquiz.controller.dto.mypage.HallOfFameInfo;
+import cotato.csquiz.controller.dto.mypage.HallOfFameResponse;
+import cotato.csquiz.controller.dto.mypage.MyHallOfFameInfo;
+import cotato.csquiz.controller.dto.mypage.MyPageMemberInfoResponse;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;

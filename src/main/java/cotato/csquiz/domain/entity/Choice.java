@@ -2,7 +2,7 @@ package cotato.csquiz.domain.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import cotato.csquiz.domain.dto.quiz.CreateChoiceRequest;
+import cotato.csquiz.controller.dto.quiz.CreateChoiceRequest;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
 import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;

@@ -1,15 +1,16 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.domain.dto.session.AddSessionRequest;
-import cotato.csquiz.domain.dto.session.AddSessionResponse;
-import cotato.csquiz.domain.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.domain.dto.session.SessionDescriptionRequest;
-import cotato.csquiz.domain.dto.session.SessionListResponse;
-import cotato.csquiz.domain.dto.session.SessionNumRequest;
-import cotato.csquiz.domain.dto.session.SessionPhotoUrlRequest;
-import cotato.csquiz.domain.dto.session.UpdateSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionRequest;
+import cotato.csquiz.controller.dto.session.AddSessionResponse;
+import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
+import cotato.csquiz.controller.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.controller.dto.session.SessionListResponse;
+import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.SessionService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,32 +40,33 @@ public class SessionController {
     }
 
     @PostMapping(value = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<?> addSession(@ModelAttribute AddSessionRequest request) throws ImageException {
-        log.info("세션 추가 컨트롤러 : {}", request.getDescription());
+    public ResponseEntity<?> addSession(@ModelAttribute @Valid AddSessionRequest request) throws ImageException {
+        log.info("세션 추가 컨트롤러 : {}", request.description());
         AddSessionResponse response = sessionService.addSession(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping(value = "/update", consumes = "multipart/form-data")
-    public ResponseEntity<?> updateSession(@ModelAttribute UpdateSessionRequest request) throws ImageException {
+    public ResponseEntity<?> updateSession(@ModelAttribute @Valid UpdateSessionRequest request) throws ImageException {
         sessionService.updateSession(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/number")
-    public ResponseEntity<?> changeSessionNum(@RequestBody SessionNumRequest request) {
+    public ResponseEntity<?> changeSessionNum(@RequestBody @Valid UpdateSessionNumberRequest request) {
         sessionService.changeSessionNumber(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/description")
-    public ResponseEntity<?> changeContent(@RequestBody SessionDescriptionRequest request) {
+    public ResponseEntity<?> changeContent(@RequestBody @Valid SessionDescriptionRequest request) {
         sessionService.changeDescription(request);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
-    public ResponseEntity<?> changePhotoUrl(@ModelAttribute SessionPhotoUrlRequest request) throws ImageException {
+    public ResponseEntity<?> changePhotoUrl(@ModelAttribute @Valid SessionPhotoUrlRequest request)
+            throws ImageException {
         sessionService.changePhotoUrl(request);
         return ResponseEntity.ok().build();
     }
