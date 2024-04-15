@@ -1,5 +1,6 @@
 package cotato.csquiz.controller;
 
+import cotato.csquiz.controller.dto.auth.FindPasswordResponse;
 import cotato.csquiz.controller.dto.auth.JoinRequest;
 import cotato.csquiz.controller.dto.auth.LogoutRequest;
 import cotato.csquiz.controller.dto.auth.ReissueResponse;
@@ -65,22 +66,21 @@ public class AuthController {
     }
 
     @PostMapping(value = "/verification", params = "type=find-password")
-    public ResponseEntity<?> sendFindPasswordVerificationCode(@RequestBody @Valid SendEmailRequest request) {
+    public ResponseEntity<Void> sendFindPasswordVerificationCode(@RequestBody @Valid SendEmailRequest request) {
         authService.sendFindPasswordEmail(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/verification", params = "type=find-password")
-    public ResponseEntity<?> verifyPasswordCode(@RequestParam(name = "email") String email,
-                                                @RequestParam(name = "code") String code) {
+    public ResponseEntity<FindPasswordResponse> verifyPasswordCode(@RequestParam(name = "email") String email,
+                                                                   @RequestParam(name = "code") String code) {
         return ResponseEntity.ok().body(authService.verifyPasswordCode(email, code));
     }
 
     @GetMapping("/email")
-    public ResponseEntity<?> findEmail(@RequestParam(name = "name") String name,
-                                       @RequestParam("phone") String phoneNumber) {
-        MemberEmailResponse memberEmail = authService.findMemberEmail(name, phoneNumber);
+    public ResponseEntity<MemberEmailResponse> findEmail(@RequestParam(name = "name") String name,
+                                                         @RequestParam("phone") String phoneNumber) {
         log.info("아이디 찾기 컨트롤러: {}", name);
-        return ResponseEntity.ok(memberEmail);
+        return ResponseEntity.ok(authService.findMemberEmail(name, phoneNumber));
     }
 }

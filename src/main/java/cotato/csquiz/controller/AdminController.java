@@ -45,17 +45,17 @@ public class AdminController {
     }
 
     @PatchMapping("/reject")
-    public ResponseEntity<?> rejectApplicant(@RequestBody @Valid MemberRejectRequest memberRejectRequest) {
+    public ResponseEntity<Void> rejectApplicant(@RequestBody @Valid MemberRejectRequest memberRejectRequest) {
         log.info("[가입자 거절 컨트롤러, 요청된 member id : {}]", memberRejectRequest.memberId());
         adminService.rejectApplicant(memberRejectRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/reapprove")
-    public ResponseEntity<?> reApproveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
+    public ResponseEntity<Void> reApproveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
         log.info("[가입자 재승인 컨트롤러, 요청된 member id : {}]", memberApproveRequest.memberId());
         adminService.reApproveApplicant(memberApproveRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/active-members")
