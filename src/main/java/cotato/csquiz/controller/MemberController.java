@@ -37,24 +37,23 @@ public class MemberController {
     }
 
     @PostMapping("/check/password")
-    public ResponseEntity<?> checkPassword(@RequestHeader("Authorization") String authorizationHeader,
-                                           @RequestBody @Valid CheckPasswordRequest request) {
+    public ResponseEntity<Void> checkPassword(@RequestHeader("Authorization") String authorizationHeader,
+                                              @RequestBody @Valid CheckPasswordRequest request) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
         memberService.checkCorrectPassword(accessToken, request.password());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/update/password")
-    public ResponseEntity<?> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
-                                            @RequestBody @Valid UpdatePasswordRequest request) {
+    public ResponseEntity<Void> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
+                                               @RequestBody @Valid UpdatePasswordRequest request) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
         memberService.updatePassword(accessToken, request.password());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{memberId}/mypage")
-    public ResponseEntity<?> findMyPageInfo(@PathVariable("memberId") Long memberId) {
-        MemberMyPageInfoResponse myPageInfo = memberService.findMyPageInfo(memberId);
-        return ResponseEntity.ok().body(myPageInfo);
+    public ResponseEntity<MemberMyPageInfoResponse> findMyPageInfo(@PathVariable("memberId") Long memberId) {
+        return ResponseEntity.ok().body(memberService.findMyPageInfo(memberId));
     }
 }

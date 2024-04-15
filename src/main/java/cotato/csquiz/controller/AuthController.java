@@ -29,40 +29,39 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/join")
-    public ResponseEntity<?> joinAuth(@RequestBody @Valid JoinRequest request) {
+    public ResponseEntity<Void> joinAuth(@RequestBody @Valid JoinRequest request) {
         log.info("[회원 가입 컨트롤러]: {}, {}", request.email(), request.name());
         authService.createLoginInfo(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원 가입 성공");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<?> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken,
-                                          HttpServletResponse response) {
+    public ResponseEntity<ReissueResponse> tokenReissue(@CookieValue(name = "refreshToken") String refreshToken,
+                                                        HttpServletResponse response) {
         log.info("[액세스 토큰 재발급 컨트롤러]: 쿠키 존재 여부, {}", !refreshToken.isEmpty());
-        ReissueResponse reissue = authService.reissue(refreshToken, response);
-        return ResponseEntity.ok().body(reissue);
+        return ResponseEntity.ok().body(authService.reissue(refreshToken, response));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refreshToken") String refreshToken,
-                                    @RequestBody @Valid LogoutRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(@CookieValue(name = "refreshToken") String refreshToken,
+                                       @RequestBody @Valid LogoutRequest request, HttpServletResponse response) {
         authService.logout(request, refreshToken, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/verification", params = "type=sign-up")
-    public ResponseEntity<?> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
+    public ResponseEntity<Void> sendSignUpVerificationCode(@Valid @RequestBody SendEmailRequest request) {
         log.info("[회원 가입 시 이메일 인증 요청 컨트롤러]: 요청된 이메일 {}", request.email());
         authService.sendSignUpEmail(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/verification", params = "type=sign-up")
-    public ResponseEntity<?> verifyCode(@RequestParam(name = "email") String email,
-                                        @RequestParam(name = "code") String code) {
+    public ResponseEntity<Void> verifyCode(@RequestParam(name = "email") String email,
+                                           @RequestParam(name = "code") String code) {
         log.info("[회원 가입 시 인증 코드 확인 컨트롤러]: {}", email);
         authService.verifySingUpCode(email, code);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/verification", params = "type=find-password")

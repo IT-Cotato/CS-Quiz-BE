@@ -28,26 +28,24 @@ public class GenerationController {
     private final GenerationService generationService;
 
     @GetMapping
-    public ResponseEntity<?> getGenerations() {
-        List<GenerationInfoResponse> generations = generationService.getGenerations();
-        return ResponseEntity.ok().body(generations);
+    public ResponseEntity<List<GenerationInfoResponse>> getGenerations() {
+        return ResponseEntity.ok().body(generationService.getGenerations());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addGeneration(@RequestBody @Valid AddGenerationRequest request) {
-        AddGenerationResponse response = generationService.addGeneration(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<AddGenerationResponse> addGeneration(@RequestBody @Valid AddGenerationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(generationService.addGeneration(request));
     }
 
     @PatchMapping("/recruiting")
-    public ResponseEntity<?> changeRecruiting(@RequestBody @Valid ChangeRecruitingRequest request) {
+    public ResponseEntity<Void> changeRecruiting(@RequestBody @Valid ChangeRecruitingRequest request) {
         generationService.changeRecruiting(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<?> changePeriod(@RequestBody @Valid ChangePeriodRequest request) {
+    public ResponseEntity<Void> changePeriod(@RequestBody @Valid ChangePeriodRequest request) {
         generationService.changePeriod(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

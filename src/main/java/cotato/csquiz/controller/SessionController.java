@@ -34,47 +34,47 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping("")
-    public ResponseEntity<?> getSessions(@RequestParam Long generationId) {
-        List<SessionListResponse> sessions = sessionService.findSessionsByGenerationId(generationId);
-        return ResponseEntity.status(HttpStatus.OK).body(sessions);
+    public ResponseEntity<List<SessionListResponse>> getSessions(@RequestParam Long generationId) {
+        return ResponseEntity.status(HttpStatus.OK).body(sessionService.findSessionsByGenerationId(generationId));
     }
 
     @PostMapping(value = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<?> addSession(@ModelAttribute @Valid AddSessionRequest request) throws ImageException {
+    public ResponseEntity<AddSessionResponse> addSession(@ModelAttribute @Valid AddSessionRequest request)
+            throws ImageException {
         log.info("세션 추가 컨트롤러 : {}", request.description());
-        AddSessionResponse response = sessionService.addSession(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(sessionService.addSession(request));
     }
 
     @PatchMapping(value = "/update", consumes = "multipart/form-data")
-    public ResponseEntity<?> updateSession(@ModelAttribute @Valid UpdateSessionRequest request) throws ImageException {
+    public ResponseEntity<Void> updateSession(@ModelAttribute @Valid UpdateSessionRequest request)
+            throws ImageException {
         sessionService.updateSession(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/number")
-    public ResponseEntity<?> changeSessionNum(@RequestBody @Valid UpdateSessionNumberRequest request) {
+    public ResponseEntity<Void> changeSessionNum(@RequestBody @Valid UpdateSessionNumberRequest request) {
         sessionService.changeSessionNumber(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/description")
-    public ResponseEntity<?> changeContent(@RequestBody @Valid SessionDescriptionRequest request) {
+    public ResponseEntity<Void> changeContent(@RequestBody @Valid SessionDescriptionRequest request) {
         sessionService.changeDescription(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
-    public ResponseEntity<?> changePhotoUrl(@ModelAttribute @Valid SessionPhotoUrlRequest request)
+    public ResponseEntity<Void> changePhotoUrl(@ModelAttribute @Valid SessionPhotoUrlRequest request)
             throws ImageException {
         sessionService.changePhotoUrl(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/cs-on")
-    public ResponseEntity<?> getSessionsWithCsEducationOn(@RequestParam Long generationId) {
-        List<CsEducationOnSessionNumberResponse> sessionNumbers = sessionService.findAllCsOnSessionsByGenerationId(
-                generationId);
-        return ResponseEntity.status(HttpStatus.OK).body(sessionNumbers);
+    public ResponseEntity<List<CsEducationOnSessionNumberResponse>> getSessionsWithCsEducationOn(
+            @RequestParam Long generationId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(sessionService.findAllCsOnSessionsByGenerationId(generationId));
     }
 }

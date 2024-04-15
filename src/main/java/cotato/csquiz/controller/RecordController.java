@@ -25,23 +25,21 @@ public class RecordController {
     private final RecordService recordService;
 
     @PostMapping("/reply")
-    public ResponseEntity<?> replyToQuiz(@RequestBody @Valid ReplyRequest request) {
+    public ResponseEntity<ReplyResponse> replyToQuiz(@RequestBody @Valid ReplyRequest request) {
         log.info("정답 제출 컨트롤러, 제출한 정답 : {}", request.inputs());
-        ReplyResponse replyResponse = recordService.replyToQuiz(request);
-        return ResponseEntity.ok().body(replyResponse);
+        return ResponseEntity.ok().body(recordService.replyToQuiz(request));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllRecordsByQuiz(@RequestParam("quizId") Long quizId) {
+    public ResponseEntity<RecordsAndScorerResponse> getAllRecordsByQuiz(@RequestParam("quizId") Long quizId) {
         log.info("문제에 답한 기록 반환 컨트롤러, 문제 pk: {}", quizId);
-        RecordsAndScorerResponse response = recordService.getRecordsAndScorer(quizId);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(recordService.getRecordsAndScorer(quizId));
     }
 
     @PostMapping("/regrade")
-    public ResponseEntity<?> regradeQuiz(@RequestBody @Valid RegradeRequest request) {
+    public ResponseEntity<Void> regradeQuiz(@RequestBody @Valid RegradeRequest request) {
         log.info("[재채점 컨트롤러] 새로운 정답: {}", request.newAnswer());
         recordService.regradeRecords(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }
