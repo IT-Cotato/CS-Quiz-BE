@@ -4,7 +4,7 @@ import cotato.csquiz.controller.dto.AllEducationResponse;
 import cotato.csquiz.controller.dto.education.AddEducationRequest;
 import cotato.csquiz.controller.dto.education.AddEducationResponse;
 import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.controller.dto.education.GetStatusResponse;
+import cotato.csquiz.controller.dto.education.FindStatusResponse;
 import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
 import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
@@ -37,9 +37,8 @@ public class EducationController {
     }
 
     @GetMapping("/status")
-    public ResponseEntity<?> getStatus(@RequestParam(value = "educationId") Long educationId) {
-        GetStatusResponse response = educationService.getStatus(educationId);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<FindStatusResponse> getStatus(@RequestParam(value = "educationId") Long educationId) {
+        return ResponseEntity.ok().body(educationService.getStatus(educationId));
     }
 
     @PostMapping("/add")

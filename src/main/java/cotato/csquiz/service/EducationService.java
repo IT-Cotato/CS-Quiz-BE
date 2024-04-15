@@ -4,7 +4,7 @@ import cotato.csquiz.controller.dto.AllEducationResponse;
 import cotato.csquiz.controller.dto.education.AddEducationRequest;
 import cotato.csquiz.controller.dto.education.AddEducationResponse;
 import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.controller.dto.education.GetStatusResponse;
+import cotato.csquiz.controller.dto.education.FindStatusResponse;
 import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
 import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
@@ -65,9 +65,9 @@ public class EducationService {
         );
     }
 
-    public GetStatusResponse getStatus(Long educationId) {
+    public FindStatusResponse getStatus(Long educationId) {
         Education education = findEducation(educationId);
-        return GetStatusResponse.builder()
+        return FindStatusResponse.builder()
                 .status(education.getStatus())
                 .build();
     }
