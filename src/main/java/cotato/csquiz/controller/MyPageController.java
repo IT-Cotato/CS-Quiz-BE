@@ -23,19 +23,18 @@ public class MyPageController {
     private final JwtUtil jwtUtil;
 
     @GetMapping("/hall-of-fame")
-    public ResponseEntity<?> getHallOfFame(@RequestParam("generationId") Long generationId,
-                                           @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<HallOfFameResponse> getHallOfFame(@RequestParam("generationId") Long generationId,
+                                                            @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
         String email = jwtUtil.getEmail(accessToken);
-        HallOfFameResponse response = myPageService.getHallOfFame(generationId, email);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, email));
     }
 
     @GetMapping("/info")
-    public ResponseEntity<?> userInfo(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<MyPageMemberInfoResponse> userInfo(
+            @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
         String email = jwtUtil.getEmail(accessToken);
-        MyPageMemberInfoResponse response = myPageService.getMemberInfo(email);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(myPageService.getMemberInfo(email));
     }
 }

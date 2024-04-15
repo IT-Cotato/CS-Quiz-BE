@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -36,43 +37,40 @@ public class QuizController {
     public ResponseEntity<?> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
                                            @RequestParam("educationId") Long educationId) {
         quizService.createQuizzes(educationId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> findAllQuizzesForEducationTeam(@RequestParam("educationId") Long educationId) {
-        AllQuizzesResponse allQuizzes = quizService.findAllQuizzesForEducationTeam(educationId);
-        return ResponseEntity.ok(allQuizzes);
+    public ResponseEntity<AllQuizzesResponse> findAllQuizzesForEducationTeam(
+            @RequestParam("educationId") Long educationId) {
+        return ResponseEntity.ok(quizService.findAllQuizzesForEducationTeam(educationId));
     }
 
     @GetMapping("/{quizId}")
-    public ResponseEntity<?> findOneQuizForMember(@PathVariable("quizId") Long quizId) {
-        QuizResponse response = quizService.findOneQuizForMember(quizId);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<QuizResponse> findOneQuizForMember(@PathVariable("quizId") Long quizId) {
+        return ResponseEntity.ok().body(quizService.findOneQuizForMember(quizId));
     }
 
     @GetMapping("/cs-admin/all")
-    public ResponseEntity<?> getAllQuizzesInCsQuiz(@RequestParam("educationId") Long educationId) {
-        AllQuizzesInCsQuizResponse allQuizzes = quizService.getAllQuizzesInCsQuiz(educationId);
-        return ResponseEntity.ok(allQuizzes);
+    public ResponseEntity<AllQuizzesInCsQuizResponse> getAllQuizzesInCsQuiz(
+            @RequestParam("educationId") Long educationId) {
+        return ResponseEntity.ok(quizService.getAllQuizzesInCsQuiz(educationId));
     }
 
     @GetMapping("/cs-admin")
-    public ResponseEntity<?> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
-        QuizInfoInCsQuizResponse response = quizService.getQuizInCsQuiz(quizId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<QuizInfoInCsQuizResponse> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
+        return ResponseEntity.ok(quizService.getQuizInCsQuiz(quizId));
     }
 
     @PostMapping("/cs-admin/answer/add")
-    public ResponseEntity<?> addAnswer(@RequestBody @Valid AddAdditionalAnswerRequest request) {
+    public ResponseEntity<Void> addAnswer(@RequestBody @Valid AddAdditionalAnswerRequest request) {
         quizService.addAdditionalAnswer(request);
         recordService.addAdditionalAnswerToRedis(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/cs-admin/results")
-    public ResponseEntity<?> quizResults(@RequestParam("educationId") Long educationId) {
-        List<QuizResultInfo> response = quizService.findQuizResults(educationId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<QuizResultInfo>> quizResults(@RequestParam("educationId") Long educationId) {
+        return ResponseEntity.ok(quizService.findQuizResults(educationId));
     }
 }

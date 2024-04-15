@@ -28,72 +28,68 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/applicants")
-    public ResponseEntity<?> getApplicantList() {
-        List<ApplyMemberInfo> applicantList = adminService.getApplicantList();
-        return ResponseEntity.ok().body(applicantList);
+    public ResponseEntity<List<ApplyMemberInfo>> getApplicantList() {
+        return ResponseEntity.ok().body(adminService.getApplicantList());
     }
 
     @GetMapping("/reject-applicants")
-    public ResponseEntity<?> rejectApplicantList() {
-        List<ApplyMemberInfo> applicantList = adminService.getRejectApplicantList();
-        return ResponseEntity.ok().body(applicantList);
+    public ResponseEntity<List<ApplyMemberInfo>> rejectApplicantList() {
+        return ResponseEntity.ok().body(adminService.getRejectApplicantList());
     }
 
     @PatchMapping("/approve")
-    public ResponseEntity<?> approveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
+    public ResponseEntity<Void> approveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
         log.info("[가입자 승인 컨트롤러, 요청된 member id : {}]", memberApproveRequest.memberId());
         adminService.approveApplicant(memberApproveRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/reject")
-    public ResponseEntity<?> rejectApplicant(@RequestBody @Valid MemberRejectRequest memberRejectRequest) {
+    public ResponseEntity<Void> rejectApplicant(@RequestBody @Valid MemberRejectRequest memberRejectRequest) {
         log.info("[가입자 거절 컨트롤러, 요청된 member id : {}]", memberRejectRequest.memberId());
         adminService.rejectApplicant(memberRejectRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/reapprove")
-    public ResponseEntity<?> reApproveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
+    public ResponseEntity<Void> reApproveApplicant(@RequestBody @Valid MemberApproveRequest memberApproveRequest) {
         log.info("[가입자 재승인 컨트롤러, 요청된 member id : {}]", memberApproveRequest.memberId());
         adminService.reApproveApplicant(memberApproveRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/active-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getCurrentActiveMembers() {
-        List<MemberEnrollInfoResponse> activeMembers = adminService.findCurrentActiveMembers();
-        return ResponseEntity.ok().body(activeMembers);
+        return ResponseEntity.ok().body(adminService.findCurrentActiveMembers());
     }
 
     @PatchMapping("/active-members/role")
-    public ResponseEntity<?> updateActiveMemberRole(
+    public ResponseEntity<Void> updateActiveMemberRole(
             @RequestBody @Valid UpdateActiveMemberRoleRequest updateActiveMemberRoleRequest) {
         log.info("[현재 활동 중인 부원 역할 업데이트 컨트롤러, 대상 member id : {}]", updateActiveMemberRoleRequest.memberId());
         adminService.updateActiveMemberRole(updateActiveMemberRoleRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/active-members/to-old-members")
-    public ResponseEntity<?> updateActiveMemberToOldMember(
+    public ResponseEntity<Void> updateActiveMemberToOldMember(
             @RequestBody @Valid UpdateActiveMemberToOldMemberRequest updateActiveMemberToOldMemberRequest) {
         log.info("[현재 활동 중인 부원들을 OM으로 업데이트 하는 컨트롤러, 대상 member ids : {}]",
                 updateActiveMemberToOldMemberRequest.memberIds());
         adminService.updateActiveMemberToOldMember(updateActiveMemberToOldMemberRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/old-members")
     public ResponseEntity<List<MemberEnrollInfoResponse>> getOldMembersList() {
-        List<MemberEnrollInfoResponse> oldMembersList = adminService.getOldMembersList();
-        return ResponseEntity.ok().body(oldMembersList);
+        return ResponseEntity.ok().body(adminService.getOldMembersList());
     }
 
     @PatchMapping("/old-members/role")
-    public ResponseEntity<?> updateOldMemberToActiveGeneration(
+    public ResponseEntity<Void> updateOldMemberToActiveGeneration(
             @RequestBody @Valid UpdateOldMemberRoleRequest updateOldMemberRoleRequest) {
         log.info("[OM을 현재 활동 기수로 업데이트하는 컨트롤러, 대상 member id: {}]", updateOldMemberRoleRequest.memberId());
         adminService.updateOldMemberToActiveGeneration(updateOldMemberRoleRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

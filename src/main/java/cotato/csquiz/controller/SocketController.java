@@ -27,46 +27,45 @@ public class SocketController {
     private final RecordService recordService;
 
     @PatchMapping("/start/csquiz")
-    public ResponseEntity<?> openCSQuiz(@RequestBody @Valid QuizOpenRequest request) {
+    public ResponseEntity<Void> openCSQuiz(@RequestBody @Valid QuizOpenRequest request) {
         socketService.openCSQuiz(request);
         recordService.saveAnswers(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/access")
-    public ResponseEntity<?> accessQuiz(@RequestBody @Valid QuizSocketRequest request) {
+    public ResponseEntity<Void> accessQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.accessQuiz(request);
         recordService.saveAnswer(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/start")
-    public ResponseEntity<?> startQuiz(@RequestBody @Valid QuizSocketRequest request) {
+    public ResponseEntity<Void> startQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.startQuiz(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/deny")
-    public ResponseEntity<?> denyQuiz(@RequestBody @Valid QuizSocketRequest request) {
+    public ResponseEntity<Void> denyQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.denyQuiz(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/stop")
-    public ResponseEntity<?> stopQuiz(@RequestBody @Valid QuizSocketRequest request) {
+    public ResponseEntity<Void> stopQuiz(@RequestBody @Valid QuizSocketRequest request) {
         socketService.stopQuiz(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/close/csquiz")
-    public ResponseEntity<?> stopAllQuiz(@RequestBody @Valid EducationCloseRequest request) {
+    public ResponseEntity<Void> stopAllQuiz(@RequestBody @Valid EducationCloseRequest request) {
         socketService.stopAllQuiz(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/token")
-    public ResponseEntity<?> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader) {
-        SocketTokenDto response = socketService.createSocketToken(authorizationHeader);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<SocketTokenDto> makeSocketToken(@RequestHeader("Authorization") String authorizationHeader) {
+        return ResponseEntity.ok(socketService.createSocketToken(authorizationHeader));
     }
 }
