@@ -8,7 +8,7 @@ public record ReplyRequest(
         Long quizId,
         @NotNull
         Long memberId,
-        @NotNull
+        @NotNull(message = "공백이 아닌 정답을 제출해주세요!")
         List<String> inputs
 ) {
 }
