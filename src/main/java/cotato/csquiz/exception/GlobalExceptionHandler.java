@@ -1,5 +1,6 @@
 package cotato.csquiz.exception;
 
+import cotato.csquiz.exception.MethodArgumentErrorResponse.FieldErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.sql.SQLException;
@@ -9,8 +10,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,15 +45,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ServletWebRequest servletWebRequest = (ServletWebRequest) request;
         HttpServletRequest httpServletRequest = servletWebRequest.getRequest();
         String requestURI = httpServletRequest.getRequestURI();
-        BindingResult bindingResult = ex.getBindingResult();
-        List<String> errorFields = bindingResult.getFieldErrors().stream()
-                .map(FieldError::getField)
+
+        List<FieldErrorResponse> fieldErrorResponses = ex.getBindingResult().getFieldErrors().stream()
+                .map(FieldErrorResponse::of)
+                .toList();
+
+        List<String> errorFields = fieldErrorResponses.stream()
+                .map(FieldErrorResponse::getField)
                 .toList();
 
         log.error("[Method Argument Not Valid Execption 발생]: {}", errorFields);
         log.error("에러가 발생한 지점 {}, {}", httpServletRequest.getMethod(), requestURI);
 
-        ErrorResponse errorResponse = ErrorResponse.of(httpServletRequest, errorFields);
+        MethodArgumentErrorResponse errorResponse = MethodArgumentErrorResponse.of(
+                ErrorCode.INVALID_INPUT, httpServletRequest, fieldErrorResponses);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
