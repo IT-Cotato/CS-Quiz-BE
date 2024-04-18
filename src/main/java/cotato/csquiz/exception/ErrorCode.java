@@ -46,13 +46,15 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "유효하지 않은 패스워드입니다."),
     INVALID_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "Invalid Password"),
     EDUCATION_CLOSED(HttpStatus.BAD_REQUEST, "CS 퀴즈가 닫혀 있습니다 먼저 교육 시작 버튼을 눌러주세요"),
+    EDUCATION_STATUS_NOT_BEFORE(HttpStatus.BAD_REQUEST, "이미 시작한 적이 있는 교육입니다."),
 
     WEBSOCKET_SEND_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "소캣 메세지 전송 실패"),
     IMAGE_PROCESSING_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 처리에 실패했습니다."),
     IMAGE_DELETE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "s3 이미지 삭제처리를 실패했습니다"),
     CREATE_VERIFY_CODE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "코드 생성에 실패했습니다."),
     RANDOM_NUMBER_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "랜덤 숫자 생성 실패"),
-    INTERNAL_SQL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SQL 관련 에러 발생");
+    INTERNAL_SQL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SQL 관련 에러 발생"),
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -36,6 +36,7 @@ public class SocketService {
     @Transactional
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.educationId());
+        checkEducationBefore(education);
         education.changeStatus(EducationStatus.ONGOING);
     }
 
@@ -145,5 +146,11 @@ public class SocketService {
         String socketToken = jwtUtil.createSocketToken(email, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return SocketTokenDto.from(socketToken);
+    }
+
+    private void checkEducationBefore(Education education) {
+        if (EducationStatus.BEFORE != education.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_STATUS_NOT_BEFORE);
+        }
     }
 }
