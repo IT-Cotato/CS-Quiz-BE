@@ -67,22 +67,18 @@ public class MyPageService {
     }
 
     private long countMyScorer(Member member, Generation generation) {
-        List<Quiz> quizzes = quizRepository.findAllFetchJoinByScorer();
-        List<Scorer> memberScorers = quizzes.stream()
-                .filter(quiz -> quiz.getGeneration().equals(generation))
-                .map(Quiz::getScorer)
+        List<Scorer> scorerList = findScorersByQuizzes(generation);
+
+        return scorerList.stream()
                 .filter(scorer -> scorer.getMember().equals(member))
-                .toList();
-        return memberScorers.size();
+                .count();
     }
 
     private long countMyAnswer(Member member, Generation generation) {
-        List<Record> records = findRecordByQuizzes(member.getGeneration());
+        List<Record> records = findRecordByQuizzes(generation);
         return records.stream()
                 .filter(record -> record.getMember().equals(member))
-                .filter(record -> record.getQuiz().getGeneration().equals(generation))
-                .toList()
-                .size();
+                .count();
     }
 
     private List<HallOfFameInfo> makeRecordsHallOfFameInfo(Generation generation) {
