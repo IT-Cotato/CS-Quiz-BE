@@ -67,7 +67,7 @@ public class QuizService {
     @Transactional
     public void createQuizzes(Long educationId, CreateQuizzesRequest request) {
         Education findEducation = findEducationById(educationId);
-        checkQuizNotBefore(findEducation);
+        checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
         log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
@@ -76,12 +76,6 @@ public class QuizService {
 
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
-    }
-
-    private void checkQuizNotBefore(Education findEducation) {
-        if (EducationStatus.BEFORE != findEducation.getStatus()) {
-            throw new AppException(ErrorCode.EDUCATION_STATUS_NOT_BEFORE);
-        }
     }
 
     @Transactional
@@ -358,5 +352,11 @@ public class QuizService {
     private Education findEducationById(Long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육 id:" + educationId + " 찾다가 에러 발생했습니다."));
+    }
+
+    private void checkQuizBefore(Education findEducation) {
+        if (EducationStatus.BEFORE != findEducation.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_STATUS_NOT_BEFORE);
+        }
     }
 }
