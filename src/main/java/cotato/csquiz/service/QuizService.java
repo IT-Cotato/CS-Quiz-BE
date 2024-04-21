@@ -39,11 +39,10 @@ import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -175,8 +174,8 @@ public class QuizService {
         createdShortQuiz.addShortAnswers(shortAnswers);
     }
 
-    private int generateRandomTime() throws NoSuchAlgorithmException {
-        Random random = SecureRandom.getInstanceStrong();
+    private int generateRandomTime() {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
         return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
     }
 

@@ -14,9 +14,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -46,16 +44,12 @@ public class EmailVerificationService {
     }
 
     private String getVerificationCode() {
-        try {
-            Random random = SecureRandom.getInstanceStrong();
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < CODE_LENGTH; i++) {
-                builder.append(random.nextInt(CODE_BOUNDARY));
-            }
-            return builder.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new AppException(ErrorCode.CREATE_VERIFY_CODE_FAIL);
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            builder.append(random.nextInt(CODE_BOUNDARY));
         }
+        return String.valueOf(builder);
     }
 
     private void sendEmailWithVerificationCode(String recipient, String verificationCode, String subject) {
