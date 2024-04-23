@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ShortQuizResponse {
 
     private Long id;
-    private int number;
+    private Integer number;
     private String question;
     private String image;
     private List<ShortAnswerResponse> shortAnswers = new ArrayList<>();
