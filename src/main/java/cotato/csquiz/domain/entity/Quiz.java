@@ -41,7 +41,7 @@ public class Quiz extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "quiz_number", nullable = false)
-    private int number;
+    private Integer number;
 
     @Column(name = "quiz_question", nullable = false, length = 500)
     private String question;
@@ -76,7 +76,7 @@ public class Quiz extends BaseTimeEntity {
     @OneToOne(mappedBy = "quiz", orphanRemoval = true)
     private Scorer scorer;
 
-    public Quiz(int number, String question, String photoUrl, Education education, int appearSecond,
+    public Quiz(Integer number, String question, String photoUrl, Education education, int appearSecond,
                 Generation generation) {
         this.number = number;
         this.question = question;
