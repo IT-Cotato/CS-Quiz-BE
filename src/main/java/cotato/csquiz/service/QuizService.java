@@ -67,7 +67,6 @@ public class QuizService {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
-        log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
 
         List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
