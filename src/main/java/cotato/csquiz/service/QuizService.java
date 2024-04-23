@@ -217,10 +217,12 @@ public class QuizService {
                 .filter(quiz -> quiz instanceof MultipleQuiz)
                 .map(this::toMultipleQuizResponse)
                 .toList();
+
         List<ShortQuizResponse> shortQuizzes = quizzes.stream()
                 .filter(quiz -> quiz instanceof ShortQuiz)
                 .map(this::toShortQuizResponse)
                 .toList();
+
         return AllQuizzesResponse.builder()
                 .multiples(multiples)
                 .shortQuizzes(shortQuizzes)
@@ -238,6 +240,7 @@ public class QuizService {
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
         List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
@@ -246,6 +249,7 @@ public class QuizService {
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+
         List<ChoiceResponse> choiceResponses = choices.stream()
                 .map(ChoiceResponse::forEducation)
                 .toList();

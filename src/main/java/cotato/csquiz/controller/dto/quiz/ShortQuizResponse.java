@@ -18,10 +18,6 @@ public class ShortQuizResponse {
     private String image;
     private List<ShortAnswerResponse> shortAnswers = new ArrayList<>();
 
-    public void addShortAnswers(List<ShortAnswerResponse> shortAnswerResponses) {
-        this.shortAnswers.addAll(shortAnswerResponses);
-    }
-
     public static ShortQuizResponse from(Quiz quiz, List<ShortAnswerResponse> shortAnswers) {
         return new ShortQuizResponse(
                 quiz.getId(),
