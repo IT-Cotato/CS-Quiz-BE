@@ -70,7 +70,12 @@ public class QuizService {
         log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
 
-        quizRepository.deleteAllByEducationId(educationId);
+        List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
+                .map(Quiz::getId)
+                .toList();
+        choiceRepository.deleteAllByQuizIdsInQuery(ids);
+        shortAnswerRepository.deleteAllByQuizIdsInQuery(ids);
+        quizRepository.deleteAllByQuizIdsInQuery(ids);
 
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
