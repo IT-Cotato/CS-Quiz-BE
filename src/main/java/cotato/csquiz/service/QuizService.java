@@ -38,7 +38,6 @@ import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,14 +100,12 @@ public class QuizService {
                 createMultipleQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            } catch (NoSuchAlgorithmException e) {
-                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
     private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
-            throws ImageException, NoSuchAlgorithmException {
+            throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
@@ -138,14 +135,12 @@ public class QuizService {
                 createShortQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            } catch (NoSuchAlgorithmException e) {
-                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
-            throws ImageException, NoSuchAlgorithmException {
+            throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
