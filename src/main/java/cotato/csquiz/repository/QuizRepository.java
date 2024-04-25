@@ -6,13 +6,19 @@ import cotato.csquiz.domain.enums.QuizStatus;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
-    List<Quiz> findAllByEducationId(Long educationId);
+    @Transactional
+    @Modifying
+    @Query("delete from Quiz p where p.id in :ids")
+    void deleteAllByQuizIdsInQuery(@Param("ids") List<Long> ids);
 
-    void deleteAllByEducationId(Long educationId);
+    List<Quiz> findAllByEducationId(Long educationId);
 
     List<Quiz> findByStatus(QuizStatus status);
 

@@ -31,17 +31,15 @@ public class ShortAnswer extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private ShortQuiz shortQuiz;
 
-    public void matchShortQuiz(ShortQuiz shortQuiz) {
+    private ShortAnswer(String content, ShortQuiz shortQuiz) {
+        this.content = content;
         this.shortQuiz = shortQuiz;
     }
 
-    private ShortAnswer(String content) {
-        this.content = content;
-    }
-
-    public static ShortAnswer of(String content) {
+    public static ShortAnswer of(String content, ShortQuiz shortQuiz) {
         return new ShortAnswer(
-                content
+                content,
+                shortQuiz
         );
     }
 }

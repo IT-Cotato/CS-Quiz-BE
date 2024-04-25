@@ -42,25 +42,23 @@ public class Choice extends BaseTimeEntity {
     @JoinColumn(name = "quiz_id")
     private MultipleQuiz multipleQuiz;
 
-    private Choice(Integer choiceNumber, String content, ChoiceCorrect isCorrect) {
+    private Choice(Integer choiceNumber, String content, ChoiceCorrect isCorrect, MultipleQuiz multipleQuiz) {
         this.choiceNumber = choiceNumber;
         this.content = content;
         this.isCorrect = isCorrect;
+        this.multipleQuiz = multipleQuiz;
     }
 
-    public static Choice of(CreateChoiceRequest request) {
+    public static Choice of(CreateChoiceRequest request, MultipleQuiz multipleQuiz) {
         return new Choice(
                 request.getNumber(),
                 request.getContent(),
-                request.getIsAnswer()
+                request.getIsAnswer(),
+                multipleQuiz
         );
     }
 
     public void changeCorrect(ChoiceCorrect choiceCorrect) {
         this.isCorrect = choiceCorrect;
-    }
-
-    public void matchMultipleQuiz(MultipleQuiz multipleQuiz) {
-        this.multipleQuiz = multipleQuiz;
     }
 }

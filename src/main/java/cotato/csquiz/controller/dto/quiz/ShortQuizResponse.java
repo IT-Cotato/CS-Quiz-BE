@@ -13,14 +13,10 @@ import lombok.NoArgsConstructor;
 public class ShortQuizResponse {
 
     private Long id;
-    private int number;
+    private Integer number;
     private String question;
     private String image;
     private List<ShortAnswerResponse> shortAnswers = new ArrayList<>();
-
-    public void addShortAnswers(List<ShortAnswerResponse> shortAnswerResponses) {
-        this.shortAnswers.addAll(shortAnswerResponses);
-    }
 
     public static ShortQuizResponse from(Quiz quiz, List<ShortAnswerResponse> shortAnswers) {
         return new ShortQuizResponse(

@@ -38,7 +38,6 @@ import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,10 +67,14 @@ public class QuizService {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
-        log.info("존재하는 문제 수 : {}개", quizRepository.findAllByEducationId(educationId).size());
         validateDuplicateNumber(request);
 
-        quizRepository.deleteAllByEducationId(educationId);
+        List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
+                .map(Quiz::getId)
+                .toList();
+        choiceRepository.deleteAllByQuizIdsInQuery(ids);
+        shortAnswerRepository.deleteAllByQuizIdsInQuery(ids);
+        quizRepository.deleteAllByQuizIdsInQuery(ids);
 
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
@@ -101,14 +104,12 @@ public class QuizService {
                 createMultipleQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            } catch (NoSuchAlgorithmException e) {
-                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
     private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
-            throws ImageException, NoSuchAlgorithmException {
+            throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
@@ -124,11 +125,10 @@ public class QuizService {
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
         List<Choice> choices = request.getChoices().stream()
-                .map(Choice::of)
+                .map(requestDto -> Choice.of(requestDto, createdMultipleQuiz))
                 .toList();
         choiceRepository.saveAll(choices);
         log.info("객관식 선지 생성 : {}개", choices.size());
-        createdMultipleQuiz.addChoices(choices);
     }
 
     private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes) {
@@ -138,14 +138,12 @@ public class QuizService {
                 createShortQuiz(findEducation, request);
             } catch (ImageException e) {
                 throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            } catch (NoSuchAlgorithmException e) {
-                throw new AppException(ErrorCode.RANDOM_NUMBER_GENERATE_FAIL);
             }
         });
     }
 
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
-            throws ImageException, NoSuchAlgorithmException {
+            throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
@@ -159,19 +157,18 @@ public class QuizService {
                 .appearSecond(generateRandomTime())
                 .generation(findEducation.getSession().getGeneration())
                 .build();
-        log.info("주관식 문제 생성 : 사진 url {}", imageUrl);
+        log.info("주관식 문제 생성 완료: 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);
 
         List<ShortAnswer> shortAnswers = request.getShortAnswers().stream()
                 .map(CreateShortAnswerRequest::getAnswer)
                 .map(String::toLowerCase)
                 .map(String::trim)
-                .map(ShortAnswer::of)
+                .map(answer -> ShortAnswer.of(answer, createdShortQuiz))
                 .toList();
         shortAnswerRepository.saveAll(shortAnswers);
 
-        log.info("주관식 정답 생성 : {}개", shortAnswers.size());
-        createdShortQuiz.addShortAnswers(shortAnswers);
+        log.info("주관식 정답 생성 완료: {}개", shortAnswers.size());
     }
 
     private int generateRandomTime() {
@@ -219,10 +216,12 @@ public class QuizService {
                 .filter(quiz -> quiz instanceof MultipleQuiz)
                 .map(this::toMultipleQuizResponse)
                 .toList();
+
         List<ShortQuizResponse> shortQuizzes = quizzes.stream()
                 .filter(quiz -> quiz instanceof ShortQuiz)
                 .map(this::toShortQuizResponse)
                 .toList();
+
         return AllQuizzesResponse.builder()
                 .multiples(multiples)
                 .shortQuizzes(shortQuizzes)
@@ -240,6 +239,7 @@ public class QuizService {
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
         List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
+
         List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
@@ -248,6 +248,7 @@ public class QuizService {
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
         List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
+
         List<ChoiceResponse> choiceResponses = choices.stream()
                 .map(ChoiceResponse::forEducation)
                 .toList();
@@ -316,8 +317,7 @@ public class QuizService {
         checkAnswerAlreadyExist(shortQuiz, answer);
         String cleanedAnswer = answer.toLowerCase()
                 .trim();
-        ShortAnswer shortAnswer = ShortAnswer.of(cleanedAnswer);
-        shortAnswer.matchShortQuiz(shortQuiz);
+        ShortAnswer shortAnswer = ShortAnswer.of(cleanedAnswer, shortQuiz);
         shortAnswerRepository.save(shortAnswer);
     }
 
