@@ -63,7 +63,7 @@ public class QuizService {
     private final S3Uploader s3Uploader;
 
     @Transactional
-    public void createQuizzes(Long educationId, CreateQuizzesRequest request) {
+    public void createQuizzes(Long educationId, CreateQuizzesRequest request) throws ImageException {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
@@ -97,15 +97,12 @@ public class QuizService {
         return QuizResultInfo.noScorer(quiz);
     }
 
-    private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples) {
+    private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples)
+            throws ImageException {
         log.info("요청된 객관식 문제의 수: {}개", multiples.size());
-        multiples.forEach(request -> {
-            try {
-                createMultipleQuiz(findEducation, request);
-            } catch (ImageException e) {
-                throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            }
-        });
+        for (MultipleChoiceQuizRequest multipleChoiceQuizRequest : multiples) {
+            createMultipleQuiz(findEducation, multipleChoiceQuizRequest);
+        }
     }
 
     private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
@@ -131,15 +128,12 @@ public class QuizService {
         log.info("객관식 선지 생성 : {}개", choices.size());
     }
 
-    private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes) {
+    private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes)
+            throws ImageException {
         log.info("요청된 주관식 문제의 수: {}개", shortQuizzes.size());
-        shortQuizzes.forEach(request -> {
-            try {
-                createShortQuiz(findEducation, request);
-            } catch (ImageException e) {
-                throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            }
-        });
+        for (CreateShortQuizRequest shortQuizRequest : shortQuizzes) {
+            createShortQuiz(findEducation, shortQuizRequest);
+        }
     }
 
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)

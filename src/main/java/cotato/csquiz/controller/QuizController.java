@@ -7,6 +7,7 @@ import cotato.csquiz.controller.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.controller.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizResultInfo;
+import cotato.csquiz.exception.ImageException;
 import cotato.csquiz.service.QuizService;
 import cotato.csquiz.service.RecordService;
 import jakarta.validation.Valid;
@@ -34,8 +35,8 @@ public class QuizController {
     private final RecordService recordService;
 
     @PostMapping(value = "/adds", consumes = "multipart/form-data")
-    public ResponseEntity<?> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
-                                           @RequestParam("educationId") Long educationId) {
+    public ResponseEntity<Void> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
+                                              @RequestParam("educationId") Long educationId) throws ImageException {
         quizService.createQuizzes(educationId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
