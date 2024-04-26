@@ -67,7 +67,11 @@ public class QuizService {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
-        validateDuplicateNumber(request);
+        List<Integer> quizNumbers = Stream.concat(
+                request.getMultiples().stream().map(CreateMultipleQuizRequest::getNumber),
+                request.getShortQuizzes().stream().map(CreateShortQuizRequest::getNumber)
+        ).toList();
+        validateQuizNumbers(quizNumbers);
 
         List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
                 .map(Quiz::getId)
@@ -78,6 +82,13 @@ public class QuizService {
 
         createShortQuizzes(findEducation, request.getShortQuizzes());
         createMultipleQuizzes(findEducation, request.getMultiples());
+    }
+
+    private void validateQuizNumbers(final List<Integer> numbers) {
+        Set<Integer> distinctNumbers = new HashSet<>(numbers);
+        if (numbers.size() != distinctNumbers.size()) {
+            throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
+        }
     }
 
     @Transactional
