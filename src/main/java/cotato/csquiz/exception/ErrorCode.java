@@ -24,6 +24,7 @@ public enum ErrorCode {
     EDUCATION_DUPLICATED(HttpStatus.CONFLICT, "이미 교육이 존재합니다"),
     QUIZ_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "퀴즈 번호는 중복될 수 없습니다."),
     PHONE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "존재하는 전화번호입니다."),
+    CHOICE_NUMBER_DUPLICATED(HttpStatus.CONFLICT, "선지 번호는 중복될 수 없습니다."),
 
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 잘못되었습니다."),
     ENUM_NOT_RESOLVED(HttpStatus.BAD_REQUEST, "입력한 Enum이 존재하지 않습니다."),
