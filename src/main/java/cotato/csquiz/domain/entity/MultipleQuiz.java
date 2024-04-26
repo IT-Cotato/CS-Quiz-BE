@@ -18,5 +18,4 @@ public class MultipleQuiz extends Quiz {
                         Generation generation) {
         super(number, question, photoUrl, education, appearSecond, generation);
     }
-
 }

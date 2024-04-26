@@ -107,9 +107,9 @@ public class QuizService {
     }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
-        Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
-        if (scorerOptional.isPresent()) {
-            Member member = scorerOptional.get().getMember();
+        Optional<Scorer> mayBeScorer = scorerRepository.findByQuiz(quiz);
+        if (mayBeScorer.isPresent()) {
+            Member member = mayBeScorer.get().getMember();
             return QuizResultInfo.from(quiz, member, memberService.getBackFourNumber(member));
         }
         return QuizResultInfo.noScorer(quiz);
@@ -183,24 +183,6 @@ public class QuizService {
     private int generateRandomTime() {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
-    }
-
-    private void validateDuplicateNumber(CreateQuizzesRequest request) {
-        List<Integer> numbers = new ArrayList<>();
-        List<Integer> multiples = request.getMultiples().stream()
-                .map(MultipleChoiceQuizRequest::getNumber)
-                .toList();
-        List<Integer> shortQuizzes = request.getShortQuizzes().stream()
-                .map(CreateShortQuizRequest::getNumber)
-                .toList();
-        numbers.addAll(multiples);
-        numbers.addAll(shortQuizzes);
-        long count = numbers.stream()
-                .distinct()
-                .count();
-        if (count != numbers.size()) {
-            throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
-        }
     }
 
     @Transactional
