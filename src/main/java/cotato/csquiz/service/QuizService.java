@@ -83,8 +83,12 @@ public class QuizService {
         shortAnswerRepository.deleteAllByQuizIdsInQuery(ids);
         quizRepository.deleteAllByQuizIdsInQuery(ids);
 
-        createShortQuizzes(findEducation, request.getShortQuizzes());
-        createMultipleQuizzes(findEducation, request.getMultiples());
+        for (CreateShortQuizRequest shortQuizRequest : request.getShortQuizzes()) {
+            createShortQuiz(findEducation, shortQuizRequest);
+        }
+        for (CreateMultipleQuizRequest multipleQuizRequest : request.getMultiples()) {
+            createMultipleQuiz(findEducation, multipleQuizRequest);
+        }
     }
 
     private void validateQuizNumbers(final List<Integer> numbers) {
@@ -111,20 +115,13 @@ public class QuizService {
         return QuizResultInfo.noScorer(quiz);
     }
 
-    private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples)
-            throws ImageException {
-        log.info("요청된 객관식 문제의 수: {}개", multiples.size());
-        for (MultipleChoiceQuizRequest multipleChoiceQuizRequest : multiples) {
-            createMultipleQuiz(findEducation, multipleChoiceQuizRequest);
-        }
-    }
-
-    private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
+    private void createMultipleQuiz(Education findEducation, CreateMultipleQuizRequest request)
             throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
+
         MultipleQuiz createdMultipleQuiz = MultipleQuiz.builder()
                 .education(findEducation)
                 .number(request.getNumber())
@@ -133,6 +130,7 @@ public class QuizService {
                 .appearSecond(generateRandomTime())
                 .generation(findEducation.getSession().getGeneration())
                 .build();
+
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
 
@@ -283,7 +281,6 @@ public class QuizService {
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
         List<String> answers = getAnswerList(quiz);
-
         return QuizInfoInCsQuizResponse.from(quiz, answers);
     }
 
@@ -312,15 +309,11 @@ public class QuizService {
     @Transactional
     public void addAdditionalAnswer(AddAdditionalAnswerRequest request) {
         Quiz quiz = findQuizById(request.quizId());
-        addAnswerInRepository(quiz, request.answer());
-    }
-
-    private void addAnswerInRepository(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
-            addShortAnswer((ShortQuiz) quiz, answer);
+            addShortAnswer((ShortQuiz) quiz, request.answer());
         }
         if (quiz instanceof MultipleQuiz) {
-            addChoiceCorrect((MultipleQuiz) quiz, answer);
+            addChoiceCorrect((MultipleQuiz) quiz, request.answer());
         }
     }
 
