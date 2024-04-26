@@ -229,18 +229,15 @@ public class QuizService {
     }
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
-        List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
-
-        List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
+        List<ShortAnswerResponse> shortAnswerResponses = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz)
+                .stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
         return ShortQuizResponse.from(quiz, shortAnswerResponses);
     }
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
-        List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
-
-        List<ChoiceResponse> choiceResponses = choices.stream()
+        List<ChoiceResponse> choiceResponses = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz).stream()
                 .map(ChoiceResponse::forEducation)
                 .toList();
         return MultipleQuizResponse.from(quiz, choiceResponses);
@@ -250,8 +247,8 @@ public class QuizService {
     public QuizResponse findOneQuizForMember(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
-            List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz);
-            List<ChoiceResponse> choiceResponses = choices.stream()
+            List<ChoiceResponse> choiceResponses = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz)
+                    .stream()
                     .map(ChoiceResponse::forMember)
                     .toList();
             return FindMultipleQuizResponse.from(findQuiz, choiceResponses);
