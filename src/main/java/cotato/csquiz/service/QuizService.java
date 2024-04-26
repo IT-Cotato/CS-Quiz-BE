@@ -132,6 +132,10 @@ public class QuizService {
                 .build();
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
+
+        List<Integer> choiceNumbers = request.getChoices().stream().map(CreateChoiceRequest::getNumber).toList();
+        validateChoiceNumbers(choiceNumbers);
+
         List<Choice> choices = request.getChoices().stream()
                 .map(requestDto -> Choice.of(requestDto, createdMultipleQuiz))
                 .toList();
@@ -139,11 +143,10 @@ public class QuizService {
         log.info("객관식 선지 생성 : {}개", choices.size());
     }
 
-    private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes)
-            throws ImageException {
-        log.info("요청된 주관식 문제의 수: {}개", shortQuizzes.size());
-        for (CreateShortQuizRequest shortQuizRequest : shortQuizzes) {
-            createShortQuiz(findEducation, shortQuizRequest);
+    private void validateChoiceNumbers(final List<Integer> choiceNumbers) {
+        Set<Integer> distinctNumbers = new HashSet<>(choiceNumbers);
+        if (distinctNumbers.size() != choiceNumbers.size()) {
+            throw new AppException(ErrorCode.CHOICE_NUMBER_DUPLICATED);
         }
     }
 
