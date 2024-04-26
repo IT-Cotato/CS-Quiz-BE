@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MultipleChoiceQuizRequest {
+public class CreateMultipleQuizRequest {
 
     private Integer number;
     private String question;
