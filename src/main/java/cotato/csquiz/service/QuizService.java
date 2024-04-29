@@ -56,7 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuizService {
 
     private static final String QUIZ_BUCKET_DIRECTORY = "quiz";
-    private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
+    private static final int RANDOM_DELAY_TIME_BOUNDARY = 7;
     private final MemberService memberService;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
