@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateQuizzesRequest {
 
-    private List<MultipleChoiceQuizRequest> multiples = new ArrayList<>();
+    private List<CreateMultipleQuizRequest> multiples = new ArrayList<>();
     private List<CreateShortQuizRequest> shortQuizzes = new ArrayList<>();
 }

@@ -4,12 +4,13 @@ import cotato.csquiz.controller.dto.quiz.AddAdditionalAnswerRequest;
 import cotato.csquiz.controller.dto.quiz.AllQuizzesInCsQuizResponse;
 import cotato.csquiz.controller.dto.quiz.AllQuizzesResponse;
 import cotato.csquiz.controller.dto.quiz.ChoiceResponse;
+import cotato.csquiz.controller.dto.quiz.CreateChoiceRequest;
+import cotato.csquiz.controller.dto.quiz.CreateMultipleQuizRequest;
 import cotato.csquiz.controller.dto.quiz.CreateQuizzesRequest;
 import cotato.csquiz.controller.dto.quiz.CreateShortAnswerRequest;
 import cotato.csquiz.controller.dto.quiz.CreateShortQuizRequest;
 import cotato.csquiz.controller.dto.quiz.CsAdminQuizResponse;
 import cotato.csquiz.controller.dto.quiz.FindMultipleQuizResponse;
-import cotato.csquiz.controller.dto.quiz.MultipleChoiceQuizRequest;
 import cotato.csquiz.controller.dto.quiz.MultipleQuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizInfoInCsQuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizResponse;
@@ -38,10 +39,12 @@ import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.ShortAnswerRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuizService {
 
     private static final String QUIZ_BUCKET_DIRECTORY = "quiz";
-    private static final int RANDOM_DELAY_TIME_BOUNDARY = 10;
+    private static final int RANDOM_DELAY_TIME_BOUNDARY = 7;
     private final MemberService memberService;
     private final EducationRepository educationRepository;
     private final QuizRepository quizRepository;
@@ -63,11 +66,15 @@ public class QuizService {
     private final S3Uploader s3Uploader;
 
     @Transactional
-    public void createQuizzes(Long educationId, CreateQuizzesRequest request) {
+    public void createQuizzes(Long educationId, CreateQuizzesRequest request) throws ImageException {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
-        validateDuplicateNumber(request);
+        List<Integer> quizNumbers = Stream.concat(
+                request.getMultiples().stream().map(CreateMultipleQuizRequest::getNumber),
+                request.getShortQuizzes().stream().map(CreateShortQuizRequest::getNumber)
+        ).toList();
+        validateQuizNumbers(quizNumbers);
 
         List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
                 .map(Quiz::getId)
@@ -76,8 +83,19 @@ public class QuizService {
         shortAnswerRepository.deleteAllByQuizIdsInQuery(ids);
         quizRepository.deleteAllByQuizIdsInQuery(ids);
 
-        createShortQuizzes(findEducation, request.getShortQuizzes());
-        createMultipleQuizzes(findEducation, request.getMultiples());
+        for (CreateShortQuizRequest shortQuizRequest : request.getShortQuizzes()) {
+            createShortQuiz(findEducation, shortQuizRequest);
+        }
+        for (CreateMultipleQuizRequest multipleQuizRequest : request.getMultiples()) {
+            createMultipleQuiz(findEducation, multipleQuizRequest);
+        }
+    }
+
+    private void validateQuizNumbers(final List<Integer> numbers) {
+        Set<Integer> distinctNumbers = new HashSet<>(numbers);
+        if (numbers.size() != distinctNumbers.size()) {
+            throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
+        }
     }
 
     @Transactional
@@ -89,31 +107,21 @@ public class QuizService {
     }
 
     private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
-        Optional<Scorer> scorerOptional = scorerRepository.findByQuiz(quiz);
-        if (scorerOptional.isPresent()) {
-            Member member = scorerOptional.get().getMember();
+        Optional<Scorer> mayBeScorer = scorerRepository.findByQuiz(quiz);
+        if (mayBeScorer.isPresent()) {
+            Member member = mayBeScorer.get().getMember();
             return QuizResultInfo.from(quiz, member, memberService.getBackFourNumber(member));
         }
         return QuizResultInfo.noScorer(quiz);
     }
 
-    private void createMultipleQuizzes(Education findEducation, List<MultipleChoiceQuizRequest> multiples) {
-        log.info("요청된 객관식 문제의 수: {}개", multiples.size());
-        multiples.forEach(request -> {
-            try {
-                createMultipleQuiz(findEducation, request);
-            } catch (ImageException e) {
-                throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            }
-        });
-    }
-
-    private void createMultipleQuiz(Education findEducation, MultipleChoiceQuizRequest request)
+    private void createMultipleQuiz(Education findEducation, CreateMultipleQuizRequest request)
             throws ImageException {
         String imageUrl = null;
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             imageUrl = s3Uploader.uploadFiles(request.getImage(), QUIZ_BUCKET_DIRECTORY);
         }
+
         MultipleQuiz createdMultipleQuiz = MultipleQuiz.builder()
                 .education(findEducation)
                 .number(request.getNumber())
@@ -122,8 +130,13 @@ public class QuizService {
                 .appearSecond(generateRandomTime())
                 .generation(findEducation.getSession().getGeneration())
                 .build();
+
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
         quizRepository.save(createdMultipleQuiz);
+
+        List<Integer> choiceNumbers = request.getChoices().stream().map(CreateChoiceRequest::getNumber).toList();
+        validateChoiceNumbers(choiceNumbers);
+
         List<Choice> choices = request.getChoices().stream()
                 .map(requestDto -> Choice.of(requestDto, createdMultipleQuiz))
                 .toList();
@@ -131,15 +144,11 @@ public class QuizService {
         log.info("객관식 선지 생성 : {}개", choices.size());
     }
 
-    private void createShortQuizzes(Education findEducation, List<CreateShortQuizRequest> shortQuizzes) {
-        log.info("요청된 주관식 문제의 수: {}개", shortQuizzes.size());
-        shortQuizzes.forEach(request -> {
-            try {
-                createShortQuiz(findEducation, request);
-            } catch (ImageException e) {
-                throw new AppException(ErrorCode.IMAGE_PROCESSING_FAIL);
-            }
-        });
+    private void validateChoiceNumbers(final List<Integer> choiceNumbers) {
+        Set<Integer> distinctNumbers = new HashSet<>(choiceNumbers);
+        if (distinctNumbers.size() != choiceNumbers.size()) {
+            throw new AppException(ErrorCode.CHOICE_NUMBER_DUPLICATED);
+        }
     }
 
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
@@ -174,24 +183,6 @@ public class QuizService {
     private int generateRandomTime() {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
-    }
-
-    private void validateDuplicateNumber(CreateQuizzesRequest request) {
-        List<Integer> numbers = new ArrayList<>();
-        List<Integer> multiples = request.getMultiples().stream()
-                .map(MultipleChoiceQuizRequest::getNumber)
-                .toList();
-        List<Integer> shortQuizzes = request.getShortQuizzes().stream()
-                .map(CreateShortQuizRequest::getNumber)
-                .toList();
-        numbers.addAll(multiples);
-        numbers.addAll(shortQuizzes);
-        long count = numbers.stream()
-                .distinct()
-                .count();
-        if (count != numbers.size()) {
-            throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
-        }
     }
 
     @Transactional
@@ -238,18 +229,15 @@ public class QuizService {
     }
 
     private ShortQuizResponse toShortQuizResponse(Quiz quiz) {
-        List<ShortAnswer> shortAnswers = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz);
-
-        List<ShortAnswerResponse> shortAnswerResponses = shortAnswers.stream()
+        List<ShortAnswerResponse> shortAnswerResponses = shortAnswerRepository.findAllByShortQuiz((ShortQuiz) quiz)
+                .stream()
                 .map(ShortAnswerResponse::from)
                 .toList();
         return ShortQuizResponse.from(quiz, shortAnswerResponses);
     }
 
     private MultipleQuizResponse toMultipleQuizResponse(Quiz quiz) {
-        List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz);
-
-        List<ChoiceResponse> choiceResponses = choices.stream()
+        List<ChoiceResponse> choiceResponses = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) quiz).stream()
                 .map(ChoiceResponse::forEducation)
                 .toList();
         return MultipleQuizResponse.from(quiz, choiceResponses);
@@ -259,8 +247,8 @@ public class QuizService {
     public QuizResponse findOneQuizForMember(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
         if (findQuiz instanceof MultipleQuiz) {
-            List<Choice> choices = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz);
-            List<ChoiceResponse> choiceResponses = choices.stream()
+            List<ChoiceResponse> choiceResponses = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz)
+                    .stream()
                     .map(ChoiceResponse::forMember)
                     .toList();
             return FindMultipleQuizResponse.from(findQuiz, choiceResponses);
@@ -272,7 +260,6 @@ public class QuizService {
     public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
         List<String> answers = getAnswerList(quiz);
-
         return QuizInfoInCsQuizResponse.from(quiz, answers);
     }
 
@@ -301,15 +288,11 @@ public class QuizService {
     @Transactional
     public void addAdditionalAnswer(AddAdditionalAnswerRequest request) {
         Quiz quiz = findQuizById(request.quizId());
-        addAnswerInRepository(quiz, request.answer());
-    }
-
-    private void addAnswerInRepository(Quiz quiz, String answer) {
         if (quiz instanceof ShortQuiz) {
-            addShortAnswer((ShortQuiz) quiz, answer);
+            addShortAnswer((ShortQuiz) quiz, request.answer());
         }
         if (quiz instanceof MultipleQuiz) {
-            addChoiceCorrect((MultipleQuiz) quiz, answer);
+            addChoiceCorrect((MultipleQuiz) quiz, request.answer());
         }
     }
 
