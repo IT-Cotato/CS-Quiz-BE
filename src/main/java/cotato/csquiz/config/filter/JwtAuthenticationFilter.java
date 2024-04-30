@@ -44,8 +44,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     member.getEmail(), member.getPassword());
             return authenticationManager.authenticate(authenticationToken);
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.LOGIN_FAIL);
+        } catch (Exception e) {
+            throw new FilterAuthenticationException("로그인 시도에 실패했습니다.");
         }
     }
 
