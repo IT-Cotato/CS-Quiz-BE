@@ -44,9 +44,9 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
 
         try {
             jwtUtil.validateSocketToken(socketToken);
+            Long memberId = jwtUtil.getMemberId(socketToken);
             String role = jwtUtil.getRole(socketToken);
-            String email = jwtUtil.getEmail(socketToken);
-            attributes.put("email", email);
+            attributes.put("email", memberId);
             attributes.put("role", role);
             attributes.put("educationId", educationId);
             validateRole(role);

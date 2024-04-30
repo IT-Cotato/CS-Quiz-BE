@@ -31,9 +31,8 @@ public class MemberController {
     @GetMapping("/info")
     public ResponseEntity<MemberInfoResponse> memberInfo(@RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
-        String email = jwtUtil.getEmail(accessToken);
-        log.info("찾은 이메일: {}", email);
-        return ResponseEntity.ok().body(memberService.getMemberInfo(email));
+        Long memberId = jwtUtil.getMemberId(accessToken);
+        return ResponseEntity.ok().body(memberService.getMemberInfo(memberId));
     }
 
     @PostMapping("/check/password")

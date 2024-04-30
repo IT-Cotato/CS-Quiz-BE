@@ -7,8 +7,7 @@ import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.exception.FilterAuthenticationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -60,12 +59,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .orElseThrow()
                 .toString();
 
-        Token token = jwtUtil.createToken(principal.getUsername(), grantedAuthority);
+        Token token = jwtUtil.createToken(principal.getMember().getId(), grantedAuthority);
 
         String accessToken = token.getAccessToken();
         response.addHeader("accessToken", accessToken);
 
-        RefreshToken refreshToken = new RefreshToken(principal.getMember().getEmail(), token.getRefreshToken());
+        RefreshToken refreshToken = new RefreshToken(principal.getMember().getId(), token.getRefreshToken());
         refreshToken.updateRefreshToken(token.getRefreshToken());
         refreshTokenRepository.save(refreshToken);
 

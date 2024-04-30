@@ -40,11 +40,6 @@ public class JwtUtil {
                 .before(new Date());
     }
 
-    public String getEmail(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-                .getBody().get("email", String.class);
-    }
-
     public String resolveAccessToken(String authorizationHeader) {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             throw new FilterAuthenticationException("Bearer 토큰이 존재하지 않습니다.");
@@ -66,10 +61,10 @@ public class JwtUtil {
         return claims.get("type", String.class);
     }
 
-    public Token createToken(String email, String authority) {
+    public Token createToken(Long id, String authority) {
         return Token.builder()
-                .accessToken(createAccessToken(email, authority))
-                .refreshToken(createRefreshToken(email, authority))
+                .accessToken(createAccessToken(id, authority))
+                .refreshToken(createRefreshToken(id, authority))
                 .build();
     }
 
@@ -87,9 +82,9 @@ public class JwtUtil {
         return claims.getExpiration().getTime() - new Date().getTime();
     }
 
-    private String createAccessToken(String email, String authority) {
+    private String createAccessToken(Long id, String authority) {
         Claims claims = Jwts.claims();
-        claims.put("email", email);
+        claims.put("id", id);
         claims.put("role", authority);
         claims.put("type", TokenConstants.ACCESS_TOKEN);
         return Jwts.builder()
@@ -100,9 +95,9 @@ public class JwtUtil {
                 .compact();
     }
 
-    private String createRefreshToken(String email, String authority) {
+    private String createRefreshToken(Long id, String authority) {
         Claims claims = Jwts.claims();
-        claims.put("email", email);
+        claims.put("id", id);
         claims.put("role", authority);
         claims.put("type", TokenConstants.REFRESH_TOKEN);
         return Jwts.builder()
@@ -113,15 +108,15 @@ public class JwtUtil {
                 .compact();
     }
 
-    public void validateMemberExist(String email) {
-        if (!memberRepository.existsByEmail(email)) {
+    public void validateMemberExist(Long id) {
+        if (!memberRepository.existsById(id)) {
             throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
         }
     }
 
-    public String createSocketToken(String email, String role) {
+    public String createSocketToken(Long id, String role) {
         Claims claims = Jwts.claims();
-        claims.put("email", email);
+        claims.put("id", id);
         claims.put("role", role);
         claims.put("type", TokenConstants.SOCKET_TOKEN);
         return Jwts.builder()
@@ -150,5 +145,10 @@ public class JwtUtil {
 
     private boolean isBlocked(final String token) {
         return blackListRepository.existsById(token);
+    }
+
+    public Long getMemberId(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
+                .getBody().get("id", Long.class);
     }
 }

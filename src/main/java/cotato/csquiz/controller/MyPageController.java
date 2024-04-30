@@ -26,15 +26,13 @@ public class MyPageController {
     public ResponseEntity<HallOfFameResponse> getHallOfFame(@RequestParam("generationId") Long generationId,
                                                             @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
-        String email = jwtUtil.getEmail(accessToken);
-        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, email));
+        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, jwtUtil.getMemberId(accessToken)));
     }
 
     @GetMapping("/info")
     public ResponseEntity<MyPageMemberInfoResponse> userInfo(
             @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtUtil.getBearer(authorizationHeader);
-        String email = jwtUtil.getEmail(accessToken);
-        return ResponseEntity.ok(myPageService.getMemberInfo(email));
+        return ResponseEntity.ok(myPageService.getMemberInfo(jwtUtil.getMemberId(accessToken)));
     }
 }

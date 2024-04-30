@@ -141,9 +141,9 @@ public class SocketService {
     public SocketTokenDto createSocketToken(String authorizationHeader) {
         String token = jwtUtil.resolveAccessToken(authorizationHeader);
         String role = jwtUtil.getRole(token);
-        String email = jwtUtil.getEmail(token);
-        jwtUtil.validateMemberExist(email);
-        String socketToken = jwtUtil.createSocketToken(email, role);
+        Long memberId = jwtUtil.getMemberId(token);
+        jwtUtil.validateMemberExist(memberId);
+        String socketToken = jwtUtil.createSocketToken(memberId, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return SocketTokenDto.from(socketToken);
     }
