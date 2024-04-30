@@ -27,7 +27,6 @@ public class JwtUtil {
     Long refreshExpiration;
 
     private static final Long SOCKET_TOKEN_EXPIRATION = 1000 * 30L;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
     private final MemberRepository memberRepository;
 
