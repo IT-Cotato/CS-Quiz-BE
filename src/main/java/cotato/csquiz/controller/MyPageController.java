@@ -1,6 +1,6 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.controller.dto.mypage.HallOfFameResponse;
 import cotato.csquiz.controller.dto.mypage.MyPageMemberInfoResponse;
 import cotato.csquiz.service.MyPageService;
@@ -20,19 +20,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class MyPageController {
 
     private final MyPageService myPageService;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/hall-of-fame")
     public ResponseEntity<HallOfFameResponse> getHallOfFame(@RequestParam("generationId") Long generationId,
                                                             @RequestHeader("Authorization") String authorizationHeader) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
-        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, jwtUtil.getMemberId(accessToken)));
+        String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
+        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, jwtTokenProvider.getMemberId(accessToken)));
     }
 
     @GetMapping("/info")
     public ResponseEntity<MyPageMemberInfoResponse> userInfo(
             @RequestHeader("Authorization") String authorizationHeader) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
-        return ResponseEntity.ok(myPageService.getMemberInfo(jwtUtil.getMemberId(accessToken)));
+        String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
+        return ResponseEntity.ok(myPageService.getMemberInfo(jwtTokenProvider.getMemberId(accessToken)));
     }
 }

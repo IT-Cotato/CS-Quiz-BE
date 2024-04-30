@@ -1,6 +1,6 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.controller.dto.socket.EducationCloseRequest;
 import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
 import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
@@ -31,7 +31,7 @@ public class SocketService {
     private final EducationRepository educationRepository;
     private final KingMemberService kingMemberService;
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public void openCSQuiz(QuizOpenRequest request) {
@@ -139,11 +139,11 @@ public class SocketService {
 
     @Transactional
     public SocketTokenDto createSocketToken(String authorizationHeader) {
-        String token = jwtUtil.resolveAccessToken(authorizationHeader);
-        String role = jwtUtil.getRole(token);
-        Long memberId = jwtUtil.getMemberId(token);
-        jwtUtil.validateMemberExist(memberId);
-        String socketToken = jwtUtil.createSocketToken(memberId, role);
+        String token = jwtTokenProvider.resolveAccessToken(authorizationHeader);
+        String role = jwtTokenProvider.getRole(token);
+        Long memberId = jwtTokenProvider.getMemberId(token);
+        jwtTokenProvider.validateMemberExist(memberId);
+        String socketToken = jwtTokenProvider.createSocketToken(memberId, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return SocketTokenDto.from(socketToken);
     }

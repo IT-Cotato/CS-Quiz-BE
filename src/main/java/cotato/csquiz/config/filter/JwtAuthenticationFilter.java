@@ -2,7 +2,7 @@ package cotato.csquiz.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.config.auth.PrincipalDetails;
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private static final int REFRESH_TOKEN_AGE = 259200;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .orElseThrow()
                 .toString();
 
-        Token token = jwtUtil.createToken(principal.getMember().getId(), grantedAuthority);
+        Token token = jwtTokenProvider.createToken(principal.getMember().getId(), grantedAuthority);
 
         String accessToken = token.getAccessToken();
         response.addHeader("accessToken", accessToken);

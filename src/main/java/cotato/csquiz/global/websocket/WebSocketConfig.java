@@ -1,6 +1,6 @@
 package cotato.csquiz.global.websocket;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;
@@ -15,11 +15,11 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     private final WebSocketHandler webSocketHandler;
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(webSocketHandler, "/websocket/csquiz").setAllowedOrigins("*")
-                .addInterceptors(new HandshakeInterceptor(jwtUtil));
+                .addInterceptors(new HandshakeInterceptor(jwtTokenProvider));
     }
 }

@@ -1,6 +1,6 @@
 package cotato.csquiz.config.filter;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.FilterAuthenticationException;
 import cotato.csquiz.repository.MemberRepository;
@@ -30,28 +30,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static final String SWAGGER_PATH_3 = "/v3/api-docs";
     private static final String WS = "/websocket/csquiz";
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
-        String accessToken = jwtUtil.resolveAccessToken(authorizationHeader);
-        jwtUtil.validateAccessToken(accessToken);
+        String accessToken = jwtTokenProvider.resolveAccessToken(authorizationHeader);
+        jwtTokenProvider.validateAccessToken(accessToken);
 
         setAuthentication(accessToken);
         filterChain.doFilter(request, response);
     }
 
     private void setAuthentication(String accessToken) {
-        Long memberId = jwtUtil.getMemberId(accessToken);
+        Long memberId = jwtTokenProvider.getMemberId(accessToken);
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new FilterAuthenticationException("해당 회원이 존재하지 않습니다."));
-        String role = jwtUtil.getRole(accessToken);
+        String role = jwtTokenProvider.getRole(accessToken);
         log.info("[인증 필터 인증 진행, {}]", memberId);
         log.info("Member Role: {}", role);
-        jwtUtil.validateMemberExist(memberId);
+        jwtTokenProvider.validateMemberExist(memberId);
 
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(findMember.getEmail(), "",
                 List.of(new SimpleGrantedAuthority(role)));
