@@ -38,10 +38,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String memberEmail = findAttributeByToken(session, "email");
+        String memberId = findAttributeByToken(session, "memberId");
         String educationId = findAttributeByToken(session, "educationId");
-        log.info(memberEmail);
-        boolean isGeneral = connectSession(session, memberEmail); //true : 일반 회원 false : 관리자
+        log.info(memberId);
+        boolean isGeneral = connectSession(session, memberId); //true : 일반 회원 false : 관리자
         if (isGeneral) {
             checkQuizAlreadyStart(session, Long.parseLong(educationId));
         }
@@ -51,12 +51,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberEmail = findAttributeByToken(session, "email");
-        if (memberEmail != null) {
+        String memberId = findAttributeByToken(session, "memberId");
+        if (memberId != null) {
             String roleString = findAttributeByToken(session, "role");
             log.info("[연결된 역할] {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
-            disconnectSession(memberEmail, role);
+            disconnectSession(memberId, role);
         }
         log.info("[disconnect the session]");
         log.info("CLIENTS: {}", CLIENTS.keySet());
@@ -130,48 +130,48 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private boolean connectSession(WebSocketSession session, String memberEmail) {
-        if (memberEmail != null) {
+    private boolean connectSession(WebSocketSession session, String memberId) {
+        if (memberId != null) {
             String roleString = findAttributeByToken(session, "role");
             log.info("roleString {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
             log.info("role role {}", role);
-            return updateSession(session, memberEmail, role);
+            return updateSession(session, memberId, role);
         } else {
             log.warn("Email is null in session {}.", session.getId());
             throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
         }
     }
 
-    private boolean updateSession(WebSocketSession session, String memberEmail, MemberRole role) {
+    private boolean updateSession(WebSocketSession session, String memberId, MemberRole role) {
         return switch (role) {
             case EDUCATION -> {
-                updateManagerSession(memberEmail, session);
+                updateManagerSession(memberId, session);
                 yield false;
             }
             case MEMBER, ADMIN -> {
-                updateClientSession(memberEmail, session);
+                updateClientSession(memberId, session);
                 yield true;
             }
             default -> {
-                log.warn("Unknown role for member {}.", memberEmail);
+                log.warn("Unknown role for member {}.", memberId);
                 throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
             }
         };
     }
 
-    private void updateManagerSession(String memberEmail, WebSocketSession session) {
-        MANAGERS.put(memberEmail, session);
-        log.info("{} connect with Session {} in MANAGER", memberEmail, session);
+    private void updateManagerSession(String memberId, WebSocketSession session) {
+        MANAGERS.put(memberId, session);
+        log.info("{} connect with Session {} in MANAGER", memberId, session);
     }
 
-    private void updateClientSession(String memberEmail, WebSocketSession session) {
-        CLIENTS.put(memberEmail, session);
-        log.info("{} connect with Session {} in CLIENTS", memberEmail, session);
+    private void updateClientSession(String memberId, WebSocketSession session) {
+        CLIENTS.put(memberId, session);
+        log.info("{} connect with Session {} in CLIENTS", memberId, session);
     }
 
     private String findAttributeByToken(WebSocketSession session, String key) {
-        return (String) session.getAttributes().get(key);
+        return session.getAttributes().get(key).toString();
     }
 
     private void checkQuizAlreadyStart(WebSocketSession session, Long educationId) {
@@ -186,13 +186,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private void disconnectSession(String memberEmail, MemberRole role) {
+    private void disconnectSession(String memberId, MemberRole role) {
         switch (role) {
             case EDUCATION -> {
-                MANAGERS.remove(memberEmail);
+                MANAGERS.remove(memberId);
             }
             case MEMBER, ADMIN -> {
-                CLIENTS.remove(memberEmail);
+                CLIENTS.remove(memberId);
             }
             default -> {
                 throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
