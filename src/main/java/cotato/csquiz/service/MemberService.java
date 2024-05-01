@@ -1,6 +1,6 @@
 package cotato.csquiz.service;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.controller.dto.auth.MemberInfoResponse;
 import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
 import cotato.csquiz.domain.entity.Member;
@@ -22,12 +22,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final EncryptService encryptService;
     private final ValidateService validateService;
 
-    public MemberInfoResponse getMemberInfo(String email) {
-        Member findMember = memberRepository.findByEmail(email)
+    public MemberInfoResponse getMemberInfo(Long id) {
+        Member findMember = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
 
         String rawBackFourNumber = getBackFourNumber(findMember);
@@ -43,9 +43,9 @@ public class MemberService {
     }
 
     public void checkCorrectPassword(String accessToken, String password) {
-        String email = jwtUtil.getEmail(accessToken);
-        Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
+        Long memberId = jwtTokenProvider.getMemberId(accessToken);
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         if (!bCryptPasswordEncoder.matches(password, findMember.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
         }
@@ -53,9 +53,9 @@ public class MemberService {
 
     @Transactional
     public void updatePassword(String accessToken, String password) {
-        String email = jwtUtil.getEmail(accessToken);
-        Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
+        Long memberId = jwtTokenProvider.getMemberId(accessToken);
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         validateService.checkPasswordPattern(password);
         validateIsSameBefore(findMember.getPassword(), password);
 

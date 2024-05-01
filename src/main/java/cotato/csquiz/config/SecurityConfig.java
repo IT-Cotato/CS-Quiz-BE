@@ -3,7 +3,7 @@ package cotato.csquiz.config;
 import cotato.csquiz.config.filter.JwtAuthenticationFilter;
 import cotato.csquiz.config.filter.JwtAuthorizationFilter;
 import cotato.csquiz.config.filter.JwtExceptionFilter;
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +29,7 @@ public class SecurityConfig {
             "/websocket/csquiz"
     };
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CorsFilter corsFilter;
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
@@ -51,7 +51,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .cors().disable()
                 .formLogin().disable()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtil, refreshTokenRepository))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider, refreshTokenRepository))
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthorizationFilter.class)
                 .addFilter(corsFilter)

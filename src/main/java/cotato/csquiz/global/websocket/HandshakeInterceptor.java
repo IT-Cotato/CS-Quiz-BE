@@ -1,6 +1,6 @@
 package cotato.csquiz.global.websocket;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.exception.InterceptorException;
 import cotato.csquiz.exception.InterceptorRoleException;
@@ -20,7 +20,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @Slf4j
 public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
 
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler,
@@ -43,10 +43,10 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
         }
 
         try {
-            jwtUtil.validateSocketToken(socketToken);
-            String role = jwtUtil.getRole(socketToken);
-            String email = jwtUtil.getEmail(socketToken);
-            attributes.put("email", email);
+            jwtTokenProvider.validateSocketToken(socketToken);
+            Long memberId = jwtTokenProvider.getMemberId(socketToken);
+            String role = jwtTokenProvider.getRole(socketToken);
+            attributes.put("email", memberId);
             attributes.put("role", role);
             attributes.put("educationId", educationId);
             validateRole(role);

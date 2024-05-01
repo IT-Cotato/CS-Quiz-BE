@@ -1,6 +1,6 @@
 package cotato.csquiz.controller;
 
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.controller.dto.auth.MemberInfoResponse;
 import cotato.csquiz.controller.dto.member.CheckPasswordRequest;
 import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
@@ -26,20 +26,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/info")
     public ResponseEntity<MemberInfoResponse> memberInfo(@RequestHeader("Authorization") String authorizationHeader) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
-        String email = jwtUtil.getEmail(accessToken);
-        log.info("찾은 이메일: {}", email);
-        return ResponseEntity.ok().body(memberService.getMemberInfo(email));
+        String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
+        Long memberId = jwtTokenProvider.getMemberId(accessToken);
+        return ResponseEntity.ok().body(memberService.getMemberInfo(memberId));
     }
 
     @PostMapping("/check/password")
     public ResponseEntity<Void> checkPassword(@RequestHeader("Authorization") String authorizationHeader,
                                               @RequestBody @Valid CheckPasswordRequest request) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
+        String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
         memberService.checkCorrectPassword(accessToken, request.password());
         return ResponseEntity.noContent().build();
     }
@@ -47,7 +46,7 @@ public class MemberController {
     @PatchMapping("/update/password")
     public ResponseEntity<Void> updatePassword(@RequestHeader("Authorization") String authorizationHeader,
                                                @RequestBody @Valid UpdatePasswordRequest request) {
-        String accessToken = jwtUtil.getBearer(authorizationHeader);
+        String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
         memberService.updatePassword(accessToken, request.password());
         return ResponseEntity.noContent().build();
     }

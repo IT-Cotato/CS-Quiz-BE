@@ -1,7 +1,7 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.BlackListRepository;
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
@@ -39,7 +39,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final ValidateService validateService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final BlackListRepository blackListRepository;
     private final EmailVerificationService emailVerificationService;
@@ -69,21 +69,23 @@ public class AuthService {
 
     @Transactional
     public ReissueResponse reissue(String refreshToken, HttpServletResponse response) {
-        if (jwtUtil.isExpired(refreshToken) || blackListRepository.existsById(refreshToken)) {
+        if (jwtTokenProvider.isExpired(refreshToken) || blackListRepository.existsById(refreshToken)) {
             log.warn("블랙리스트에 존재하는 토큰: {}", blackListRepository.existsById(refreshToken));
             throw new AppException(ErrorCode.REISSUE_FAIL);
         }
-        String email = jwtUtil.getEmail(refreshToken);
-        String role = jwtUtil.getRole(refreshToken);
-        RefreshToken findToken = refreshTokenRepository.findById(email)
+        Long memberId = jwtTokenProvider.getMemberId(refreshToken);
+        String role = jwtTokenProvider.getRole(refreshToken);
+
+        RefreshToken findToken = refreshTokenRepository.findById(memberId)
                 .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
         log.info("[브라우저에서 들어온 쿠키] == [DB에 저장된 토큰], {}", refreshToken.equals(findToken.getRefreshToken()));
+
         if (!refreshToken.equals(findToken.getRefreshToken())) {
             log.warn("[쿠키로 들어온 토큰과 DB의 토큰이 일치하지 않음.]");
             throw new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST);
         }
-        jwtUtil.setBlackList(refreshToken);
-        Token token = jwtUtil.createToken(email, role);
+        jwtTokenProvider.setBlackList(refreshToken);
+        Token token = jwtTokenProvider.createToken(memberId, role);
         findToken.updateRefreshToken(token.getRefreshToken());
         refreshTokenRepository.save(findToken);
 
@@ -99,10 +101,10 @@ public class AuthService {
 
     @Transactional
     public void logout(LogoutRequest request, String refreshToken, HttpServletResponse response) {
-        String email = jwtUtil.getEmail(refreshToken);
-        RefreshToken existRefreshToken = refreshTokenRepository.findById(email)
+        Long memberId = jwtTokenProvider.getMemberId(refreshToken);
+        RefreshToken existRefreshToken = refreshTokenRepository.findById(memberId)
                 .orElseThrow(() -> new AppException(ErrorCode.REFRESH_TOKEN_NOT_EXIST));
-        jwtUtil.setBlackList(refreshToken);
+        jwtTokenProvider.setBlackList(refreshToken);
         log.info("[로그아웃 된 리프레시 토큰 블랙리스트 처리]");
         refreshTokenRepository.delete(existRefreshToken);
         Cookie deleteCookie = new Cookie(REFRESH_TOKEN, null);
@@ -111,7 +113,7 @@ public class AuthService {
         deleteCookie.setSecure(true);
         deleteCookie.setHttpOnly(true);
         response.addCookie(deleteCookie);
-        jwtUtil.setBlackList(request.accessToken());
+        jwtTokenProvider.setBlackList(request.accessToken());
         log.info("[로그아웃 된 액세스 토큰 블랙리스트 처리]");
     }
 
@@ -134,7 +136,8 @@ public class AuthService {
         Member findMember = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
         String role = findMember.getRole().getKey();
-        Token token = jwtUtil.createToken(email, role);
+
+        Token token = jwtTokenProvider.createToken(findMember.getId(), role);
         return FindPasswordResponse.builder()
                 .accessToken(token.getAccessToken())
                 .build();

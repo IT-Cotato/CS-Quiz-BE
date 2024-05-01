@@ -2,13 +2,12 @@ package cotato.csquiz.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cotato.csquiz.config.auth.PrincipalDetails;
-import cotato.csquiz.config.jwt.JwtUtil;
+import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.config.jwt.RefreshToken;
 import cotato.csquiz.config.jwt.RefreshTokenRepository;
 import cotato.csquiz.config.jwt.Token;
 import cotato.csquiz.domain.entity.Member;
-import cotato.csquiz.exception.AppException;
-import cotato.csquiz.exception.ErrorCode;
+import cotato.csquiz.exception.FilterAuthenticationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -31,7 +30,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private static final int REFRESH_TOKEN_AGE = 259200;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
 
@@ -45,8 +44,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     member.getEmail(), member.getPassword());
             return authenticationManager.authenticate(authenticationToken);
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.LOGIN_FAIL);
+        } catch (Exception e) {
+            throw new FilterAuthenticationException("로그인 시도에 실패했습니다.");
         }
     }
 
@@ -60,12 +59,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .orElseThrow()
                 .toString();
 
-        Token token = jwtUtil.createToken(principal.getUsername(), grantedAuthority);
+        Token token = jwtTokenProvider.createToken(principal.getMember().getId(), grantedAuthority);
 
         String accessToken = token.getAccessToken();
         response.addHeader("accessToken", accessToken);
 
-        RefreshToken refreshToken = new RefreshToken(principal.getMember().getEmail(), token.getRefreshToken());
+        RefreshToken refreshToken = new RefreshToken(principal.getMember().getId(), token.getRefreshToken());
         refreshToken.updateRefreshToken(token.getRefreshToken());
         refreshTokenRepository.save(refreshToken);
 

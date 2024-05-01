@@ -36,7 +36,7 @@ public class MyPageService {
     private final MemberRepository memberRepository;
     private final EncryptService encryptService;
 
-    public HallOfFameResponse getHallOfFame(Long generationId, String email) {
+    public HallOfFameResponse getHallOfFame(Long generationId, Long memberId) {
         Generation findGeneration = generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
         log.info("============{}기에 존재하는 모든 퀴즈 조회================", findGeneration.getNumber());
@@ -44,13 +44,13 @@ public class MyPageService {
         log.info("============{}기에 존재하는 모든 득점자 조회================", findGeneration.getNumber());
         List<HallOfFameInfo> answerHallOfFame = makeRecordsHallOfFameInfo(findGeneration);
         log.info("============{}기에 존재하는 모든 정답자 조회================", findGeneration.getNumber());
-        Member member = findMemberByEmail(email);
+        Member member = findMemberById(memberId);
         MyHallOfFameInfo myHallOfFameInfo1 = makeMyHallOfFameInfo(member, findGeneration);
         return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo1);
     }
 
-    public MyPageMemberInfoResponse getMemberInfo(String email) {
-        Member member = findMemberByEmail(email);
+    public MyPageMemberInfoResponse getMemberInfo(Long memberId) {
+        Member member = findMemberById(memberId);
         String originPhoneNumber = encryptService.decryptPhoneNumber(member.getPhoneNumber());
         return MyPageMemberInfoResponse.from(member, originPhoneNumber);
     }
@@ -61,9 +61,9 @@ public class MyPageService {
         return MyHallOfFameInfo.from(member, scorerCount, answerCount);
     }
 
-    private Member findMemberByEmail(String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 멤버를 찾을 수 없습니다."));
+    private Member findMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id를 가진 멤버를 찾을 수 없습니다."));
     }
 
     private long countMyScorer(Member member, Generation generation) {
