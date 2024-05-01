@@ -41,8 +41,8 @@ public class SocketController {
     }
 
     @PatchMapping("/start")
-    public ResponseEntity<Void> startQuiz(@RequestBody @Valid QuizSocketRequest request) {
-        socketService.startQuiz(request);
+    public ResponseEntity<Void> startQuizSolve(@RequestBody @Valid QuizSocketRequest request) {
+        socketService.startQuizSolve(request);
         return ResponseEntity.noContent().build();
     }
 
@@ -53,8 +53,8 @@ public class SocketController {
     }
 
     @PatchMapping("/stop")
-    public ResponseEntity<Void> stopQuiz(@RequestBody @Valid QuizSocketRequest request) {
-        socketService.stopQuiz(request);
+    public ResponseEntity<Void> stopQuizSolve(@RequestBody @Valid QuizSocketRequest request) {
+        socketService.stopQuizSolve(request);
         return ResponseEntity.noContent().build();
     }
 

@@ -7,7 +7,7 @@ public record HallOfFameResponse(
         List<HallOfFameInfo> answerInfo,
         MyHallOfFameInfo myInfo
 ) {
-    public static HallOfFameResponse from(
+    public static HallOfFameResponse of(
             List<HallOfFameInfo> scorerInfo, List<HallOfFameInfo> answerInfo, MyHallOfFameInfo myInfo) {
         return new HallOfFameResponse(
                 scorerInfo,

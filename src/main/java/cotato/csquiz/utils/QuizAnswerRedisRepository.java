@@ -41,24 +41,29 @@ public class QuizAnswerRedisRepository {
         if (quiz instanceof ShortQuiz) {
             ShortAnswer shortAnswer = shortAnswerRepository.findByShortQuizAndContent((ShortQuiz) quiz, answer)
                     .orElseThrow(() -> new AppException(ErrorCode.CONTENT_IS_NOT_ANSWER));
+
             saveAdditionalShortQuizAnswer(quiz, shortAnswer.getContent());
         }
+
         if (quiz instanceof MultipleQuiz) {
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber((MultipleQuiz) quiz,
                             Integer.parseInt(answer))
                     .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
+
             saveAdditionalMultipleQuizAnswer(quiz, choice.getChoiceNumber());
         }
     }
 
     private void saveAdditionalMultipleQuizAnswer(Quiz quiz, Integer answerNumber) {
         String quizKey = KEY_PREFIX + quiz.getId();
+
         redisTemplate.opsForList().rightPush(quizKey, answerNumber);
         redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }
 
     private void saveAdditionalShortQuizAnswer(Quiz quiz, String answer) {
         String quizKey = KEY_PREFIX + quiz.getId();
+
         redisTemplate.opsForList().rightPush(quizKey, answer);
         redisTemplate.expire(quizKey, QUIZ_ANSWER_EXPIRATION_TIME, TimeUnit.MINUTES);
     }

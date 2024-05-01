@@ -31,9 +31,9 @@ public class RecordController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<RecordsAndScorerResponse> getAllRecordsByQuiz(@RequestParam("quizId") Long quizId) {
+    public ResponseEntity<RecordsAndScorerResponse> findRecordsAndScorerByQuiz(@RequestParam("quizId") Long quizId) {
         log.info("문제에 답한 기록 반환 컨트롤러, 문제 pk: {}", quizId);
-        return ResponseEntity.ok().body(recordService.getRecordsAndScorer(quizId));
+        return ResponseEntity.ok().body(recordService.findRecordsAndScorer(quizId));
     }
 
     @PostMapping("/regrade")

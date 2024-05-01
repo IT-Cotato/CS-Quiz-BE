@@ -69,19 +69,18 @@ public class QuizService {
     public void createQuizzes(Long educationId, CreateQuizzesRequest request) throws ImageException {
         Education findEducation = findEducationById(educationId);
         checkQuizBefore(findEducation);
+
         log.info("등록할 교육 회차 : {}회차", findEducation.getNumber());
         List<Integer> quizNumbers = Stream.concat(
-                request.getMultiples().stream().map(CreateMultipleQuizRequest::getNumber),
-                request.getShortQuizzes().stream().map(CreateShortQuizRequest::getNumber)
+                request.getMultiples().stream()
+                        .map(CreateMultipleQuizRequest::getNumber),
+                request.getShortQuizzes().stream()
+                        .map(CreateShortQuizRequest::getNumber)
         ).toList();
-        validateQuizNumbers(quizNumbers);
+        
+        checkQuizNumbersDistinct(quizNumbers);
 
-        List<Long> ids = quizRepository.findAllByEducationId(educationId).stream()
-                .map(Quiz::getId)
-                .toList();
-        choiceRepository.deleteAllByQuizIdsInQuery(ids);
-        shortAnswerRepository.deleteAllByQuizIdsInQuery(ids);
-        quizRepository.deleteAllByQuizIdsInQuery(ids);
+        deleteAllQuizByEducation(educationId);
 
         for (CreateShortQuizRequest shortQuizRequest : request.getShortQuizzes()) {
             createShortQuiz(findEducation, shortQuizRequest);
@@ -91,7 +90,17 @@ public class QuizService {
         }
     }
 
-    private void validateQuizNumbers(final List<Integer> numbers) {
+    private void deleteAllQuizByEducation(Long educationId) {
+        List<Long> quizIds = quizRepository.findAllByEducationId(educationId).stream()
+                .map(Quiz::getId)
+                .toList();
+
+        choiceRepository.deleteAllByQuizIdsInQuery(quizIds);
+        shortAnswerRepository.deleteAllByQuizIdsInQuery(quizIds);
+        quizRepository.deleteAllByQuizIdsInQuery(quizIds);
+    }
+
+    private void checkQuizNumbersDistinct(final List<Integer> numbers) {
         Set<Integer> distinctNumbers = new HashSet<>(numbers);
         if (numbers.size() != distinctNumbers.size()) {
             throw new AppException(ErrorCode.QUIZ_NUMBER_DUPLICATED);
@@ -99,18 +108,21 @@ public class QuizService {
     }
 
     @Transactional
-    public List<QuizResultInfo> findQuizResults(Long educationId) {
-        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+    public List<QuizResultInfo> createQuizResults(Long educationId) {
+        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
+
         return quizzes.stream()
-                .map(this::makeQuizResultInfo)
+                .map(this::createQuizResultInfo)
                 .toList();
     }
 
-    private QuizResultInfo makeQuizResultInfo(Quiz quiz) {
+    private QuizResultInfo createQuizResultInfo(Quiz quiz) {
         Optional<Scorer> mayBeScorer = scorerRepository.findByQuiz(quiz);
+
         if (mayBeScorer.isPresent()) {
             Member member = mayBeScorer.get().getMember();
-            return QuizResultInfo.from(quiz, member, memberService.getBackFourNumber(member));
+
+            return QuizResultInfo.of(quiz, member, memberService.getBackFourNumber(member));
         }
         return QuizResultInfo.noScorer(quiz);
     }
@@ -202,12 +214,12 @@ public class QuizService {
 
     @Transactional
     public AllQuizzesResponse findAllQuizzesForEducationTeam(Long educationId) {
-        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
+
         List<MultipleQuizResponse> multiples = quizzes.stream()
                 .filter(quiz -> quiz instanceof MultipleQuiz)
                 .map(this::toMultipleQuizResponse)
                 .toList();
-
         List<ShortQuizResponse> shortQuizzes = quizzes.stream()
                 .filter(quiz -> quiz instanceof ShortQuiz)
                 .map(this::toShortQuizResponse)
@@ -220,11 +232,13 @@ public class QuizService {
     }
 
     @Transactional
-    public AllQuizzesInCsQuizResponse getAllQuizzesInCsQuiz(Long educationId) {
-        List<Quiz> quizzes = findQuizzesFromEducationId(educationId);
+    public AllQuizzesInCsQuizResponse findAllQuizzesForAdminCsQuiz(Long educationId) {
+        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
+
         List<CsAdminQuizResponse> responses = quizzes.stream()
                 .map(CsAdminQuizResponse::from)
                 .toList();
+
         return AllQuizzesInCsQuizResponse.from(responses);
     }
 
@@ -246,20 +260,24 @@ public class QuizService {
     @Transactional
     public QuizResponse findOneQuizForMember(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
+
         if (findQuiz instanceof MultipleQuiz) {
             List<ChoiceResponse> choiceResponses = choiceRepository.findAllByMultipleQuiz((MultipleQuiz) findQuiz)
                     .stream()
                     .map(ChoiceResponse::forMember)
                     .toList();
+
             return FindMultipleQuizResponse.from(findQuiz, choiceResponses);
         }
+
         return QuizResponse.from((ShortQuiz) findQuiz);
     }
 
     @Transactional
-    public QuizInfoInCsQuizResponse getQuizInCsQuiz(Long quizId) {
+    public QuizInfoInCsQuizResponse findQuizForAdminCsQuiz(Long quizId) {
         Quiz quiz = findQuizById(quizId);
         List<String> answers = getAnswerList(quiz);
+
         return QuizInfoInCsQuizResponse.from(quiz, answers);
     }
 
@@ -292,15 +310,17 @@ public class QuizService {
             addShortAnswer((ShortQuiz) quiz, request.answer());
         }
         if (quiz instanceof MultipleQuiz) {
-            addChoiceCorrect((MultipleQuiz) quiz, request.answer());
+            addCorrectChoice((MultipleQuiz) quiz, request.answer());
         }
     }
 
     private void addShortAnswer(ShortQuiz shortQuiz, String answer) {
         checkAnswerAlreadyExist(shortQuiz, answer);
+
         String cleanedAnswer = answer.toLowerCase()
                 .trim();
         ShortAnswer shortAnswer = ShortAnswer.of(cleanedAnswer, shortQuiz);
+
         shortAnswerRepository.save(shortAnswer);
     }
 
@@ -311,12 +331,13 @@ public class QuizService {
                 });
     }
 
-    private void addChoiceCorrect(MultipleQuiz multipleQuiz, String answer) {
+    private void addCorrectChoice(MultipleQuiz multipleQuiz, String answer) {
         try {
             int choiceNumber = Integer.parseInt(answer);
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber)
                     .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
-            choice.changeCorrect(ChoiceCorrect.ANSWER);
+
+            choice.updateCorrect(ChoiceCorrect.ANSWER);
         } catch (NumberFormatException e) {
             throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
         }
@@ -327,7 +348,7 @@ public class QuizService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
     }
 
-    private List<Quiz> findQuizzesFromEducationId(Long educationId) {
+    private List<Quiz> findQuizzesByEducationId(Long educationId) {
         return quizRepository.findAllByEducationId(educationId);
     }
 

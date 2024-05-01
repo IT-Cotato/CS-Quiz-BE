@@ -107,7 +107,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateMemberExist(Long id) {
+    public void checkMemberExist(Long id) {
         if (!memberRepository.existsById(id)) {
             throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
         }

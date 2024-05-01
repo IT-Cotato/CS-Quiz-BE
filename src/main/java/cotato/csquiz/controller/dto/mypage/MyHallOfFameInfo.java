@@ -7,7 +7,7 @@ public record MyHallOfFameInfo(
         long scorerCount,
         long answerCount
 ) {
-    public static MyHallOfFameInfo from(Member member, long scorerCount, long answerCount) {
+    public static MyHallOfFameInfo of(Member member, long scorerCount, long answerCount) {
         return new MyHallOfFameInfo(
                 member.getId(),
                 scorerCount,

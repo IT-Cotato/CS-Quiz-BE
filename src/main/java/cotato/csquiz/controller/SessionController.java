@@ -3,9 +3,9 @@ package cotato.csquiz.controller;
 import cotato.csquiz.controller.dto.session.AddSessionRequest;
 import cotato.csquiz.controller.dto.session.AddSessionResponse;
 import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.controller.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionDescriptionRequest;
 import cotato.csquiz.controller.dto.session.SessionListResponse;
-import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionPhotoRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.exception.ImageException;
@@ -34,7 +34,7 @@ public class SessionController {
     private final SessionService sessionService;
 
     @GetMapping("")
-    public ResponseEntity<List<SessionListResponse>> getSessions(@RequestParam Long generationId) {
+    public ResponseEntity<List<SessionListResponse>> findSessionsByGenerationId(@RequestParam Long generationId) {
         return ResponseEntity.status(HttpStatus.OK).body(sessionService.findSessionsByGenerationId(generationId));
     }
 
@@ -53,26 +53,26 @@ public class SessionController {
     }
 
     @PatchMapping("/number")
-    public ResponseEntity<Void> changeSessionNum(@RequestBody @Valid UpdateSessionNumberRequest request) {
-        sessionService.changeSessionNumber(request);
+    public ResponseEntity<Void> updateSessionNumber(@RequestBody @Valid UpdateSessionNumberRequest request) {
+        sessionService.updateSessionNumber(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/description")
-    public ResponseEntity<Void> changeContent(@RequestBody @Valid SessionDescriptionRequest request) {
-        sessionService.changeDescription(request);
+    public ResponseEntity<Void> updateSessionDescription(@RequestBody @Valid UpdateSessionDescriptionRequest request) {
+        sessionService.updateSessionDescription(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/update/photo", consumes = "multipart/form-data")
-    public ResponseEntity<Void> changePhotoUrl(@ModelAttribute @Valid SessionPhotoUrlRequest request)
+    public ResponseEntity<Void> updateSessionPhoto(@ModelAttribute @Valid UpdateSessionPhotoRequest request)
             throws ImageException {
-        sessionService.changePhotoUrl(request);
+        sessionService.updateSessionPhoto(request);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/cs-on")
-    public ResponseEntity<List<CsEducationOnSessionNumberResponse>> getSessionsWithCsEducationOn(
+    public ResponseEntity<List<CsEducationOnSessionNumberResponse>> findAllCsOnSessionsByGenerationId(
             @RequestParam Long generationId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(sessionService.findAllCsOnSessionsByGenerationId(generationId));

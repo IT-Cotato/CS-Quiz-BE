@@ -6,6 +6,7 @@ import cotato.csquiz.controller.dto.socket.QuizOpenRequest;
 import cotato.csquiz.controller.dto.socket.QuizSocketRequest;
 import cotato.csquiz.controller.dto.socket.SocketTokenDto;
 import cotato.csquiz.domain.entity.Education;
+import cotato.csquiz.domain.entity.KingMember;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.EducationStatus;
 import cotato.csquiz.domain.enums.QuizStatus;
@@ -15,6 +16,7 @@ import cotato.csquiz.global.websocket.WebSocketHandler;
 import cotato.csquiz.repository.EducationRepository;
 import cotato.csquiz.repository.QuizRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class SocketService {
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.educationId());
         checkEducationBefore(education);
-        education.changeStatus(EducationStatus.ONGOING);
+        education.updateStatus(EducationStatus.ONGOING);
     }
 
     @Transactional
@@ -57,7 +59,7 @@ public class SocketService {
     }
 
     @Transactional
-    public void startQuiz(QuizSocketRequest request) {
+    public void startQuizSolve(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
@@ -75,16 +77,19 @@ public class SocketService {
     }
 
     @Transactional
-    public void stopQuiz(QuizSocketRequest request) {
+    public void stopQuizSolve(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
         checkEducationOpen(quiz.getEducation());
+
         quiz.updateStart(QuizStatus.QUIZ_OFF);
         if (quiz.getNumber() == 9) {
-            kingMemberService.calculateKingMember(quiz);
+            List<KingMember> kingMembers = kingMemberService.calculateKingMember(quiz.getEducation());
+            kingMemberService.saveKingMembers(kingMembers);
+            kingMemberService.saveWinnerIfKingMemberIsOne(kingMembers, quiz.getEducation());
             webSocketHandler.stopQuiz(quiz);
         }
         if (quiz.getNumber() == 10) {
-            kingMemberService.saveWinner(quiz);
+            kingMemberService.saveWinnerIfNoWinnerExist(quiz);
             webSocketHandler.stopQuiz(quiz);
         }
     }
@@ -92,8 +97,10 @@ public class SocketService {
     @Transactional
     public void stopAllQuiz(EducationCloseRequest request) {
         closeAllFlags();
+
         Education education = findEducationById(request.educationId());
-        education.changeStatus(EducationStatus.FINISHED);
+
+        education.updateStatus(EducationStatus.FINISHED);
         webSocketHandler.stopAllQuiz(education.getId());
     }
 
@@ -142,7 +149,8 @@ public class SocketService {
         String token = jwtTokenProvider.resolveAccessToken(authorizationHeader);
         String role = jwtTokenProvider.getRole(token);
         Long memberId = jwtTokenProvider.getMemberId(token);
-        jwtTokenProvider.validateMemberExist(memberId);
+        jwtTokenProvider.checkMemberExist(memberId);
+
         String socketToken = jwtTokenProvider.createSocketToken(memberId, role);
         log.info("[ 소켓 전용 토큰 발급 완료 ]");
         return SocketTokenDto.from(socketToken);

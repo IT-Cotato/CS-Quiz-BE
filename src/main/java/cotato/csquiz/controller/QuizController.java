@@ -38,6 +38,7 @@ public class QuizController {
     public ResponseEntity<Void> addAllQuizzes(@ModelAttribute CreateQuizzesRequest request,
                                               @RequestParam("educationId") Long educationId) throws ImageException {
         quizService.createQuizzes(educationId, request);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -53,25 +54,26 @@ public class QuizController {
     }
 
     @GetMapping("/cs-admin/all")
-    public ResponseEntity<AllQuizzesInCsQuizResponse> getAllQuizzesInCsQuiz(
+    public ResponseEntity<AllQuizzesInCsQuizResponse> findAllQuizzesForAdminCsQuiz(
             @RequestParam("educationId") Long educationId) {
-        return ResponseEntity.ok(quizService.getAllQuizzesInCsQuiz(educationId));
+        return ResponseEntity.ok(quizService.findAllQuizzesForAdminCsQuiz(educationId));
     }
 
     @GetMapping("/cs-admin")
-    public ResponseEntity<QuizInfoInCsQuizResponse> getQuizInCsQuiz(@RequestParam("quizId") Long quizId) {
-        return ResponseEntity.ok(quizService.getQuizInCsQuiz(quizId));
+    public ResponseEntity<QuizInfoInCsQuizResponse> findQuizForAdminCsQuiz(@RequestParam("quizId") Long quizId) {
+        return ResponseEntity.ok(quizService.findQuizForAdminCsQuiz(quizId));
     }
 
     @PostMapping("/cs-admin/answer/add")
     public ResponseEntity<Void> addAnswer(@RequestBody @Valid AddAdditionalAnswerRequest request) {
         quizService.addAdditionalAnswer(request);
         recordService.addAdditionalAnswerToRedis(request);
+
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/cs-admin/results")
     public ResponseEntity<List<QuizResultInfo>> quizResults(@RequestParam("educationId") Long educationId) {
-        return ResponseEntity.ok(quizService.findQuizResults(educationId));
+        return ResponseEntity.ok(quizService.createQuizResults(educationId));
     }
 }

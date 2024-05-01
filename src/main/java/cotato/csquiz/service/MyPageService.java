@@ -36,29 +36,33 @@ public class MyPageService {
     private final MemberRepository memberRepository;
     private final EncryptService encryptService;
 
-    public HallOfFameResponse getHallOfFame(Long generationId, Long memberId) {
+    public HallOfFameResponse findHallOfFame(Long generationId, Long memberId) {
         Generation findGeneration = generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
-        log.info("============{}기에 존재하는 모든 퀴즈 조회================", findGeneration.getNumber());
-        List<HallOfFameInfo> scorerHallOfFame = makeScorerHallOfFame(findGeneration);
+
         log.info("============{}기에 존재하는 모든 득점자 조회================", findGeneration.getNumber());
-        List<HallOfFameInfo> answerHallOfFame = makeRecordsHallOfFameInfo(findGeneration);
+        List<HallOfFameInfo> scorerHallOfFame = createScorerHallOfFameByGeneration(findGeneration);
         log.info("============{}기에 존재하는 모든 정답자 조회================", findGeneration.getNumber());
+        List<HallOfFameInfo> answerHallOfFame = createRecordsHallOfFameInfoByGeneration(findGeneration);
+
         Member member = findMemberById(memberId);
-        MyHallOfFameInfo myHallOfFameInfo1 = makeMyHallOfFameInfo(member, findGeneration);
-        return HallOfFameResponse.from(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo1);
+        MyHallOfFameInfo myHallOfFameInfo = createMyHallOfFameInfoByGeneration(member, findGeneration);
+
+        return HallOfFameResponse.of(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo);
     }
 
-    public MyPageMemberInfoResponse getMemberInfo(Long memberId) {
+    public MyPageMemberInfoResponse findMemberInfo(Long memberId) {
         Member member = findMemberById(memberId);
         String originPhoneNumber = encryptService.decryptPhoneNumber(member.getPhoneNumber());
-        return MyPageMemberInfoResponse.from(member, originPhoneNumber);
+
+        return MyPageMemberInfoResponse.of(member, originPhoneNumber);
     }
 
-    private MyHallOfFameInfo makeMyHallOfFameInfo(Member member, Generation generation) {
-        long scorerCount = countMyScorer(member, generation);
-        long answerCount = countMyAnswer(member, generation);
-        return MyHallOfFameInfo.from(member, scorerCount, answerCount);
+    private MyHallOfFameInfo createMyHallOfFameInfoByGeneration(Member member, Generation generation) {
+        long scorerCount = countMyScorerByGeneration(member, generation);
+        long answerCount = countMyAnswerByGeneration(member, generation);
+
+        return MyHallOfFameInfo.of(member, scorerCount, answerCount);
     }
 
     private Member findMemberById(Long id) {
@@ -66,43 +70,47 @@ public class MyPageService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 id를 가진 멤버를 찾을 수 없습니다."));
     }
 
-    private long countMyScorer(Member member, Generation generation) {
-        List<Scorer> scorerList = findScorersByQuizzes(generation);
+    private long countMyScorerByGeneration(Member member, Generation generation) {
+        List<Scorer> myScorers = findScorersByQuizzes(generation);
 
-        return scorerList.stream()
+        return myScorers.stream()
                 .filter(scorer -> scorer.getMember().equals(member))
                 .count();
     }
 
-    private long countMyAnswer(Member member, Generation generation) {
-        List<Record> records = findRecordByQuizzes(generation);
-        return records.stream()
+    private long countMyAnswerByGeneration(Member member, Generation generation) {
+        List<Record> myRecords = findRecordByQuizzes(generation);
+
+        return myRecords.stream()
                 .filter(record -> record.getMember().equals(member))
                 .count();
     }
 
-    private List<HallOfFameInfo> makeRecordsHallOfFameInfo(Generation generation) {
+    private List<HallOfFameInfo> createRecordsHallOfFameInfoByGeneration(Generation generation) {
         List<Record> records = findRecordByQuizzes(generation);
         Map<Member, Long> countByMember = records.stream()
                 .collect(Collectors.groupingBy(Record::getMember, Collectors.counting()));
-        List<Entry<Member, Long>> sorted5MemberEntry = sorted5MemberEntry(countByMember);
+        List<Entry<Member, Long>> sorted5MemberEntry = sortTopMemberEntry(countByMember);
         return sorted5MemberEntry.stream()
                 .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    private List<HallOfFameInfo> makeScorerHallOfFame(Generation generation) {
+    private List<HallOfFameInfo> createScorerHallOfFameByGeneration(Generation generation) {
         List<Scorer> scorers = findScorersByQuizzes(generation);
-        Map<Member, Long> countByMember = scorers.stream()
+
+        Map<Member, Long> memberScoreMap = scorers.stream()
                 .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
-        List<Map.Entry<Member, Long>> sorted5MemberEntry = sorted5MemberEntry(countByMember);
-        return sorted5MemberEntry.stream()
+        List<Map.Entry<Member, Long>> topMemberEntry = sortTopMemberEntry(memberScoreMap);
+
+        return topMemberEntry.stream()
                 .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
     private List<Scorer> findScorersByQuizzes(Generation generation) {
         List<Quiz> quizzes = quizRepository.findAllFetchJoinByScorer();
+
         return quizzes.stream().
                 filter(quiz -> quiz.getGeneration().equals(generation))
                 .map(Quiz::getScorer)
@@ -123,7 +131,7 @@ public class MyPageService {
         return records;
     }
 
-    private List<Entry<Member, Long>> sorted5MemberEntry(Map<Member, Long> countByMember) {
+    private List<Entry<Member, Long>> sortTopMemberEntry(Map<Member, Long> countByMember) {
         return countByMember.entrySet().stream()
                 .sorted(Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(SHOW_PEOPLE_COUNT)

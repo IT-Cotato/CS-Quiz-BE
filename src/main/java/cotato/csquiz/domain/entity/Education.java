@@ -50,7 +50,7 @@ public class Education extends BaseTimeEntity {
         status = EducationStatus.BEFORE;
     }
 
-    public void changeStatus(EducationStatus status) {
+    public void updateStatus(EducationStatus status) {
         this.status = status;
     }
 

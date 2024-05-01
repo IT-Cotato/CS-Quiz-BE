@@ -77,7 +77,7 @@ public class Session extends BaseTimeEntity {
         this.number = sessionNumber;
     }
 
-    public void changeDescription(String description) {
+    public void updateDescription(String description) {
         this.description = description;
     }
 

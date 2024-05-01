@@ -58,7 +58,7 @@ public class Choice extends BaseTimeEntity {
         );
     }
 
-    public void changeCorrect(ChoiceCorrect choiceCorrect) {
+    public void updateCorrect(ChoiceCorrect choiceCorrect) {
         this.isCorrect = choiceCorrect;
     }
 }
