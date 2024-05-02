@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.validation.FieldError;
 
 public record MethodArgumentErrorResponse(
-        ErrorCode errorCode,
+        String code,
         String message,
         String method,
         String requestURI,
@@ -19,7 +19,7 @@ public record MethodArgumentErrorResponse(
     public static MethodArgumentErrorResponse of(ErrorCode errorCode, HttpServletRequest request,
                                                  List<FieldErrorResponse> errors) {
         return new MethodArgumentErrorResponse(
-                errorCode,
+                errorCode.getCode(),
                 errorCode.getMessage(),
                 request.getMethod(),
                 request.getRequestURI(),
