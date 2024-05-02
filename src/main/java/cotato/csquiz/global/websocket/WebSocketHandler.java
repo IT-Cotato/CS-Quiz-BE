@@ -40,27 +40,34 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) {
         String memberId = findAttributeByToken(session, "memberId");
         String educationId = findAttributeByToken(session, "educationId");
-        log.info(memberId);
-        boolean isGeneral = connectSession(session, memberId); //true : 일반 회원 false : 관리자
-        if (isGeneral) {
+
+        MemberRole memberRole = findMemberRole(session, memberId);
+        Boolean isMemberClient = isMemberClient(memberRole);
+
+        if (isMemberClient) {
+            addClientSession(memberId,session);
             checkQuizAlreadyStart(session, Long.parseLong(educationId));
+        } else {
+            addManagerSession(memberId,session);
         }
-        log.info("CLIENTS: {}", CLIENTS.keySet());
-        log.info("MANAGERS: {}", MANAGERS.keySet());
+
+        log.info("[세션 연결] {}", memberId);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String memberId = findAttributeByToken(session, "memberId");
-        if (memberId != null) {
-            String roleString = findAttributeByToken(session, "role");
-            log.info("[연결된 역할] {}", roleString);
-            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
-            disconnectSession(memberId, role);
+
+        MemberRole role = findMemberRole(session, memberId);
+        Boolean isMemberClient = isMemberClient(role);
+
+        if (isMemberClient) {
+            CLIENTS.remove(memberId);
+        } else {
+            MANAGERS.remove(memberId);
         }
-        log.info("[disconnect the session]");
-        log.info("CLIENTS: {}", CLIENTS.keySet());
-        log.info("MANAGERS: {}", MANAGERS.keySet());
+
+        log.info("[세션 종료] {}", memberId);
     }
 
     public void accessQuiz(long quizId) {
@@ -87,8 +94,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
                     .quizId(quizId)
                     .command("start")
                     .build();
+
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
+
             for (WebSocketSession clientSession : CLIENTS.values()) {
                 clientSession.sendMessage(responseMessage);
             }
@@ -107,8 +116,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
         try {
             QuizStopResponse response = QuizStopResponse.from(command, quiz.getId());
+
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
+
             for (WebSocketSession clientSession : CLIENTS.values()) {
                 clientSession.sendMessage(responseMessage);
             }
@@ -120,8 +131,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void stopAllQuiz(Long educationId) {
         try {
             CsQuizStopResponse response = CsQuizStopResponse.from("exit", educationId);
+
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
+
             for (WebSocketSession clientSession : CLIENTS.values()) {
                 clientSession.sendMessage(responseMessage);
             }
@@ -130,42 +143,35 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private boolean connectSession(WebSocketSession session, String memberId) {
+    private MemberRole findMemberRole(WebSocketSession session, String memberId) {
         if (memberId != null) {
             String roleString = findAttributeByToken(session, "role");
-            log.info("roleString {}", roleString);
             MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
-            log.info("role role {}", role);
-            return updateSession(session, memberId, role);
+            log.info("[소켓 MemberRole] {}", role);
+            return role;
         } else {
-            log.warn("Email is null in session {}.", session.getId());
-            throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
+            log.warn("해당 WebSocketSession에 멤버가 없습니다 {}.", session.getId());
+            throw new AppException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 
-    private boolean updateSession(WebSocketSession session, String memberId, MemberRole role) {
-        return switch (role) {
-            case EDUCATION -> {
-                updateManagerSession(memberId, session);
-                yield false;
-            }
-            case MEMBER, ADMIN -> {
-                updateClientSession(memberId, session);
-                yield true;
-            }
+    private Boolean isMemberClient(MemberRole memberRole) {
+        return switch (memberRole) {
+            case EDUCATION -> false;
+            case MEMBER, ADMIN -> true;
             default -> {
-                log.warn("Unknown role for member {}.", memberId);
+                log.warn("Unknown role for member {}.", memberRole);
                 throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
             }
         };
     }
 
-    private void updateManagerSession(String memberId, WebSocketSession session) {
+    private void addManagerSession(String memberId, WebSocketSession session) {
         MANAGERS.put(memberId, session);
         log.info("{} connect with Session {} in MANAGER", memberId, session);
     }
 
-    private void updateClientSession(String memberId, WebSocketSession session) {
+    private void addClientSession(String memberId, WebSocketSession session) {
         CLIENTS.put(memberId, session);
         log.info("{} connect with Session {} in CLIENTS", memberId, session);
     }
@@ -178,25 +184,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("checkQuizAlreadyStart Start");
         try {
             QuizStatusResponse response = quizService.checkQuizStarted(educationId);
+
             String json = objectMapper.writeValueAsString(response);
             TextMessage responseMessage = new TextMessage(json);
+
             session.sendMessage(responseMessage);
         } catch (IOException e) {
             throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
-        }
-    }
-
-    private void disconnectSession(String memberId, MemberRole role) {
-        switch (role) {
-            case EDUCATION -> {
-                MANAGERS.remove(memberId);
-            }
-            case MEMBER, ADMIN -> {
-                CLIENTS.remove(memberId);
-            }
-            default -> {
-                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
-            }
         }
     }
 }

@@ -77,7 +77,7 @@ public class AuthService {
         String role = jwtTokenProvider.getRole(refreshToken);
 
         RefreshToken findToken = refreshTokenRepository.findById(memberId)
-                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
         log.info("[브라우저에서 들어온 쿠키] == [DB에 저장된 토큰], {}", refreshToken.equals(findToken.getRefreshToken()));
 
         if (!refreshToken.equals(findToken.getRefreshToken())) {
@@ -134,7 +134,7 @@ public class AuthService {
     public FindPasswordResponse verifyPasswordCode(String email, String code) {
         emailVerificationService.verifyCode(email, code);
         Member findMember = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_FOUND));
         String role = findMember.getRole().getKey();
 
         Token token = jwtTokenProvider.createToken(findMember.getId(), role);

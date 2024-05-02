@@ -41,7 +41,7 @@ public class ValidateService {
 
     public void emailExist(String email) {
         if (memberRepository.findByEmail(email).isEmpty()) {
-            throw new AppException(ErrorCode.EMAIL_NOT_FOUND);
+            throw new AppException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 

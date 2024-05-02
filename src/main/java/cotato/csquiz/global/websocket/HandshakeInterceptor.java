@@ -43,14 +43,13 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
         }
 
         try {
-            jwtTokenProvider.validateSocketToken(socketToken);
+            jwtTokenProvider.checkSocketToken(socketToken);
             Long memberId = jwtTokenProvider.getMemberId(socketToken);
             String role = jwtTokenProvider.getRole(socketToken);
             attributes.put("memberId", memberId);
             attributes.put("role", role);
-            System.out.println(role);
             attributes.put("educationId", educationId);
-            validateRole(role);
+            checkRole(role);
         } catch (InterceptorException | ExpiredJwtException | MalformedJwtException | SignatureException exception) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return false;
@@ -61,7 +60,7 @@ public class HandshakeInterceptor extends HttpSessionHandshakeInterceptor {
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }
 
-    private void validateRole(String role) {
+    private void checkRole(String role) {
         MemberRole memberRole = MemberRole.fromKey(role);
         if (MemberRole.EDUCATION != memberRole && MemberRole.ADMIN != memberRole && MemberRole.MEMBER != memberRole) {
             throw new InterceptorRoleException("해당 역할은 WS 연결이 불가능합니다.");
