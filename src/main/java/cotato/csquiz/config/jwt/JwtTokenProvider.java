@@ -126,7 +126,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateSocketToken(String socketToken) {
+    public void checkSocketToken(String socketToken) {
         String tokenType = getType(socketToken);
         if (!TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
             throw new InterceptorException("소켓 토큰을 이용해주세요.");

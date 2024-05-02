@@ -38,16 +38,21 @@ public class SocketService {
     @Transactional
     public void openCSQuiz(QuizOpenRequest request) {
         Education education = findEducationById(request.educationId());
+
         checkEducationBefore(education);
+
         education.updateStatus(EducationStatus.ONGOING);
     }
 
     @Transactional
     public void accessQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
+
         checkEducationOpen(quiz.getEducation());
+
         makeAllStartFalse();
         makeAllStatusFalse();
+
         quiz.updateStatus(QuizStatus.QUIZ_ON);
         webSocketHandler.accessQuiz(quiz.getId());
     }
@@ -61,17 +66,22 @@ public class SocketService {
     @Transactional
     public void startQuizSolve(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
+
         checkEducationOpen(quiz.getEducation());
         isQuizStatusTrue(quiz);
+
         sleepRandomTime(quiz);
         quiz.updateStart(QuizStatus.QUIZ_ON);
+
         webSocketHandler.startQuiz(quiz.getId());
     }
 
     @Transactional
     public void denyQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
+
         checkEducationOpen(quiz.getEducation());
+
         quiz.updateStatus(QuizStatus.QUIZ_OFF);
         quiz.updateStart(QuizStatus.QUIZ_OFF);
     }
