@@ -1,10 +1,10 @@
 package cotato.csquiz.controller;
 
 import cotato.csquiz.controller.dto.AllEducationResponse;
-import cotato.csquiz.controller.dto.education.AddEducationRequest;
-import cotato.csquiz.controller.dto.education.AddEducationResponse;
+import cotato.csquiz.controller.dto.education.CreateEducationRequest;
+import cotato.csquiz.controller.dto.education.CreateEducationResponse;
 import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.controller.dto.education.FindStatusResponse;
+import cotato.csquiz.controller.dto.education.FindEducationStatusResponse;
 import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
 import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
@@ -32,19 +32,19 @@ public class EducationController {
     private final EducationService educationService;
 
     @GetMapping
-    public ResponseEntity<List<AllEducationResponse>> getEducationListByGeneration(
+    public ResponseEntity<List<AllEducationResponse>> findEducationListByGeneration(
             @RequestParam(value = "generationId") Long generationId) {
-        return ResponseEntity.ok().body(educationService.getEducationListByGeneration(generationId));
+        return ResponseEntity.ok().body(educationService.findEducationListByGeneration(generationId));
     }
 
     @GetMapping("/status")
-    public ResponseEntity<FindStatusResponse> getStatus(@RequestParam(value = "educationId") Long educationId) {
-        return ResponseEntity.ok().body(educationService.getStatus(educationId));
+    public ResponseEntity<FindEducationStatusResponse> findEducationStatus(@RequestParam(value = "educationId") Long educationId) {
+        return ResponseEntity.ok().body(educationService.findEducationStatus(educationId));
     }
 
     @PostMapping("/add")
-    public ResponseEntity<AddEducationResponse> addEducation(@RequestBody @Valid AddEducationRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(educationService.addEducation(request));
+    public ResponseEntity<CreateEducationResponse> createEducation(@RequestBody @Valid CreateEducationRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(educationService.createEducation(request));
     }
 
     @PatchMapping("/update")

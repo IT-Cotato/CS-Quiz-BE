@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AddEducationResponse {
+public class CreateEducationResponse {
 
     private Long educationId;
 }
