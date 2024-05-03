@@ -33,7 +33,6 @@ public enum ErrorCode {
     CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "요청하신 코드가 일치하지 않습니다."),
     EMAIL_TYPE_ERROR(HttpStatus.BAD_REQUEST, "구글, 네이버 형식으로 입력해주세요"),
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
-    SUBJECT_INVALID(HttpStatus.BAD_REQUEST, "교육 주제는 NULL이거나 비어있을 수 없습니다."),
     ROLE_IS_NOT_OLD_MEMBER(HttpStatus.BAD_REQUEST, "해당 회원의 ROLE은 OLD_MEMBER가 아닙니다."),
     INVALID_POSITION(HttpStatus.BAD_REQUEST, "포지션을 선택해주세요."),
     QUIZ_ACCESS_DENIED(HttpStatus.BAD_REQUEST, "cannot access this quiz"),

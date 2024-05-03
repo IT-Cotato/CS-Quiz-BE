@@ -85,12 +85,6 @@ public class EducationService {
         educationRepository.save(education);
     }
 
-    private void validateNotEmpty(String newSubject) {
-        Optional.ofNullable(newSubject)
-                .filter(subject -> !subject.trim().isEmpty())
-                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
-    }
-
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
         return sessionRepository.findAllByGenerationId(generationId).stream()
                 .map(educationRepository::findBySession)
