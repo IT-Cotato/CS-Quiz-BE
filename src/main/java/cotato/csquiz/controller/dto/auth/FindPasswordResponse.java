@@ -1,9 +1,11 @@
 package cotato.csquiz.controller.dto.auth;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Data;
 
-public record FindPasswordResponse (
-        @NotNull
-        String accessToken
-) {
+@Data
+@Builder
+public class FindPasswordResponse {
+
+        private String accessToken;
 }
