@@ -79,9 +79,7 @@ public class EducationService {
 
     @Transactional
     public void updateSubjectAndNumber(UpdateEducationRequest request) {
-        validateNotEmpty(request.newSubject());
-        Education education = educationRepository.findById(request.educationId())
-                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
+        Education education = findEducation(request.educationId());
         education.updateSubject(request.newSubject());
         education.updateNumber(request.newNumber());
         educationRepository.save(education);
@@ -103,8 +101,7 @@ public class EducationService {
     }
 
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
-        Education findEducation = educationRepository.findById(educationId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
+        Education findEducation = findEducation(educationId);
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
         validateEmpty(kingMembers);
         return kingMembers.stream()
@@ -120,8 +117,7 @@ public class EducationService {
     }
 
     public WinnerInfoResponse findWinner(Long educationId) {
-        Education findEducation = educationRepository.findById(educationId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
+        Education findEducation = findEducation(educationId);
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
         return WinnerInfoResponse.from(findWinner, memberService.getBackFourNumber(findWinner.getMember()));
