@@ -169,7 +169,7 @@ public class AdminService {
 
     private List<ApplyMemberInfoResponse> createApplyInfoList(List<Member> applicantList) {
         return applicantList.stream()
-                .map(member -> ApplyMemberInfoResponse.from(member, memberService.getBackFourNumber(member)))
+                .map(member -> ApplyMemberInfoResponse.from(member, memberService.findBackFourNumber(member)))
                 .toList();
     }
 }

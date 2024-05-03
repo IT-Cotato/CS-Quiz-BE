@@ -170,7 +170,7 @@ public class RecordService {
         Optional<Scorer> maybeScorer = scorerRepository.findByQuiz(findQuiz);
         if (maybeScorer.isPresent()) {
             ScorerResponse scorerResponse = ScorerResponse.from(maybeScorer.get(),
-                    memberService.getBackFourNumber(maybeScorer.get().getMember()));
+                    memberService.findBackFourNumber(maybeScorer.get().getMember()));
             log.info("[기존 득점자 존재]: {}", maybeScorer.get().getMember().getName());
             return RecordsAndScorerResponse.from(records, scorerResponse);
         }
@@ -184,7 +184,7 @@ public class RecordService {
         return records.stream()
                 .filter(record -> record.getQuiz().equals(quiz))
                 .sorted(Comparator.comparing(Record::getTicketNumber))
-                .map(record -> RecordResponse.from(record, memberService.getBackFourNumber(record.getMember())))
+                .map(record -> RecordResponse.from(record, memberService.findBackFourNumber(record.getMember())))
                 .toList();
     }
 

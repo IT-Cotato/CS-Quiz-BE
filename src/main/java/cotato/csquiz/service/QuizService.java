@@ -122,7 +122,7 @@ public class QuizService {
         if (mayBeScorer.isPresent()) {
             Member member = mayBeScorer.get().getMember();
 
-            return QuizResultInfo.of(quiz, member, memberService.getBackFourNumber(member));
+            return QuizResultInfo.of(quiz, member, memberService.findBackFourNumber(member));
         }
         return QuizResultInfo.noScorer(quiz);
     }

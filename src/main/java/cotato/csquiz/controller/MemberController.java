@@ -29,10 +29,10 @@ public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/info")
-    public ResponseEntity<MemberInfoResponse> memberInfo(@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<MemberInfoResponse> findMemberInfo(@RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
         Long memberId = jwtTokenProvider.getMemberId(accessToken);
-        return ResponseEntity.ok().body(memberService.getMemberInfo(memberId));
+        return ResponseEntity.ok().body(memberService.findMemberInfo(memberId));
     }
 
     @PostMapping("/check/password")

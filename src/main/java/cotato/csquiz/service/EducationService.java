@@ -110,7 +110,7 @@ public class EducationService {
         validateEmpty(kingMembers);
         return kingMembers.stream()
                 .map(KingMember::getMember)
-                .map(member -> KingMemberInfo.from(member, memberService.getBackFourNumber(member)))
+                .map(member -> KingMemberInfo.from(member, memberService.findBackFourNumber(member)))
                 .toList();
     }
 
@@ -125,7 +125,7 @@ public class EducationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
-        return WinnerInfoResponse.from(findWinner, memberService.getBackFourNumber(findWinner.getMember()));
+        return WinnerInfoResponse.from(findWinner, memberService.findBackFourNumber(findWinner.getMember()));
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {
