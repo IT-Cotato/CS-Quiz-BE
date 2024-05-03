@@ -1,12 +1,11 @@
 package cotato.csquiz.controller.dto.education;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record UpdateEducationRequest(
         @NotNull
         Long educationId,
-        @NotBlank
+        @NotNull
         String newSubject,
         @NotNull
         Integer newNumber

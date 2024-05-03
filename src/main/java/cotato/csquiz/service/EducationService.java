@@ -79,11 +79,20 @@ public class EducationService {
 
     @Transactional
     public void updateSubjectAndNumber(UpdateEducationRequest request) {
-        Education education = findEducation(request.educationId());
+        validateNotEmpty(request.newSubject());
+        Education education = educationRepository.findById(request.educationId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         education.updateSubject(request.newSubject());
         education.updateNumber(request.newNumber());
         educationRepository.save(education);
     }
+
+    private void validateNotEmpty(String newSubject) {
+        Optional.ofNullable(newSubject)
+                .filter(subject -> !subject.trim().isEmpty())
+                .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
+    }
+
 
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
         return sessionRepository.findAllByGenerationId(generationId).stream()
@@ -95,7 +104,8 @@ public class EducationService {
     }
 
     public List<KingMemberInfo> findKingMemberInfo(Long educationId) {
-        Education findEducation = findEducation(educationId);
+        Education findEducation = educationRepository.findById(educationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
         validateEmpty(kingMembers);
         return kingMembers.stream()
@@ -111,7 +121,8 @@ public class EducationService {
     }
 
     public WinnerInfoResponse findWinner(Long educationId) {
-        Education findEducation = findEducation(educationId);
+        Education findEducation = educationRepository.findById(educationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
         return WinnerInfoResponse.from(findWinner, memberService.getBackFourNumber(findWinner.getMember()));
