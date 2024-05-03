@@ -2,8 +2,8 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.controller.dto.generation.AddGenerationRequest;
 import cotato.csquiz.controller.dto.generation.AddGenerationResponse;
-import cotato.csquiz.controller.dto.generation.ChangePeriodRequest;
-import cotato.csquiz.controller.dto.generation.ChangeRecruitingRequest;
+import cotato.csquiz.controller.dto.generation.ChangGenerationPeriodRequest;
+import cotato.csquiz.controller.dto.generation.ChangeRecruitingStatusRequest;
 import cotato.csquiz.controller.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.exception.AppException;
@@ -42,7 +42,7 @@ public class GenerationService {
     }
 
     @Transactional
-    public void changeRecruiting(ChangeRecruitingRequest request) {
+    public void changeRecruitingStatus(ChangeRecruitingStatusRequest request) {
         Generation generation = generationRepository.findById(request.generationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
         generation.changeRecruit(request.statement());
@@ -50,7 +50,7 @@ public class GenerationService {
     }
 
     @Transactional
-    public void changePeriod(ChangePeriodRequest request) {
+    public void changeGenerationPeriod(ChangGenerationPeriodRequest request) {
         checkPeriodValid(request.startDate(), request.endDate());
         Generation generation = generationRepository.findById(request.generationId())
                 .orElseThrow(() -> new EntityNotFoundException("찾으려는 기수가 존재하지 않습니다."));
@@ -58,7 +58,7 @@ public class GenerationService {
         log.info("[기수 기간 변경 성공]: 시작: {} ~ 끝: {}", request.startDate(), request.endDate());
     }
 
-    public List<GenerationInfoResponse> getGenerations() {
+    public List<GenerationInfoResponse> findGenerationList() {
         List<Generation> generations = generationRepository.findAll();
         return generations.stream()
                 .map(GenerationInfoResponse::from)

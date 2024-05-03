@@ -1,12 +1,14 @@
 package cotato.csquiz.controller.dto.generation;
 
-
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 
-public record ChangeRecruitingRequest(
+public record ChangGenerationPeriodRequest(
         @NotNull
         Long generationId,
         @NotNull
-        boolean statement
+        LocalDate startDate,
+        @NotNull
+        LocalDate endDate
 ) {
 }
