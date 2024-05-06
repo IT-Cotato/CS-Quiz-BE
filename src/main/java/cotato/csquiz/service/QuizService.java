@@ -318,11 +318,10 @@ public class QuizService {
         try {
             int choiceNumber = Integer.parseInt(answer);
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber(multipleQuiz, choiceNumber)
-                    .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
-
+                    .orElseThrow(() -> new EntityNotFoundException("해당 번호의 선지를 찾을 수 없습니다."));
             choice.updateCorrect(ChoiceCorrect.ANSWER);
         } catch (NumberFormatException e) {
-            throw new AppException(ErrorCode.ANSWER_VALIDATION_FAULT);
+            throw new AppException(ErrorCode.INVALID_ANSWER);
         }
     }
 

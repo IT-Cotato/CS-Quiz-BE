@@ -67,7 +67,7 @@ public class GenerationService {
 
     private void checkPeriodValid(LocalDate startDate, LocalDate endDate) {
         if (endDate.isBefore(startDate)) {
-            throw new AppException(ErrorCode.DATE_INVALID);
+            throw new AppException(ErrorCode.INVALID_DATE);
         }
     }
 

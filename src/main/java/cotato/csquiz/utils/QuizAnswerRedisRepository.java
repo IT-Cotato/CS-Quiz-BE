@@ -48,8 +48,7 @@ public class QuizAnswerRedisRepository {
         if (quiz instanceof MultipleQuiz) {
             Choice choice = choiceRepository.findByMultipleQuizAndChoiceNumber((MultipleQuiz) quiz,
                             Integer.parseInt(answer))
-                    .orElseThrow(() -> new AppException(ErrorCode.ANSWER_VALIDATION_FAULT));
-
+                    .orElseThrow(() -> new AppException(ErrorCode.CONTENT_IS_NOT_ANSWER));
             saveAdditionalMultipleQuizAnswer(quiz, choice.getChoiceNumber());
         }
     }
