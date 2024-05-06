@@ -2,7 +2,7 @@ package cotato.csquiz.controller.dto.education;
 
 import jakarta.validation.constraints.NotNull;
 
-public record AddEducationRequest(
+public record CreateEducationRequest(
         @NotNull
         String subject,
         @NotNull

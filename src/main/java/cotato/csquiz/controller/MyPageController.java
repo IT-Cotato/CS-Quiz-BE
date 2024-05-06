@@ -23,16 +23,18 @@ public class MyPageController {
     private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping("/hall-of-fame")
-    public ResponseEntity<HallOfFameResponse> getHallOfFame(@RequestParam("generationId") Long generationId,
-                                                            @RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<HallOfFameResponse> findHallOfFame(@RequestParam("generationId") Long generationId,
+                                                               @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
-        return ResponseEntity.ok(myPageService.getHallOfFame(generationId, jwtTokenProvider.getMemberId(accessToken)));
+        
+        return ResponseEntity.ok(myPageService.findHallOfFame(generationId, jwtTokenProvider.getMemberId(accessToken)));
     }
 
     @GetMapping("/info")
-    public ResponseEntity<MyPageMemberInfoResponse> userInfo(
+    public ResponseEntity<MyPageMemberInfoResponse> findUserInfo(
             @RequestHeader("Authorization") String authorizationHeader) {
         String accessToken = jwtTokenProvider.getBearer(authorizationHeader);
-        return ResponseEntity.ok(myPageService.getMemberInfo(jwtTokenProvider.getMemberId(accessToken)));
+        
+        return ResponseEntity.ok(myPageService.findMemberInfo(jwtTokenProvider.getMemberId(accessToken)));
     }
 }

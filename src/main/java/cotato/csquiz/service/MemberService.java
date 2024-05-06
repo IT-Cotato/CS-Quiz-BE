@@ -26,16 +26,16 @@ public class MemberService {
     private final EncryptService encryptService;
     private final ValidateService validateService;
 
-    public MemberInfoResponse getMemberInfo(Long id) {
+    public MemberInfoResponse findMemberInfo(Long id) {
         Member findMember = memberRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("해당 이메일을 가진 회원을 찾을 수 없습니다."));
 
-        String rawBackFourNumber = getBackFourNumber(findMember);
+        String rawBackFourNumber = findBackFourNumber(findMember);
         log.info("이름 + 번호 4자리: {}({})", findMember.getName(), rawBackFourNumber);
         return MemberInfoResponse.from(findMember, rawBackFourNumber);
     }
 
-    public String getBackFourNumber(Member member) {
+    public String findBackFourNumber(Member member) {
         String decryptedPhone = member.getPhoneNumber();
         String originPhoneNumber = encryptService.decryptPhoneNumber(decryptedPhone);
         int numberLength = originPhoneNumber.length();

@@ -3,9 +3,9 @@ package cotato.csquiz.service;
 import cotato.csquiz.controller.dto.session.AddSessionRequest;
 import cotato.csquiz.controller.dto.session.AddSessionResponse;
 import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.controller.dto.session.SessionDescriptionRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionDescriptionRequest;
 import cotato.csquiz.controller.dto.session.SessionListResponse;
-import cotato.csquiz.controller.dto.session.SessionPhotoUrlRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionPhotoRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
@@ -67,11 +67,11 @@ public class SessionService {
     public void updateSession(UpdateSessionRequest request) throws ImageException {
         Session session = findSessionById(request.sessionId());
 
-        session.changeDescription(request.description());
+        session.updateDescription(request.description());
         session.updateToggle(request.itIssue(), request.csEducation(),
                 request.networking());
         if (request.isPhotoUpdated()) {
-            changePhoto(session, request.sessionImage());
+            updatePhoto(session, request.sessionImage());
         }
 
         sessionRepository.save(session);
@@ -84,24 +84,24 @@ public class SessionService {
     }
 
     @Transactional
-    public void changeSessionNumber(UpdateSessionNumberRequest request) {
+    public void updateSessionNumber(UpdateSessionNumberRequest request) {
         Session session = findSessionById(request.sessionId());
         session.changeSessionNumber(session.getNumber());
     }
 
     @Transactional
-    public void changeDescription(SessionDescriptionRequest request) {
+    public void updateSessionDescription(UpdateSessionDescriptionRequest request) {
         Session session = findSessionById(request.sessionId());
-        session.changeDescription(request.description());
+        session.updateDescription(request.description());
     }
 
     @Transactional
-    public void changePhotoUrl(SessionPhotoUrlRequest request) throws ImageException {
+    public void updateSessionPhoto(UpdateSessionPhotoRequest request) throws ImageException {
         Session session = findSessionById(request.sessionId());
-        changePhoto(session, request.sessionImage());
+        updatePhoto(session, request.sessionImage());
     }
 
-    private void changePhoto(Session session, MultipartFile sessionImage) throws ImageException {
+    private void updatePhoto(Session session, MultipartFile sessionImage) throws ImageException {
         if (isImageExist(sessionImage)) {
             String imageUrl = s3Uploader.uploadFiles(sessionImage, SESSION_BUCKET_DIRECTORY);
             deleteOldImage(session);
@@ -118,6 +118,7 @@ public class SessionService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
 
         List<Session> sessions = sessionRepository.findAllByGeneration(generation);
+
         return sessions.stream()
                 .map(SessionListResponse::from)
                 .toList();
@@ -132,6 +133,7 @@ public class SessionService {
         Generation generation = generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
         List<Session> sessions = sessionRepository.findAllByGeneration(generation);
+
         return sessions.stream()
                 .filter(session -> session.getCsEducation() == CSEducation.CS_ON)
                 .map(CsEducationOnSessionNumberResponse::from)

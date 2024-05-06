@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class FindStatusResponse {
+public class FindEducationStatusResponse {
 
     private EducationStatus status;
 }

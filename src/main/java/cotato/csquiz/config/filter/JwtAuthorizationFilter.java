@@ -51,7 +51,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String role = jwtTokenProvider.getRole(accessToken);
         log.info("[인증 필터 인증 진행, {}]", memberId);
         log.info("Member Role: {}", role);
-        jwtTokenProvider.validateMemberExist(memberId);
+        jwtTokenProvider.checkMemberExist(memberId);
 
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(findMember.getEmail(), "",
                 List.of(new SimpleGrantedAuthority(role)));

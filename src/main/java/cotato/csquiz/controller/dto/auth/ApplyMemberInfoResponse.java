@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApplyMemberInfo {
+public class ApplyMemberInfoResponse {
 
     private Long id;
     private String name;
     private String backFourNumber;
 
-    public static ApplyMemberInfo from(Member member, String backFourNumber) {
-        return new ApplyMemberInfo(
+    public static ApplyMemberInfoResponse from(Member member, String backFourNumber) {
+        return new ApplyMemberInfoResponse(
                 member.getId(),
                 member.getName(),
                 backFourNumber

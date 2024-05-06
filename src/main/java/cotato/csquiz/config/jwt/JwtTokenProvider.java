@@ -107,7 +107,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateMemberExist(Long id) {
+    public void checkMemberExist(Long id) {
         if (!memberRepository.existsById(id)) {
             throw new FilterAuthenticationException("존재하지 않는 회원입니다.");
         }
@@ -126,7 +126,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void validateSocketToken(String socketToken) {
+    public void checkSocketToken(String socketToken) {
         String tokenType = getType(socketToken);
         if (!TokenConstants.SOCKET_TOKEN.equals(tokenType)) {
             throw new InterceptorException("소켓 토큰을 이용해주세요.");

@@ -10,7 +10,7 @@ public record QuizResultInfo(
         String scorerName,
         String backFourNumber
 ) {
-    public static QuizResultInfo from(Quiz quiz, Member member, String backFourNumber) {
+    public static QuizResultInfo of(Quiz quiz, Member member, String backFourNumber) {
         return new QuizResultInfo(
                 quiz.getId(),
                 quiz.getNumber(),

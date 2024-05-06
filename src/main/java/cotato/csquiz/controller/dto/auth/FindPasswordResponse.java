@@ -7,5 +7,5 @@ import lombok.Data;
 @Builder
 public class FindPasswordResponse {
 
-    private String accessToken;
+        private String accessToken;
 }

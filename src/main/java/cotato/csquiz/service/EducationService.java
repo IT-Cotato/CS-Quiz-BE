@@ -1,10 +1,10 @@
 package cotato.csquiz.service;
 
 import cotato.csquiz.controller.dto.AllEducationResponse;
-import cotato.csquiz.controller.dto.education.AddEducationRequest;
-import cotato.csquiz.controller.dto.education.AddEducationResponse;
+import cotato.csquiz.controller.dto.education.CreateEducationRequest;
+import cotato.csquiz.controller.dto.education.CreateEducationResponse;
 import cotato.csquiz.controller.dto.education.EducationIdOfQuizResponse;
-import cotato.csquiz.controller.dto.education.FindStatusResponse;
+import cotato.csquiz.controller.dto.education.FindEducationStatusResponse;
 import cotato.csquiz.controller.dto.education.UpdateEducationRequest;
 import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
@@ -43,7 +43,7 @@ public class EducationService {
     private final SessionRepository sessionRepository;
 
     @Transactional
-    public AddEducationResponse addEducation(AddEducationRequest request) {
+    public CreateEducationResponse createEducation(CreateEducationRequest request) {
         Session session = sessionService.findSessionById(request.sessionId());
         checkEducationExist(session);
         Education education = Education.builder()
@@ -52,7 +52,7 @@ public class EducationService {
                 .educationNum(request.educationNum())
                 .build();
         Education saveEducation = educationRepository.save(education);
-        return AddEducationResponse.builder()
+        return CreateEducationResponse.builder()
                 .educationId(saveEducation.getId())
                 .build();
     }
@@ -65,9 +65,9 @@ public class EducationService {
         );
     }
 
-    public FindStatusResponse getStatus(Long educationId) {
+    public FindEducationStatusResponse findEducationStatus(Long educationId) {
         Education education = findEducation(educationId);
-        return FindStatusResponse.builder()
+        return FindEducationStatusResponse.builder()
                 .status(education.getStatus())
                 .build();
     }
@@ -93,7 +93,8 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-    public List<AllEducationResponse> getEducationListByGeneration(Long generationId) {
+
+    public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
         return sessionRepository.findAllByGenerationId(generationId).stream()
                 .map(educationRepository::findBySession)
                 .filter(Optional::isPresent)
@@ -109,7 +110,7 @@ public class EducationService {
         validateEmpty(kingMembers);
         return kingMembers.stream()
                 .map(KingMember::getMember)
-                .map(member -> KingMemberInfo.from(member, memberService.getBackFourNumber(member)))
+                .map(member -> KingMemberInfo.from(member, memberService.findBackFourNumber(member)))
                 .toList();
     }
 
@@ -124,7 +125,7 @@ public class EducationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
-        return WinnerInfoResponse.from(findWinner, memberService.getBackFourNumber(findWinner.getMember()));
+        return WinnerInfoResponse.from(findWinner, memberService.findBackFourNumber(findWinner.getMember()));
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {

@@ -2,8 +2,8 @@ package cotato.csquiz.controller;
 
 import cotato.csquiz.controller.dto.generation.AddGenerationRequest;
 import cotato.csquiz.controller.dto.generation.AddGenerationResponse;
-import cotato.csquiz.controller.dto.generation.ChangePeriodRequest;
-import cotato.csquiz.controller.dto.generation.ChangeRecruitingRequest;
+import cotato.csquiz.controller.dto.generation.ChangeGenerationPeriodRequest;
+import cotato.csquiz.controller.dto.generation.ChangeRecruitingStatusRequest;
 import cotato.csquiz.controller.dto.generation.GenerationInfoResponse;
 import cotato.csquiz.service.GenerationService;
 import jakarta.validation.Valid;
@@ -28,8 +28,8 @@ public class GenerationController {
     private final GenerationService generationService;
 
     @GetMapping
-    public ResponseEntity<List<GenerationInfoResponse>> getGenerations() {
-        return ResponseEntity.ok().body(generationService.getGenerations());
+    public ResponseEntity<List<GenerationInfoResponse>> findGenerations() {
+        return ResponseEntity.ok().body(generationService.findGenerations());
     }
 
     @PostMapping("/add")
@@ -38,14 +38,14 @@ public class GenerationController {
     }
 
     @PatchMapping("/recruiting")
-    public ResponseEntity<Void> changeRecruiting(@RequestBody @Valid ChangeRecruitingRequest request) {
-        generationService.changeRecruiting(request);
+    public ResponseEntity<Void> changeRecruitingStatus(@RequestBody @Valid ChangeRecruitingStatusRequest request) {
+        generationService.changeRecruitingStatus(request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/period")
-    public ResponseEntity<Void> changePeriod(@RequestBody @Valid ChangePeriodRequest request) {
-        generationService.changePeriod(request);
+    public ResponseEntity<Void> changeGenerationPeriod(@RequestBody @Valid ChangeGenerationPeriodRequest request) {
+        generationService.changeGenerationPeriod(request);
         return ResponseEntity.noContent().build();
     }
 }
