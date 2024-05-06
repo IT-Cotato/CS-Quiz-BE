@@ -42,14 +42,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         String memberId = findAttributeByToken(session, MEMBER_ID_KEY);
-        String educationId = findAttributeByToken(session, EDUCATION_ID_KEY);
+        Long educationId = Long.parseLong(findAttributeByToken(session, EDUCATION_ID_KEY));
         String role = findAttributeByToken(session, ROLE_KEY);
         MemberRole memberRole = findMemberRole(role);
 
         addMemberToSession(memberId, memberRole, session);
 
-        if (isQuizAlreadyStarted(Long.parseLong(educationId)) && isMemberClient(memberRole)) {
-            sendStartedQuiz(Long.parseLong(educationId), session);
+        if (isQuizAlreadyStarted(educationId) && isMemberClient(memberRole)) {
+            sendStartedQuiz(educationId, session);
         }
 
         log.info("[세션 연결] {}", memberId);
