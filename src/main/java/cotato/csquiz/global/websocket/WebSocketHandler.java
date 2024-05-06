@@ -48,16 +48,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         addMemberToSession(memberId, memberRole, session);
 
-        if (isQuizAlreadyStarted(educationId) && isMemberClient(memberRole)) {
-            sendStartedQuiz(educationId, session);
+        if (isMemberClient(memberRole)) {
+            sendQuiz(educationId, session);
         }
 
         log.info("[세션 연결] {}", memberId);
     }
 
-    private void sendStartedQuiz(Long educationId, WebSocketSession session) {
+    private void sendQuiz(Long educationId, WebSocketSession session) {
         Optional<Quiz> maybeQuiz = quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON,
                 educationId);
+
         QuizStatusResponse response = maybeQuiz.map(quiz -> QuizStatusResponse.builder()
                         .command(SHOW_COMMAND)
                         .quizId(quiz.getId())
@@ -68,10 +69,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                         .command(SHOW_COMMAND)
                         .build());
         sendMessage(session, response);
-    }
-
-    private boolean isQuizAlreadyStarted(Long educationId) {
-        return quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON, educationId).isPresent();
     }
 
     @Override
