@@ -15,7 +15,7 @@ public enum ErrorCode {
     FILTER_EXCEPTION(HttpStatus.UNAUTHORIZED, "필터 내부에러 발생"),
     JWT_FORM_ERROR(HttpStatus.UNAUTHORIZED, "jwt 형식 에러 발생"),
 
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 멤버가 존재하지 않습니다."),
+    EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 멤버가 존재하지 않습니다."),
     ENTITY_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 entity를 찾을 수 없습니다."),
 
     EMAIL_DUPLICATED(HttpStatus.CONFLICT, "존재하는 이메일 입니다."),

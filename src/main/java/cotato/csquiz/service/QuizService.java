@@ -17,7 +17,6 @@ import cotato.csquiz.controller.dto.quiz.QuizResponse;
 import cotato.csquiz.controller.dto.quiz.QuizResultInfo;
 import cotato.csquiz.controller.dto.quiz.ShortAnswerResponse;
 import cotato.csquiz.controller.dto.quiz.ShortQuizResponse;
-import cotato.csquiz.controller.dto.socket.QuizStatusResponse;
 import cotato.csquiz.domain.entity.Choice;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Member;
@@ -28,7 +27,6 @@ import cotato.csquiz.domain.entity.ShortAnswer;
 import cotato.csquiz.domain.entity.ShortQuiz;
 import cotato.csquiz.domain.enums.ChoiceCorrect;
 import cotato.csquiz.domain.enums.EducationStatus;
-import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.exception.ImageException;
@@ -77,7 +75,7 @@ public class QuizService {
                 request.getShortQuizzes().stream()
                         .map(CreateShortQuizRequest::getNumber)
         ).toList();
-        
+
         checkQuizNumbersDistinct(quizNumbers);
 
         deleteAllQuizByEducation(educationId);
@@ -195,21 +193,6 @@ public class QuizService {
     private int generateRandomTime() {
         final ThreadLocalRandom random = ThreadLocalRandom.current();
         return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
-    }
-
-    @Transactional
-    public QuizStatusResponse checkQuizStarted(Long educationId) {
-        Education education = findEducationById(educationId);
-        return quizRepository.findByStatusAndEducation(QuizStatus.QUIZ_ON, education)
-                .map(quiz -> QuizStatusResponse.builder()
-                        .command("show")
-                        .quizId(quiz.getId())
-                        .status(quiz.getStatus())
-                        .start(quiz.getStart())
-                        .build())
-                .orElse(QuizStatusResponse.builder()
-                        .command("show")
-                        .build());
     }
 
     @Transactional

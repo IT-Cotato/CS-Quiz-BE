@@ -10,11 +10,12 @@ import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
-import cotato.csquiz.service.QuizService;
+import cotato.csquiz.repository.QuizRepository;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -22,6 +23,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> CLIENTS = new ConcurrentHashMap<>();
@@ -29,39 +31,58 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final String KING_COMMAND = "king";
     private static final String WINNER_COMMAND = "winner";
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final QuizService quizService;
-
-    @Autowired
-    public WebSocketHandler(QuizService quizService) {
-        this.quizService = quizService;
-    }
+    private final QuizRepository quizRepository;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         String memberId = findAttributeByToken(session, "memberId");
         String educationId = findAttributeByToken(session, "educationId");
+        String role = findAttributeByToken(session, "role");
+        MemberRole memberRole = findMemberRole(role);
 
-        MemberRole memberRole = findMemberRole(session, memberId);
-        Boolean isMemberClient = isMemberClient(memberRole);
+        addMemberToSession(memberId, memberRole, session);
 
-        if (isMemberClient) {
-            addClientSession(memberId,session);
-            checkQuizAlreadyStart(session, Long.parseLong(educationId));
-        } else {
-            addManagerSession(memberId,session);
+        if (isQuizAlreadyStarted(Long.parseLong(educationId)) && isMemberClient(memberRole)) {
+            sendStartedQuiz(Long.parseLong(educationId), session);
         }
 
         log.info("[세션 연결] {}", memberId);
     }
 
+    private void sendStartedQuiz(Long educationId, WebSocketSession session) {
+        try {
+            Optional<Quiz> maybeQuiz = quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON,
+                    educationId);
+            QuizStatusResponse response = maybeQuiz.map(quiz -> QuizStatusResponse.builder()
+                            .command("show")
+                            .quizId(quiz.getId())
+                            .status(quiz.getStatus())
+                            .start(quiz.getStart())
+                            .build())
+                    .orElse(QuizStatusResponse.builder()
+                            .command("show")
+                            .build());
+
+            String json = objectMapper.writeValueAsString(response);
+            TextMessage responseMessage = new TextMessage(json);
+
+            session.sendMessage(responseMessage);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
+    }
+
+    private boolean isQuizAlreadyStarted(Long educationId) {
+        return quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON, educationId).isPresent();
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String memberId = findAttributeByToken(session, "memberId");
+        String role = findAttributeByToken(session, "role");
+        MemberRole memberRole = findMemberRole(role);
 
-        MemberRole role = findMemberRole(session, memberId);
-        Boolean isMemberClient = isMemberClient(role);
-
-        if (isMemberClient) {
+        if (isMemberClient(memberRole)) {
             CLIENTS.remove(memberId);
         } else {
             MANAGERS.remove(memberId);
@@ -143,16 +164,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private MemberRole findMemberRole(WebSocketSession session, String memberId) {
-        if (memberId != null) {
-            String roleString = findAttributeByToken(session, "role");
-            MemberRole role = MemberRole.valueOf(roleString.split("_")[1]);
-            log.info("[소켓 MemberRole] {}", role);
-            return role;
-        } else {
-            log.warn("해당 WebSocketSession에 멤버가 없습니다 {}.", session.getId());
-            throw new AppException(ErrorCode.MEMBER_NOT_FOUND);
-        }
+    private MemberRole findMemberRole(String roleName) {
+        return MemberRole.fromKey(roleName);
     }
 
     private Boolean isMemberClient(MemberRole memberRole) {
@@ -166,31 +179,17 @@ public class WebSocketHandler extends TextWebSocketHandler {
         };
     }
 
-    private void addManagerSession(String memberId, WebSocketSession session) {
-        MANAGERS.put(memberId, session);
-        log.info("{} connect with Session {} in MANAGER", memberId, session);
-    }
-
-    private void addClientSession(String memberId, WebSocketSession session) {
-        CLIENTS.put(memberId, session);
-        log.info("{} connect with Session {} in CLIENTS", memberId, session);
+    private void addMemberToSession(String memberId, MemberRole role, WebSocketSession session) {
+        if (isMemberClient(role)) {
+            CLIENTS.put(memberId, session);
+            log.info("{} connect with Session {} in CLIENTS", memberId, session);
+        } else {
+            MANAGERS.put(memberId, session);
+            log.info("{} connect with Session {} in MANAGER", memberId, session);
+        }
     }
 
     private String findAttributeByToken(WebSocketSession session, String key) {
         return session.getAttributes().get(key).toString();
-    }
-
-    private void checkQuizAlreadyStart(WebSocketSession session, Long educationId) {
-        log.info("checkQuizAlreadyStart Start");
-        try {
-            QuizStatusResponse response = quizService.checkQuizStarted(educationId);
-
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-
-            session.sendMessage(responseMessage);
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
-        }
     }
 }
