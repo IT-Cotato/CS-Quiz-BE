@@ -50,26 +50,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     private void sendStartedQuiz(Long educationId, WebSocketSession session) {
-        try {
-            Optional<Quiz> maybeQuiz = quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON,
-                    educationId);
-            QuizStatusResponse response = maybeQuiz.map(quiz -> QuizStatusResponse.builder()
-                            .command("show")
-                            .quizId(quiz.getId())
-                            .status(quiz.getStatus())
-                            .start(quiz.getStart())
-                            .build())
-                    .orElse(QuizStatusResponse.builder()
-                            .command("show")
-                            .build());
-
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-
-            session.sendMessage(responseMessage);
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
-        }
+        Optional<Quiz> maybeQuiz = quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON,
+                educationId);
+        QuizStatusResponse response = maybeQuiz.map(quiz -> QuizStatusResponse.builder()
+                        .command("show")
+                        .quizId(quiz.getId())
+                        .status(quiz.getStatus())
+                        .start(quiz.getStart())
+                        .build())
+                .orElse(QuizStatusResponse.builder()
+                        .command("show")
+                        .build());
+        sendMessage(session, response);
     }
 
     private boolean isQuizAlreadyStarted(Long educationId) {
@@ -92,38 +84,26 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     public void accessQuiz(Long quizId) {
-        try {
-            QuizStatusResponse response = QuizStatusResponse.builder()
-                    .quizId(quizId)
-                    .command("show")
-                    .status(QuizStatus.QUIZ_ON)
-                    .start(QuizStatus.QUIZ_OFF)
-                    .build();
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-            for (WebSocketSession clientSession : CLIENTS.values()) {
-                clientSession.sendMessage(responseMessage);
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        QuizStatusResponse response = QuizStatusResponse.builder()
+                .quizId(quizId)
+                .command("show")
+                .status(QuizStatus.QUIZ_ON)
+                .start(QuizStatus.QUIZ_OFF)
+                .build();
+
+        for (WebSocketSession clientSession : CLIENTS.values()) {
+            sendMessage(clientSession, response);
         }
     }
 
     public void startQuiz(Long quizId) {
-        try {
-            QuizStartResponse response = QuizStartResponse.builder()
-                    .quizId(quizId)
-                    .command("start")
-                    .build();
+        QuizStartResponse response = QuizStartResponse.builder()
+                .quizId(quizId)
+                .command("start")
+                .build();
 
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-
-            for (WebSocketSession clientSession : CLIENTS.values()) {
-                clientSession.sendMessage(responseMessage);
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        for (WebSocketSession clientSession : CLIENTS.values()) {
+            sendMessage(clientSession, response);
         }
     }
 
@@ -135,32 +115,16 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if (quiz.getNumber() == 10) {
             command = WINNER_COMMAND;
         }
-        try {
-            QuizStopResponse response = QuizStopResponse.from(command, quiz.getId());
-
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-
-            for (WebSocketSession clientSession : CLIENTS.values()) {
-                clientSession.sendMessage(responseMessage);
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        QuizStopResponse response = QuizStopResponse.from(command, quiz.getId());
+        for (WebSocketSession clientSession : CLIENTS.values()) {
+            sendMessage(clientSession, response);
         }
     }
 
     public void stopAllQuiz(Long educationId) {
-        try {
-            CsQuizStopResponse response = CsQuizStopResponse.from("exit", educationId);
-
-            String json = objectMapper.writeValueAsString(response);
-            TextMessage responseMessage = new TextMessage(json);
-
-            for (WebSocketSession clientSession : CLIENTS.values()) {
-                clientSession.sendMessage(responseMessage);
-            }
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        CsQuizStopResponse response = CsQuizStopResponse.from("exit", educationId);
+        for (WebSocketSession clientSession : CLIENTS.values()) {
+            sendMessage(clientSession, response);
         }
     }
 
@@ -191,5 +155,15 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private String findAttributeByToken(WebSocketSession session, String key) {
         return session.getAttributes().get(key).toString();
+    }
+
+    private void sendMessage(WebSocketSession session, Object sendValue) {
+        try {
+            String json = objectMapper.writeValueAsString(sendValue);
+            TextMessage responseMessage = new TextMessage(json);
+            session.sendMessage(responseMessage);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.WEBSOCKET_SEND_EXCEPTION);
+        }
     }
 }
