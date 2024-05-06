@@ -81,7 +81,7 @@ public class AdminController {
     }
 
     @GetMapping("/old-members")
-    public ResponseEntity<List<MemberEnrollInfoResponse>> findOldMembersList() {
+    public ResponseEntity<List<MemberEnrollInfoResponse>> findOldMembers() {
         return ResponseEntity.ok().body(adminService.findOldMembers());
     }
 
