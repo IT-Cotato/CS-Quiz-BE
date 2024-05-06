@@ -30,14 +30,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final ConcurrentHashMap<String, WebSocketSession> MANAGERS = new ConcurrentHashMap<>();
     private static final String KING_COMMAND = "king";
     private static final String WINNER_COMMAND = "winner";
+    private static final String SHOW_COMMAND = "show";
+    private static final String START_COMMAND = "start";
+    private static final String EXIT_COMMAND = "exit";
+    private static final String MEMBER_ID_KEY = "memberId";
+    private static final String EDUCATION_ID_KEY = "educationId";
+    private static final String ROLE_KEY = "role";
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final QuizRepository quizRepository;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        String memberId = findAttributeByToken(session, "memberId");
-        String educationId = findAttributeByToken(session, "educationId");
-        String role = findAttributeByToken(session, "role");
+        String memberId = findAttributeByToken(session, MEMBER_ID_KEY);
+        String educationId = findAttributeByToken(session, EDUCATION_ID_KEY);
+        String role = findAttributeByToken(session, ROLE_KEY);
         MemberRole memberRole = findMemberRole(role);
 
         addMemberToSession(memberId, memberRole, session);
@@ -53,13 +59,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
         Optional<Quiz> maybeQuiz = quizRepository.findByStatusAndEducationId(QuizStatus.QUIZ_ON,
                 educationId);
         QuizStatusResponse response = maybeQuiz.map(quiz -> QuizStatusResponse.builder()
-                        .command("show")
+                        .command(SHOW_COMMAND)
                         .quizId(quiz.getId())
                         .status(quiz.getStatus())
                         .start(quiz.getStart())
                         .build())
                 .orElse(QuizStatusResponse.builder()
-                        .command("show")
+                        .command(SHOW_COMMAND)
                         .build());
         sendMessage(session, response);
     }
@@ -70,8 +76,8 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        String memberId = findAttributeByToken(session, "memberId");
-        String role = findAttributeByToken(session, "role");
+        String memberId = findAttributeByToken(session, MEMBER_ID_KEY);
+        String role = findAttributeByToken(session, ROLE_KEY);
         MemberRole memberRole = findMemberRole(role);
 
         if (isMemberClient(memberRole)) {
@@ -86,7 +92,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void accessQuiz(Long quizId) {
         QuizStatusResponse response = QuizStatusResponse.builder()
                 .quizId(quizId)
-                .command("show")
+                .command(SHOW_COMMAND)
                 .status(QuizStatus.QUIZ_ON)
                 .start(QuizStatus.QUIZ_OFF)
                 .build();
@@ -99,7 +105,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     public void startQuiz(Long quizId) {
         QuizStartResponse response = QuizStartResponse.builder()
                 .quizId(quizId)
-                .command("start")
+                .command(START_COMMAND)
                 .build();
 
         for (WebSocketSession clientSession : CLIENTS.values()) {
@@ -122,7 +128,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     public void stopAllQuiz(Long educationId) {
-        CsQuizStopResponse response = CsQuizStopResponse.from("exit", educationId);
+        CsQuizStopResponse response = CsQuizStopResponse.from(EXIT_COMMAND, educationId);
         for (WebSocketSession clientSession : CLIENTS.values()) {
             sendMessage(clientSession, response);
         }
