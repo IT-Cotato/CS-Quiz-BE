@@ -91,7 +91,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         log.info("[세션 종료] {}", memberId);
     }
 
-    public void accessQuiz(long quizId) {
+    public void accessQuiz(Long quizId) {
         try {
             QuizStatusResponse response = QuizStatusResponse.builder()
                     .quizId(quizId)
