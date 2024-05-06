@@ -126,7 +126,7 @@ public class AdminService {
         }
     }
 
-    public List<MemberEnrollInfoResponse> findOldMembersList() {
+    public List<MemberEnrollInfoResponse> findOldMembers() {
         List<Member> oldMembers = memberRepository.findAllByRole(OLD_MEMBER);
         return oldMembers.stream()
                 .map(MemberEnrollInfoResponse::from)
