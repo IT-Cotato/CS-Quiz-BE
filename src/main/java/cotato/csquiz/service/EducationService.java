@@ -88,7 +88,6 @@ public class EducationService {
                 .orElseThrow(() -> new AppException(ErrorCode.SUBJECT_INVALID));
     }
 
-
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
         return sessionRepository.findAllByGenerationId(generationId).stream()
                 .map(educationRepository::findBySession)
