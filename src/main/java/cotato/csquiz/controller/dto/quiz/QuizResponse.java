@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class QuizResponse {
 
     private Long id;
-    private int number;
+    private Integer number;
     private QuizType quizType;
     private String question;
     private String image;

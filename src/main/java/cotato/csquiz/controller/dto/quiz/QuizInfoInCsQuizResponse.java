@@ -7,7 +7,7 @@ import java.util.List;
 public record QuizInfoInCsQuizResponse(
         Long quizId,
         QuizType quizType,
-        int quizNumber,
+        Integer quizNumber,
         String question,
         List<String> answer
 ) {

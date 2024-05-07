@@ -8,7 +8,7 @@ public record MyPageMemberInfoResponse(
         Long memberId,
         String memberName,
         String phoneNumber,
-        int generationNumber,
+        Integer generationNumber,
         MemberRole memberRole,
         MemberPosition memberPosition
 ) {

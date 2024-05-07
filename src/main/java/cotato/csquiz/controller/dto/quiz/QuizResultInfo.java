@@ -5,7 +5,7 @@ import cotato.csquiz.domain.entity.Quiz;
 
 public record QuizResultInfo(
         Long quizId,
-        int quizNumber,
+        Integer quizNumber,
         Long scorerId,
         String scorerName,
         String backFourNumber
