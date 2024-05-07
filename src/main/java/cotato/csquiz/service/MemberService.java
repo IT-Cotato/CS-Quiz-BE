@@ -72,6 +72,6 @@ public class MemberService {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         String originPhoneNumber = encryptService.decryptPhoneNumber(findMember.getPhoneNumber());
-        return MemberMyPageInfoResponse.from(findMember, originPhoneNumber);
+        return MemberMyPageInfoResponse.of(findMember, originPhoneNumber);
     }
 }

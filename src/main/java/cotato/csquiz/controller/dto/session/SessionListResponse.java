@@ -7,7 +7,7 @@ import cotato.csquiz.domain.enums.Networking;
 
 public record SessionListResponse(
         Long sessionId,
-        int sessionNumber,
+        Integer sessionNumber,
         String photoUrl,
         String description,
         Long generationId,

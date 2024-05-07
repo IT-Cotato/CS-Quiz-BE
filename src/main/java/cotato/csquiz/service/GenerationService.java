@@ -36,9 +36,7 @@ public class GenerationService {
                 .sessionCount(request.sessionCount())
                 .build();
         Generation savedGeneration = generationRepository.save(generation);
-        return AddGenerationResponse.builder()
-                .generationId(savedGeneration.getId())
-                .build();
+        return AddGenerationResponse.from(savedGeneration);
     }
 
     @Transactional

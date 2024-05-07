@@ -4,7 +4,7 @@ import cotato.csquiz.domain.entity.Session;
 
 public record CsEducationOnSessionNumberResponse(
         Long sessionId,
-        int sessionNumber
+        Integer sessionNumber
 ) {
     public static CsEducationOnSessionNumberResponse from(Session session) {
         return new CsEducationOnSessionNumberResponse(

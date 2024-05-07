@@ -138,9 +138,7 @@ public class AuthService {
         String role = findMember.getRole().getKey();
 
         Token token = jwtTokenProvider.createToken(findMember.getId(), role);
-        return FindPasswordResponse.builder()
-                .accessToken(token.getAccessToken())
-                .build();
+        return FindPasswordResponse.from(token.getAccessToken());
     }
 
     public MemberEmailResponse findMemberEmail(String name, String phoneNumber) {

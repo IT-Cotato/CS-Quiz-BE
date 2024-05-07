@@ -1,15 +1,12 @@
 package cotato.csquiz.domain.entity;
 
 import cotato.csquiz.global.entity.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,10 +23,10 @@ public class Generation extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "generation_number", unique = true, nullable = false)
-    private int number;
+    private Integer number;
 
-    @Column(name = "generation_session_count")
-    private int sessionCount;
+    @Column(name = "generation_session_count", nullable = false)
+    private Integer sessionCount;
 
     @Column(name = "generation_start_date")
     private LocalDate startDate;
@@ -41,7 +38,7 @@ public class Generation extends BaseTimeEntity {
     private Boolean isRecruit;
 
     @Builder
-    public Generation(int number, int sessionCount ,LocalDate startDate, LocalDate endDate) {
+    public Generation(Integer number, Integer sessionCount, LocalDate startDate, LocalDate endDate) {
         this.number = number;
         this.sessionCount = sessionCount;
         this.startDate = startDate;
@@ -49,12 +46,12 @@ public class Generation extends BaseTimeEntity {
         isRecruit = false;
     }
 
-    public void changeRecruit(boolean isRecruit){
+    public void changeRecruit(Boolean isRecruit) {
         this.isRecruit = isRecruit;
     }
 
     public void changePeriod(LocalDate startDate, LocalDate endDate) {
-        this.startDate=startDate;
+        this.startDate = startDate;
         this.endDate = endDate;
     }
 }

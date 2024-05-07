@@ -7,11 +7,11 @@ public record MemberMyPageInfoResponse(
         Long memberId,
         String email,
         String name,
-        int generationNumber,
+        Integer generationNumber,
         MemberPosition memberPosition,
         String phoneNumber
 ) {
-    public static MemberMyPageInfoResponse from(Member member, String originPhoneNumber) {
+    public static MemberMyPageInfoResponse of(Member member, String originPhoneNumber) {
         return new MemberMyPageInfoResponse(
                 member.getId(),
                 member.getEmail(),

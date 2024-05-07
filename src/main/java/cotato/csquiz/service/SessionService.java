@@ -3,10 +3,10 @@ package cotato.csquiz.service;
 import cotato.csquiz.controller.dto.session.AddSessionRequest;
 import cotato.csquiz.controller.dto.session.AddSessionResponse;
 import cotato.csquiz.controller.dto.session.CsEducationOnSessionNumberResponse;
-import cotato.csquiz.controller.dto.session.UpdateSessionDescriptionRequest;
 import cotato.csquiz.controller.dto.session.SessionListResponse;
-import cotato.csquiz.controller.dto.session.UpdateSessionPhotoRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionDescriptionRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
+import cotato.csquiz.controller.dto.session.UpdateSessionPhotoRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
@@ -57,10 +57,7 @@ public class SessionService {
         Session savedSession = sessionRepository.save(session);
         log.info("세션 생성 완료");
 
-        return AddSessionResponse.builder()
-                .sessionId(savedSession.getId())
-                .sessionNumber(session.getNumber())
-                .build();
+        return AddSessionResponse.from(savedSession);
     }
 
     @Transactional

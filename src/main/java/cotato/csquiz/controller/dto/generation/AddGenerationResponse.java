@@ -1,11 +1,11 @@
 package cotato.csquiz.controller.dto.generation;
 
-import lombok.Builder;
-import lombok.Data;
+import cotato.csquiz.domain.entity.Generation;
 
-@Data
-@Builder
-public class AddGenerationResponse {
-
-    private Long generationId;
+public record AddGenerationResponse(
+        Long generationId
+) {
+    public static AddGenerationResponse from(Generation generation) {
+        return new AddGenerationResponse(generation.getId());
+    }
 }
