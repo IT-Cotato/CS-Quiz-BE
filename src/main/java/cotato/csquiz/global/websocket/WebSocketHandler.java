@@ -7,6 +7,7 @@ import cotato.csquiz.controller.dto.socket.QuizStatusResponse;
 import cotato.csquiz.controller.dto.socket.QuizStopResponse;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.enums.MemberRole;
+import cotato.csquiz.domain.enums.MemberRoleGroup;
 import cotato.csquiz.domain.enums.QuizStatus;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -44,11 +45,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         String memberId = findAttributeByToken(session, MEMBER_ID_KEY);
         Long educationId = Long.parseLong(findAttributeByToken(session, EDUCATION_ID_KEY));
         String role = findAttributeByToken(session, ROLE_KEY);
-        MemberRole memberRole = findMemberRole(role);
+        MemberRole memberRole = MemberRole.fromKey(role);
 
-        addMemberToSession(memberId, memberRole, session);
+        addMemberToSession(memberId, session);
 
-        if (isMemberClient(memberRole)) {
+        if (MemberRoleGroup.hasRole(MemberRoleGroup.CLIENTS, memberRole)) {
             sendQuiz(educationId, session);
         }
 
@@ -74,10 +75,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String memberId = findAttributeByToken(session, MEMBER_ID_KEY);
-        String role = findAttributeByToken(session, ROLE_KEY);
-        MemberRole memberRole = findMemberRole(role);
+        String roleAttribute = findAttributeByToken(session, ROLE_KEY);
+        MemberRole memberRole = MemberRole.fromKey(roleAttribute);
 
-        if (isMemberClient(memberRole)) {
+        if (MemberRoleGroup.hasRole(MemberRoleGroup.CLIENTS, memberRole)) {
             CLIENTS.remove(memberId);
         } else {
             MANAGERS.remove(memberId);
@@ -131,23 +132,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
-    private MemberRole findMemberRole(String roleName) {
-        return MemberRole.fromKey(roleName);
-    }
+    private void addMemberToSession(String memberId, WebSocketSession session) {
+        String roleAttribute = findAttributeByToken(session, ROLE_KEY);
+        MemberRole role = MemberRole.fromKey(roleAttribute);
 
-    private Boolean isMemberClient(MemberRole memberRole) {
-        return switch (memberRole) {
-            case EDUCATION -> false;
-            case MEMBER, ADMIN -> true;
-            default -> {
-                log.warn("Unknown role for member {}.", memberRole);
-                throw new AppException(ErrorCode.MEMBER_CANT_ACCESS);
-            }
-        };
-    }
-
-    private void addMemberToSession(String memberId, MemberRole role, WebSocketSession session) {
-        if (isMemberClient(role)) {
+        if (MemberRoleGroup.hasRole(MemberRoleGroup.CLIENTS, role)) {
             CLIENTS.put(memberId, session);
             log.info("{} connect with Session {} in CLIENTS", memberId, session);
         } else {

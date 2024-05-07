@@ -1,7 +1,5 @@
 package cotato.csquiz.service;
 
-import static cotato.csquiz.domain.enums.MemberRole.ADMIN;
-import static cotato.csquiz.domain.enums.MemberRole.EDUCATION;
 import static cotato.csquiz.domain.enums.MemberRole.GENERAL;
 import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
 import static cotato.csquiz.domain.enums.MemberRole.OLD_MEMBER;
@@ -17,7 +15,7 @@ import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.RefusedMember;
-import cotato.csquiz.domain.enums.MemberRole;
+import cotato.csquiz.domain.enums.MemberRoleGroup;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
 import cotato.csquiz.repository.GenerationRepository;
@@ -106,7 +104,7 @@ public class AdminService {
     @Transactional
     public void updateActiveMemberRole(UpdateActiveMemberRoleRequest request) {
         Member member = findMember(request.memberId());
-        if (member.getRole() == MemberRole.GENERAL || member.getRole() == REFUSED || member.getRole() == OLD_MEMBER) {
+        if (!MemberRoleGroup.hasRole(MemberRoleGroup.ACTIVE_MEMBERS, member.getRole())) {
             throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
         }
         member.updateRole(request.role());
@@ -117,12 +115,11 @@ public class AdminService {
     public void updateActiveMembersToOldMembers(UpdateActiveMemberToOldMemberRequest request) {
         for (Long memberId : request.memberIds()) {
             Member member = findMember(memberId);
-            if (member.getRole() == MEMBER || member.getRole() == ADMIN || member.getRole() == EDUCATION) {
-                member.updateRole(OLD_MEMBER);
-                memberRepository.save(member);
-            } else {
+            if (!MemberRoleGroup.hasRole(MemberRoleGroup.ACTIVE_MEMBERS, member.getRole())) {
                 throw new AppException(ErrorCode.ROLE_IS_NOT_MATCH);
             }
+            member.updateRole(OLD_MEMBER);
+            memberRepository.save(member);
         }
     }
 
