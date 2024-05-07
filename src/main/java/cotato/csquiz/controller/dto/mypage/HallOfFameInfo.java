@@ -7,7 +7,7 @@ public record HallOfFameInfo(
         String name,
         long count
 ) {
-    public static HallOfFameInfo from(Member member, long count) {
+    public static HallOfFameInfo of(Member member, long count) {
         return new HallOfFameInfo(
                 member.getId(),
                 member.getName(),

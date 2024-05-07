@@ -92,7 +92,7 @@ public class MyPageService {
                 .collect(Collectors.groupingBy(Record::getMember, Collectors.counting()));
         List<Entry<Member, Long>> sorted5MemberEntry = sortTopMemberEntry(countByMember);
         return sorted5MemberEntry.stream()
-                .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
+                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
@@ -104,7 +104,7 @@ public class MyPageService {
         List<Map.Entry<Member, Long>> topMemberEntry = sortTopMemberEntry(memberScoreMap);
 
         return topMemberEntry.stream()
-                .map(entry -> HallOfFameInfo.from(entry.getKey(), entry.getValue()))
+                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
                 .toList();
     }
 
