@@ -16,7 +16,8 @@ public class FindMultipleQuizResponse extends QuizResponse {
 
     private List<ChoiceResponse> choices;
 
-    private FindMultipleQuizResponse(Long id, int number, String question, String image, List<ChoiceResponse> choices) {
+    private FindMultipleQuizResponse(Long id, Integer number, String question, String image,
+                                     List<ChoiceResponse> choices) {
         super(id, number, QuizType.MULTIPLE_QUIZ, question, image);
         this.choices = choices;
     }

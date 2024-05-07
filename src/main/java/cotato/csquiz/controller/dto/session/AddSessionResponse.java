@@ -1,11 +1,15 @@
 package cotato.csquiz.controller.dto.session;
 
-import lombok.Builder;
-import lombok.Data;
+import cotato.csquiz.domain.entity.Session;
 
-@Data
-@Builder
-public class AddSessionResponse {
-    private Long sessionId;
-    private int sessionNumber;
+public record AddSessionResponse(
+        Long sessionId,
+        Integer sessionNumber
+) {
+    public static AddSessionResponse from(Session session) {
+        return new AddSessionResponse(
+                session.getId(),
+                session.getNumber()
+        );
+    }
 }

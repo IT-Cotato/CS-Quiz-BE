@@ -1,23 +1,20 @@
 package cotato.csquiz.controller.dto;
 
 import cotato.csquiz.domain.entity.Education;
-import lombok.Builder;
-import lombok.Getter;
 
-@Getter
-@Builder
-public class AllEducationResponse {
-    private Long educationId;
-    private String subject;
-    private int educationNumber;
-    private int sessionNumber;
+public record AllEducationResponse(
+        Long educationId,
+        String subject,
+        Integer educationNumber,
+        Integer sessionNumber
+) {
 
-    public static AllEducationResponse convertFromEducation(Education education) {
-        return AllEducationResponse.builder()
-                .educationId(education.getId())
-                .subject(education.getSubject())
-                .educationNumber(education.getNumber())
-                .sessionNumber(education.getSession().getNumber())
-                .build();
+    public static AllEducationResponse from(Education education) {
+        return new AllEducationResponse(
+                education.getId(),
+                education.getSubject(),
+                education.getNumber(),
+                education.getSession().getNumber()
+        );
     }
 }

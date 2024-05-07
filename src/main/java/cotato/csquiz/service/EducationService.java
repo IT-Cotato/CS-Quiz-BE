@@ -52,9 +52,7 @@ public class EducationService {
                 .educationNum(request.educationNum())
                 .build();
         Education saveEducation = educationRepository.save(education);
-        return CreateEducationResponse.builder()
-                .educationId(saveEducation.getId())
-                .build();
+        return CreateEducationResponse.from(saveEducation);
     }
 
     private void checkEducationExist(Session session) {
@@ -66,10 +64,7 @@ public class EducationService {
     }
 
     public FindEducationStatusResponse findEducationStatus(Long educationId) {
-        Education education = findEducation(educationId);
-        return FindEducationStatusResponse.builder()
-                .status(education.getStatus())
-                .build();
+        return FindEducationStatusResponse.from(findEducation(educationId));
     }
 
     private Education findEducation(Long educationId) {
@@ -99,7 +94,7 @@ public class EducationService {
                 .map(educationRepository::findBySession)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(AllEducationResponse::convertFromEducation)
+                .map(AllEducationResponse::from)
                 .toList();
     }
 

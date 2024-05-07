@@ -1,11 +1,11 @@
 package cotato.csquiz.controller.dto.education;
 
-import lombok.Builder;
-import lombok.Data;
+import cotato.csquiz.domain.entity.Education;
 
-@Data
-@Builder
-public class CreateEducationResponse {
-
-    private Long educationId;
+public record CreateEducationResponse(
+        Long educationId
+) {
+    public static CreateEducationResponse from(Education education) {
+        return new CreateEducationResponse(education.getId());
+    }
 }
