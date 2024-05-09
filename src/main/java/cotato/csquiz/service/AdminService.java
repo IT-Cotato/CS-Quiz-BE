@@ -39,13 +39,11 @@ public class AdminService {
     private final MemberService memberService;
 
     public List<ApplyMemberInfoResponse> findApplicantList() {
-        List<Member> applicantList = memberRepository.findAllByRole(GENERAL);
-        return createApplyInfoList(applicantList);
+        return createApplyInfoList(memberRepository.findAllByRole(GENERAL));
     }
 
     public List<ApplyMemberInfoResponse> findRejectApplicantList() {
-        List<Member> applicantList = memberRepository.findAllByRole(REFUSED);
-        return createApplyInfoList(applicantList);
+        return createApplyInfoList(memberRepository.findAllByRole(REFUSED));
     }
 
     @Transactional
