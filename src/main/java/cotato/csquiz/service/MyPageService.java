@@ -115,7 +115,7 @@ public class MyPageService {
     }
 
     private List<Scorer> findAllScorersByGeneration(final Generation generation) {
-        List<Long> educationIds = educationRepository.findAllByGenereationId(generation.getId()).stream()
+        List<Long> educationIds = educationRepository.findAllByGenerationId(generation.getId()).stream()
                 .map(Education::getId)
                 .toList();
         List<Long> quizIds = quizRepository.findAllByEducationIdsInQuery(educationIds).stream()
@@ -125,7 +125,7 @@ public class MyPageService {
     }
 
     private List<Record> findAllCorrectRecordByGeneration(final Generation generation) {
-        List<Long> educationIds = educationRepository.findAllByGenereationId(generation.getId()).stream()
+        List<Long> educationIds = educationRepository.findAllByGenerationId(generation.getId()).stream()
                 .map(Education::getId)
                 .toList();
         List<Quiz> quizIds = quizRepository.findAllByEducationIdsInQuery(educationIds);
