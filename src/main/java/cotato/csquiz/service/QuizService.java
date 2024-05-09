@@ -138,7 +138,6 @@ public class QuizService {
                 .question(request.getQuestion())
                 .photoUrl(imageUrl)
                 .appearSecond(generateRandomTime())
-                .generation(findEducation.getSession().getGeneration())
                 .build();
 
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
@@ -174,7 +173,6 @@ public class QuizService {
                 .number(request.getNumber())
                 .photoUrl(imageUrl)
                 .appearSecond(generateRandomTime())
-                .generation(findEducation.getSession().getGeneration())
                 .build();
         log.info("주관식 문제 생성 완료: 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);

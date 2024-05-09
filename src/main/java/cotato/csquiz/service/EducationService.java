@@ -49,7 +49,7 @@ public class EducationService {
         checkEducationExist(request.sessionId());
 
         Education education = Education.builder()
-                .session(findSession)
+                .sessionId(findSession.getId())
                 .subject(request.subject())
                 .educationNumber(request.educationNum())
                 .generationId(findSession.getGeneration().getId())

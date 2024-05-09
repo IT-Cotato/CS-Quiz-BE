@@ -25,9 +25,8 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findByStart(QuizStatus quizStatus);
 
-    @Query("select o from Quiz o join fetch o.records")
-    List<Quiz> findAllFetchJoinRecords();
-
-    @Query("select o from Quiz o join fetch o.scorer")
-    List<Quiz> findAllFetchJoinByScorer();
+    @Transactional
+    @Modifying
+    @Query("select q from Quiz q where q.id in :educationIds")
+    List<Quiz> findAllByEducationIdsInQuery(@Param("educationIds") List<Long> educationIds);
 }
