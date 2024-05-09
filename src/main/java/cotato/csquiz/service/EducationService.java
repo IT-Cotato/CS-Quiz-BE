@@ -45,7 +45,7 @@ public class EducationService {
     @Transactional
     public CreateEducationResponse createEducation(CreateEducationRequest request) {
         Session session = sessionService.findSessionById(request.sessionId());
-        checkEducationExist(session);
+        checkEducationExist(request.sessionId());
         Education education = Education.builder()
                 .session(session)
                 .subject(request.subject())
@@ -55,12 +55,10 @@ public class EducationService {
         return CreateEducationResponse.from(saveEducation);
     }
 
-    private void checkEducationExist(Session session) {
-        educationRepository.findBySession(session).ifPresent(
-                education -> {
-                    throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
-                }
-        );
+    private void checkEducationExist(Long sessionId) {
+        if (educationRepository.existsBySessionId(sessionId)) {
+            throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
+        }
     }
 
     public FindEducationStatusResponse findEducationStatus(Long educationId) {
