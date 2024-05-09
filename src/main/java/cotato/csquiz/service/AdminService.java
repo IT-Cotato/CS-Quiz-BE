@@ -98,8 +98,10 @@ public class AdminService {
     }
 
     public List<MemberEnrollInfoResponse> findCurrentActiveMembers() {
-        return memberRepository.findAll().stream()
-                .filter(Member::isActiveRole)
+        List<MemberRole> roles = MemberRoleGroup.ACTIVE_MEMBERS.getRoles();
+        List<Member> activeMembers = memberRepository.findAllByRoleInQuery(roles);
+
+        return activeMembers.stream()
                 .map(MemberEnrollInfoResponse::of)
                 .toList();
     }
@@ -129,7 +131,7 @@ public class AdminService {
     public List<MemberEnrollInfoResponse> findOldMembers() {
         List<Member> oldMembers = memberRepository.findAllByRole(OLD_MEMBER);
         return oldMembers.stream()
-                .map(MemberEnrollInfoResponse::from)
+                .map(MemberEnrollInfoResponse::of)
                 .toList();
     }
 

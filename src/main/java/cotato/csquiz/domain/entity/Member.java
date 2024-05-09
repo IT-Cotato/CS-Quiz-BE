@@ -1,9 +1,5 @@
 package cotato.csquiz.domain.entity;
 
-import static cotato.csquiz.domain.enums.MemberRole.ADMIN;
-import static cotato.csquiz.domain.enums.MemberRole.EDUCATION;
-import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
-
 import cotato.csquiz.domain.enums.MemberPosition;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.global.entity.BaseTimeEntity;
@@ -81,9 +77,5 @@ public class Member extends BaseTimeEntity {
 
     public void updatePosition(MemberPosition position) {
         this.position = position;
-    }
-
-    public boolean isActiveRole() {
-        return role == ADMIN || role == EDUCATION || role == MEMBER;
     }
 }
