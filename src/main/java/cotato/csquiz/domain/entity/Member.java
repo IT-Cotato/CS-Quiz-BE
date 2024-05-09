@@ -52,8 +52,8 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault(value = "'GENERAL'")
     private MemberRole role;
 
-    @Column(name = "generation_number")
-    private Integer passedGeneration;
+    @Column(name = "passed_generation_number")
+    private Integer passedGenerationNumber;
 
     @Builder
     public Member(String email, String password, String name, String phoneNumber) {
@@ -71,8 +71,8 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    public void updateGeneration(Integer passedGeneration) {
-        this.passedGeneration = passedGeneration;
+    public void updateGeneration(Integer passedGenerationNumber) {
+        this.passedGenerationNumber = passedGenerationNumber;
     }
 
     public void updatePosition(MemberPosition position) {

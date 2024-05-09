@@ -18,7 +18,7 @@ public record MemberEnrollInfoResponse(
                 member.getId(),
                 member.getName(),
                 member.getPosition(),
-                member.getPassedGeneration(),
+                member.getPassedGenerationNumber(),
                 member.getRole()
         );
     }
