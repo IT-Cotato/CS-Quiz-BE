@@ -15,6 +15,7 @@ import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.RefusedMember;
+import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.MemberRoleGroup;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -50,11 +51,12 @@ public class AdminService {
     @Transactional
     public void approveApplicant(MemberApproveRequest request) {
         Member member = findMember(request.memberId());
-        Generation findGeneration = findGeneration(request.generationId());
         checkMemberRoleIsGeneral(member);
+
         if (member.getRole() == GENERAL) {
+            Generation findGeneration = findGeneration(request.generationId());
             member.updateRole(MEMBER);
-            member.updateGeneration(findGeneration);
+            member.updateGeneration(findGeneration.getNumber());
             member.updatePosition(request.position());
             memberRepository.save(member);
         }
@@ -63,10 +65,11 @@ public class AdminService {
     @Transactional
     public void reapproveApplicant(MemberApproveRequest request) {
         Member member = findMember(request.memberId());
+
         if (member.getRole() == REFUSED) {
             Generation findGeneration = findGeneration(request.generationId());
             member.updateRole(MEMBER);
-            member.updateGeneration(findGeneration);
+            member.updateGeneration(findGeneration.getNumber());
             member.updatePosition(request.position());
             deleteRefusedMember(member);
         }
@@ -97,7 +100,7 @@ public class AdminService {
     public List<MemberEnrollInfoResponse> findCurrentActiveMembers() {
         return memberRepository.findAll().stream()
                 .filter(Member::isActiveRole)
-                .map(MemberEnrollInfoResponse::from)
+                .map(MemberEnrollInfoResponse::of)
                 .toList();
     }
 

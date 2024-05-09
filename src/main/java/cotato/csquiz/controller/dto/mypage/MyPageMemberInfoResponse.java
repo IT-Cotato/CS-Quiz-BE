@@ -17,7 +17,7 @@ public record MyPageMemberInfoResponse(
                 member.getId(),
                 member.getName(),
                 originPhoneNumber,
-                member.getGeneration().getNumber(),
+                member.getPassedGeneration(),
                 member.getRole(),
                 member.getPosition()
         );
