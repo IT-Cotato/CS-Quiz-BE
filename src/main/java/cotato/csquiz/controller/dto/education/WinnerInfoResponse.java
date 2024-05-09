@@ -1,5 +1,6 @@
 package cotato.csquiz.controller.dto.education;
 
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.domain.enums.MemberPosition;
 
@@ -10,13 +11,13 @@ public record WinnerInfoResponse(
         String backFourNumber,
         MemberPosition memberPosition
 ) {
-    public static WinnerInfoResponse from(Winner winner, String backFourNumber) {
+    public static WinnerInfoResponse of(Winner winner, Member member, String backFourNumber) {
         return new WinnerInfoResponse(
-                winner.getMember().getId(),
-                winner.getMember().getName(),
+                member.getId(),
+                member.getName(),
                 winner.getEducation().getId(),
                 backFourNumber,
-                winner.getMember().getPosition()
+                member.getPosition()
         );
     }
 }

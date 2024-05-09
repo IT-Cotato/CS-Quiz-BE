@@ -10,6 +10,7 @@ import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.KingMember;
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.entity.Winner;
@@ -117,7 +118,8 @@ public class EducationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
-        return WinnerInfoResponse.from(findWinner, memberService.findBackFourNumber(findWinner.getMember()));
+        Member findMember = memberService.findById(findWinner.getMemberId());
+        return WinnerInfoResponse.of(findWinner, findMember, memberService.findBackFourNumber(findMember));
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {
