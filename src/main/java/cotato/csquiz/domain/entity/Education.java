@@ -29,7 +29,7 @@ public class Education extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "education_number")
-    private int number;
+    private Integer number;
 
     @Column(name = "education_subject")
     private String subject;
@@ -42,11 +42,15 @@ public class Education extends BaseTimeEntity {
     @JoinColumn(name = "session_id")
     private Session session;
 
+    @Column(name = "generation_id")
+    private Long generationId;
+
     @Builder
-    public Education(String subject, int educationNum, Session session) {
+    public Education(String subject, Integer educationNumber, Session session, Long generationId) {
         this.subject = subject;
-        this.number = educationNum;
+        this.number = educationNumber;
         this.session = session;
+        this.generationId = generationId;
         status = EducationStatus.BEFORE;
     }
 
@@ -58,7 +62,7 @@ public class Education extends BaseTimeEntity {
         this.subject = newSubject;
     }
 
-    public void updateNumber(int changeNumber) {
+    public void updateNumber(Integer changeNumber) {
         this.number = changeNumber;
     }
 }

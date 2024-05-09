@@ -44,13 +44,17 @@ public class EducationService {
 
     @Transactional
     public CreateEducationResponse createEducation(CreateEducationRequest request) {
-        Session session = sessionService.findSessionById(request.sessionId());
+        Session findSession = sessionRepository.findById(request.sessionId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
         checkEducationExist(request.sessionId());
+
         Education education = Education.builder()
-                .session(session)
+                .session(findSession)
                 .subject(request.subject())
-                .educationNum(request.educationNum())
+                .educationNumber(request.educationNum())
+                .generationId(findSession.getGeneration().getId())
                 .build();
+
         Education saveEducation = educationRepository.save(education);
         return CreateEducationResponse.from(saveEducation);
     }
@@ -87,10 +91,7 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
-        return sessionRepository.findAllByGenerationId(generationId).stream()
-                .map(educationRepository::findBySession)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return educationRepository.findAllByGenereationId(generationId).stream()
                 .map(AllEducationResponse::from)
                 .toList();
     }
