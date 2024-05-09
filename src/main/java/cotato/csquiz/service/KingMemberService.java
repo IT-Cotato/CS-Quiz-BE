@@ -7,6 +7,7 @@ import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Scorer;
 import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.repository.KingMemberRepository;
+import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.WinnerRepository;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class KingMemberService {
 
+    private final MemberRepository memberRepository;
     private final QuizRepository quizRepository;
     private final KingMemberRepository kingMemberRepository;
     private final ScorerRepository scorerRepository;
@@ -48,7 +50,9 @@ public class KingMemberService {
 
     public void saveWinnerIfKingMemberIsOne(List<KingMember> kingMembers, Education education) {
         if (kingMembers.size() == 1) {
-            saveWinner(kingMembers.get(0).getMember(), education);
+            Member findMember = memberRepository.findById(kingMembers.get(0).getMemberId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
+            saveWinner(findMember, education);
         }
     }
 

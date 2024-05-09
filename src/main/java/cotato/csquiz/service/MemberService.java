@@ -74,4 +74,9 @@ public class MemberService {
         String originPhoneNumber = encryptService.decryptPhoneNumber(findMember.getPhoneNumber());
         return MemberMyPageInfoResponse.of(findMember, originPhoneNumber);
     }
+
+    public Member findById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
+    }
 }

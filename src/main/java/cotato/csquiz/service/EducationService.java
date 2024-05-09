@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class EducationService {
 
-    private final SessionService sessionService;
     private final MemberService memberService;
     private final EducationRepository educationRepository;
     private final KingMemberRepository kingMemberRepository;
@@ -91,7 +90,7 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
-        return educationRepository.findAllByGenereationId(generationId).stream()
+        return educationRepository.findAllByGenerationId(generationId).stream()
                 .map(AllEducationResponse::from)
                 .toList();
     }
@@ -100,14 +99,14 @@ public class EducationService {
         Education findEducation = educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
-        validateEmpty(kingMembers);
+        validateIsEmpty(kingMembers);
         return kingMembers.stream()
-                .map(KingMember::getMember)
+                .map(kingMember -> memberService.findById(kingMember.getMemberId()))
                 .map(member -> KingMemberInfo.from(member, memberService.findBackFourNumber(member)))
                 .toList();
     }
 
-    private void validateEmpty(List<KingMember> kingMembers) {
+    private void validateIsEmpty(List<KingMember> kingMembers) {
         if (kingMembers.isEmpty()) {
             throw new EntityNotFoundException("아직 결승 진출자가 결정되지 않았습니다.");
         }
