@@ -115,10 +115,10 @@ public class QuizService {
     }
 
     private QuizResultInfo createQuizResultInfo(Quiz quiz) {
-        Optional<Scorer> mayBeScorer = scorerRepository.findByQuiz(quiz);
+        Optional<Scorer> mayBeScorer = scorerRepository.findByQuizId(quiz.getId());
 
         if (mayBeScorer.isPresent()) {
-            Member member = mayBeScorer.get().getMember();
+            Member member = memberService.findById(mayBeScorer.get().getMemberId());
 
             return QuizResultInfo.of(quiz, member, memberService.findBackFourNumber(member));
         }

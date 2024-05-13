@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyPageService {
 
     private static final int SHOW_PEOPLE_COUNT = 5;
+    private final MemberService memberService;
     private final GenerationRepository generationRepository;
     private final QuizRepository quizRepository;
     private final MemberRepository memberRepository;
@@ -79,7 +80,7 @@ public class MyPageService {
     private long countMyScorerByGeneration(Member member, Generation generation) {
         List<Scorer> myScorers = findAllScorersByGeneration(generation);
         return myScorers.stream()
-                .filter(scorer -> scorer.getMember().equals(member))
+                .filter(scorer -> scorer.getMemberId().equals(member.getId()))
                 .count();
     }
 
@@ -106,7 +107,8 @@ public class MyPageService {
         List<Scorer> scorers = findAllScorersByGeneration(generation);
 
         Map<Member, Long> memberScoreMap = scorers.stream()
-                .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
         List<Map.Entry<Member, Long>> topMemberEntry = sortTopMemberEntry(memberScoreMap);
 
         return topMemberEntry.stream()

@@ -31,14 +31,14 @@ public class Winner extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education;
 
-    private Winner(Member member, Education education) {
-        this.memberId = member.getId();
+    private Winner(Long memberId, Education education) {
+        this.memberId = memberId;
         this.education = education;
     }
 
-    public static Winner of(Member member, Education education) {
+    public static Winner of(Long memberId, Education education) {
         return new Winner(
-                member,
+                memberId,
                 education
         );
     }

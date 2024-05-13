@@ -130,7 +130,7 @@ public class RecordService {
                 .min(Comparator.comparing(Record::getTicketNumber))
                 .orElseThrow(() -> new AppException(ErrorCode.REGRADE_FAIL));
 
-        scorerRepository.findByQuiz(quiz)
+        scorerRepository.findByQuizId(quiz.getId())
                 .ifPresentOrElse(
                         scorer -> updateScorer(scorer, fastestRecord),
                         () -> createScorer(fastestRecord)
@@ -152,8 +152,9 @@ public class RecordService {
     }
 
     private boolean isFaster(Scorer previousScorer, Record fastestRecord) {
-        return scorerExistRedisRepository.getScorerTicketNumber(previousScorer.getQuiz())
-                > fastestRecord.getTicketNumber();
+        Quiz findQuiz = quizRepository.findById(previousScorer.getQuizId())
+                .orElseThrow(() -> new EntityNotFoundException("이전 득점자가 맞춘 퀴즈가 존재하지 않습니다."));
+        return scorerExistRedisRepository.getScorerTicketNumber(findQuiz) > fastestRecord.getTicketNumber();
     }
 
     private void createScorer(Record fastestRecord) {
@@ -167,11 +168,12 @@ public class RecordService {
         Quiz findQuiz = findQuizById(quizId);
         List<RecordResponse> records = findRecordsByQuiz(findQuiz);
 
-        Optional<Scorer> maybeScorer = scorerRepository.findByQuiz(findQuiz);
+        Optional<Scorer> maybeScorer = scorerRepository.findByQuizId(findQuiz.getId());
         if (maybeScorer.isPresent()) {
-            ScorerResponse scorerResponse = ScorerResponse.from(maybeScorer.get(),
-                    memberService.findBackFourNumber(maybeScorer.get().getMember()));
-            log.info("[기존 득점자 존재]: {}", maybeScorer.get().getMember().getName());
+            Member findMember = memberService.findById(maybeScorer.get().getMemberId());
+            ScorerResponse scorerResponse = ScorerResponse.of(maybeScorer.get(), findMember,
+                    memberService.findBackFourNumber(findMember));
+            log.info("[기존 득점자 존재]: {}", findMember.getName());
             return RecordsAndScorerResponse.from(records, scorerResponse);
         }
         log.info("[응답과 득점자 반환 서비스]");
