@@ -48,8 +48,9 @@ public class KingMemberService {
         kingMemberRepository.saveAll(kingMembers);
     }
 
-
-    public void saveWinnerIfKingMemberIsOne(List<KingMember> kingMembers, Education education) {
+    @Transactional
+    public void saveWinnerIfKingMemberIsOne(Education education) {
+        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
         if (kingMembers.size() == 1) {
             Member findMember = memberRepository.findById(kingMembers.get(0).getMemberId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
