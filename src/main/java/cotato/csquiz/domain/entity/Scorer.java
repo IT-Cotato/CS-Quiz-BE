@@ -22,24 +22,24 @@ public class Scorer extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "scorer_id")
     private Long id;
-    
+
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
     @Column(name = "quiz_id", nullable = false)
     private Long quizId;
 
-    private Scorer(Member member, Quiz quiz) {
-        this.memberId = member.getId();
+    private Scorer(final Long memberId, Quiz quiz) {
+        this.memberId = memberId;
         this.quizId = quiz.getId();
     }
 
-    public static Scorer of(Member member, Quiz quiz) {
-        return new Scorer(member, quiz);
+    public static Scorer of(final Long memberId, Quiz quiz) {
+        return new Scorer(memberId, quiz);
     }
 
-    public Scorer changeMember(Member member) {
-        this.memberId = member.getId();
+    public Scorer changeMemberId(final Long memberId) {
+        this.memberId = memberId;
         return this;
     }
 }

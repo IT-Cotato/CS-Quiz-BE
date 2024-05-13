@@ -69,7 +69,7 @@ public class RecordService {
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
 
-            Scorer scorer = Scorer.of(findMember, findQuiz);
+            Scorer scorer = Scorer.of(findMember.getId(), findQuiz);
             log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
             scorerRepository.save(scorer);
         }
@@ -146,7 +146,7 @@ public class RecordService {
     private void updateScorer(Scorer previousScorer, Record fastestRecord) {
         if (isFaster(previousScorer, fastestRecord)) {
             log.info("[득점자 변경] 새로운 티켓 번호: {}", fastestRecord.getTicketNumber());
-            Scorer changedScorer = previousScorer.changeMember(fastestRecord.getMember());
+            Scorer changedScorer = previousScorer.changeMemberId(fastestRecord.getMemberId());
             scorerRepository.save(changedScorer);
         }
     }
@@ -158,7 +158,7 @@ public class RecordService {
     }
 
     private void createScorer(Record fastestRecord) {
-        Scorer scorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
+        Scorer scorer = Scorer.of(fastestRecord.getMemberId(), fastestRecord.getQuiz());
         scorerRepository.save(scorer);
         scorerExistRedisRepository.saveScorer(fastestRecord.getQuiz(), fastestRecord.getTicketNumber());
     }
