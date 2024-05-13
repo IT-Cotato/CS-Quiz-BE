@@ -82,7 +82,7 @@ public class RecordService {
     }
 
     private void checkMemberAlreadyCorrect(Quiz findQuiz, Member findMember) {
-        if (recordRepository.findByQuizAndMemberAndIsCorrect(findQuiz, findMember, true).isPresent()) {
+        if (recordRepository.findByQuizAndMemberIdAndIsCorrect(findQuiz, findMember.getId(), true).isPresent()) {
             log.warn("이미 해당 문제에 정답 제출한 사용자입니다.");
             log.warn("문제 번호: {}, 제출한 멤버: {}", findQuiz.getNumber(), findMember.getName());
             throw new AppException(ErrorCode.ALREADY_REPLY_CORRECT);
@@ -166,7 +166,7 @@ public class RecordService {
     @Transactional
     public RecordsAndScorerResponse findRecordsAndScorer(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
-        List<RecordResponse> records = findRecordsByQuiz(findQuiz);
+        List<RecordResponse> records = findAllRecordByQuiz(findQuiz);
 
         Optional<Scorer> maybeScorer = scorerRepository.findByQuizId(findQuiz.getId());
         if (maybeScorer.isPresent()) {
@@ -180,13 +180,13 @@ public class RecordService {
         return RecordsAndScorerResponse.from(records, null);
     }
 
-    private List<RecordResponse> findRecordsByQuiz(Quiz quiz) {
+    private List<RecordResponse> findAllRecordByQuiz(Quiz quiz) {
         List<Record> records = recordRepository.findAllFetchJoin();
         log.info("[문제에 모든 응답 반환 서비스]");
         return records.stream()
                 .filter(record -> record.getQuiz().equals(quiz))
                 .sorted(Comparator.comparing(Record::getTicketNumber))
-                .map(record -> RecordResponse.from(record, memberService.findBackFourNumber(record.getMember())))
+                .map(record -> RecordResponse.of(record, memberService.getMemberInfo(record.getMemberId())))
                 .toList();
     }
 

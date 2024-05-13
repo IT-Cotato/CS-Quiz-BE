@@ -88,7 +88,7 @@ public class MyPageService {
         List<Record> myRecords = findAllCorrectRecordByGeneration(generation);
 
         return myRecords.stream()
-                .filter(record -> record.getMember().equals(member))
+                .filter(record -> record.getMemberId().equals(member.getId()))
                 .count();
     }
 
@@ -96,7 +96,8 @@ public class MyPageService {
         List<Record> records = findAllCorrectRecordByGeneration(generation);
 
         Map<Member, Long> countByMember = records.stream()
-                .collect(Collectors.groupingBy(Record::getMember, Collectors.counting()));
+                .collect(Collectors.groupingBy(record -> memberService.findById(record.getMemberId()),
+                        Collectors.counting()));
         List<Entry<Member, Long>> sorted5MemberEntry = sortTopMemberEntry(countByMember);
         return sorted5MemberEntry.stream()
                 .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))

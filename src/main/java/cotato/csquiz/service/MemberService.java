@@ -2,6 +2,7 @@ package cotato.csquiz.service;
 
 import cotato.csquiz.config.jwt.JwtTokenProvider;
 import cotato.csquiz.controller.dto.auth.MemberInfoResponse;
+import cotato.csquiz.controller.dto.member.MemberInfo;
 import cotato.csquiz.controller.dto.member.MemberMyPageInfoResponse;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.exception.AppException;
@@ -78,5 +79,11 @@ public class MemberService {
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
+    }
+
+    public MemberInfo getMemberInfo(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
+        return MemberInfo.of(findMember, findBackFourNumber(findMember));
     }
 }

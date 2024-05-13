@@ -1,6 +1,5 @@
 package cotato.csquiz.repository;
 
-import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Record;
 import java.util.List;
@@ -18,7 +17,7 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     @Query("select o from Record o join fetch o.quiz")
     List<Record> findAllFetchJoin();
 
-    Optional<Record> findByQuizAndMemberAndIsCorrect(Quiz findQuiz, Member findMember, boolean isCorrect);
+    Optional<Record> findByQuizAndMemberIdAndIsCorrect(Quiz findQuiz, Long memberId, boolean isCorrect);
 
     @Transactional
     @Modifying
