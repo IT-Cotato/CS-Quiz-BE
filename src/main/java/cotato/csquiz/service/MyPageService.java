@@ -131,7 +131,9 @@ public class MyPageService {
         List<Long> educationIds = educationRepository.findAllByGenerationId(generation.getId()).stream()
                 .map(Education::getId)
                 .toList();
-        List<Quiz> quizIds = quizRepository.findAllByEducationIdsInQuery(educationIds);
+        List<Long> quizIds = quizRepository.findAllByEducationIdsInQuery(educationIds).stream()
+                .map(Quiz::getId)
+                .toList();
 
         return recordRepository.findAllByQuizIdsInQuery(quizIds).stream()
                 .filter(Record::getIsCorrect)

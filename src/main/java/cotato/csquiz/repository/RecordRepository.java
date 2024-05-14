@@ -22,5 +22,5 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     @Transactional
     @Modifying
     @Query("select r from Record r where r.quiz.id in :quizIds")
-    List<Record> findAllByQuizIdsInQuery(@Param("quizIds") List<Quiz> quizIds);
+    List<Record> findAllByQuizIdsInQuery(@Param("quizIds") List<Long> quizIds);
 }

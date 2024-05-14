@@ -27,6 +27,6 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     @Transactional
     @Modifying
-    @Query("select q from Quiz q where q.id in :educationIds")
+    @Query("select q from Quiz q where q.education.id in :educationIds")
     List<Quiz> findAllByEducationIdsInQuery(@Param("educationIds") List<Long> educationIds);
 }
