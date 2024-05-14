@@ -19,11 +19,11 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
     List<Quiz> findAllByEducationId(Long educationId);
 
-    List<Quiz> findByStatus(QuizStatus status);
+    List<Quiz> findAllByStatus(QuizStatus status);
 
     Optional<Quiz> findByStatusAndEducationId(QuizStatus status, Long educationId);
 
-    List<Quiz> findByStart(QuizStatus quizStatus);
+    List<Quiz> findAllByStart(QuizStatus quizStatus);
 
     @Transactional
     @Modifying
