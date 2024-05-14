@@ -7,6 +7,7 @@ import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Scorer;
 import cotato.csquiz.domain.entity.Winner;
 import cotato.csquiz.repository.KingMemberRepository;
+import cotato.csquiz.repository.MemberRepository;
 import cotato.csquiz.repository.QuizRepository;
 import cotato.csquiz.repository.ScorerRepository;
 import cotato.csquiz.repository.WinnerRepository;
@@ -27,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class KingMemberService {
 
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final QuizRepository quizRepository;
     private final KingMemberRepository kingMemberRepository;
     private final ScorerRepository scorerRepository;
@@ -45,10 +48,13 @@ public class KingMemberService {
         kingMemberRepository.saveAll(kingMembers);
     }
 
-
-    public void saveWinnerIfKingMemberIsOne(List<KingMember> kingMembers, Education education) {
+    @Transactional
+    public void saveWinnerIfKingMemberIsOne(Education education) {
+        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
         if (kingMembers.size() == 1) {
-            saveWinner(kingMembers.get(0).getMember(), education);
+            Member findMember = memberRepository.findById(kingMembers.get(0).getMemberId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
+            saveWinner(findMember.getId(), education);
         }
     }
 
@@ -61,13 +67,14 @@ public class KingMemberService {
 
     private List<Scorer> findScorersFromQuizzes(List<Quiz> quizzes) {
         return quizzes.stream()
-                .flatMap(tempQuiz -> scorerRepository.findAllByQuiz(tempQuiz).stream())
+                .flatMap(tempQuiz -> scorerRepository.findAllByQuizId(tempQuiz.getId()).stream())
                 .toList();
     }
 
     private List<Member> findKingMembers(List<Scorer> scorers) {
         Map<Member, Long> countByMember = scorers.stream()
-                .collect(Collectors.groupingBy(Scorer::getMember, Collectors.counting()));
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
         Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
         return countByMember.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
@@ -79,15 +86,15 @@ public class KingMemberService {
     public void saveWinnerIfNoWinnerExist(Quiz quiz) {
         Education education = quiz.getEducation();
         if (isWinnerExist(education)) {
-            Scorer findScorer = scorerRepository.findByQuiz(quiz)
+            Scorer findScorer = scorerRepository.findByQuizId(quiz.getId())
                     .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈엔 득점자가 존재하지 않습니다."));
-            saveWinner(findScorer.getMember(), education);
+            saveWinner(findScorer.getMemberId(), education);
         }
     }
 
     @Transactional
-    public void saveWinner(Member kingMembers, Education education) {
-        Winner winner = Winner.of(kingMembers, education);
+    public void saveWinner(final Long memberId, final Education education) {
+        Winner winner = Winner.of(memberId, education);
         winnerRepository.save(winner);
     }
 

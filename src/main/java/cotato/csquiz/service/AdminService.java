@@ -15,6 +15,7 @@ import cotato.csquiz.controller.dto.member.UpdateOldMemberRoleRequest;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.RefusedMember;
+import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.domain.enums.MemberRoleGroup;
 import cotato.csquiz.exception.AppException;
 import cotato.csquiz.exception.ErrorCode;
@@ -38,23 +39,22 @@ public class AdminService {
     private final MemberService memberService;
 
     public List<ApplyMemberInfoResponse> findApplicantList() {
-        List<Member> applicantList = memberRepository.findAllByRole(GENERAL);
-        return createApplyInfoList(applicantList);
+        return createApplyInfoList(memberRepository.findAllByRole(GENERAL));
     }
 
     public List<ApplyMemberInfoResponse> findRejectApplicantList() {
-        List<Member> applicantList = memberRepository.findAllByRole(REFUSED);
-        return createApplyInfoList(applicantList);
+        return createApplyInfoList(memberRepository.findAllByRole(REFUSED));
     }
 
     @Transactional
     public void approveApplicant(MemberApproveRequest request) {
         Member member = findMember(request.memberId());
-        Generation findGeneration = findGeneration(request.generationId());
         checkMemberRoleIsGeneral(member);
+
         if (member.getRole() == GENERAL) {
+            Generation findGeneration = findGeneration(request.generationId());
             member.updateRole(MEMBER);
-            member.updateGeneration(findGeneration);
+            member.updateGeneration(findGeneration.getNumber());
             member.updatePosition(request.position());
             memberRepository.save(member);
         }
@@ -63,10 +63,11 @@ public class AdminService {
     @Transactional
     public void reapproveApplicant(MemberApproveRequest request) {
         Member member = findMember(request.memberId());
+
         if (member.getRole() == REFUSED) {
             Generation findGeneration = findGeneration(request.generationId());
             member.updateRole(MEMBER);
-            member.updateGeneration(findGeneration);
+            member.updateGeneration(findGeneration.getNumber());
             member.updatePosition(request.position());
             deleteRefusedMember(member);
         }
@@ -95,9 +96,11 @@ public class AdminService {
     }
 
     public List<MemberEnrollInfoResponse> findCurrentActiveMembers() {
-        return memberRepository.findAll().stream()
-                .filter(Member::isActiveRole)
-                .map(MemberEnrollInfoResponse::from)
+        List<MemberRole> roles = MemberRoleGroup.ACTIVE_MEMBERS.getRoles();
+        List<Member> activeMembers = memberRepository.findAllByRoleInQuery(roles);
+
+        return activeMembers.stream()
+                .map(MemberEnrollInfoResponse::of)
                 .toList();
     }
 
@@ -126,7 +129,7 @@ public class AdminService {
     public List<MemberEnrollInfoResponse> findOldMembers() {
         List<Member> oldMembers = memberRepository.findAllByRole(OLD_MEMBER);
         return oldMembers.stream()
-                .map(MemberEnrollInfoResponse::from)
+                .map(MemberEnrollInfoResponse::of)
                 .toList();
     }
 

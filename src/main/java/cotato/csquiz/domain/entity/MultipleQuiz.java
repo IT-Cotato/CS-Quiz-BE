@@ -14,8 +14,7 @@ import org.hibernate.annotations.DynamicInsert;
 public class MultipleQuiz extends Quiz {
 
     @Builder
-    public MultipleQuiz(Integer number, String question, String photoUrl, Education education, int appearSecond,
-                        Generation generation) {
-        super(number, question, photoUrl, education, appearSecond, generation);
+    public MultipleQuiz(Integer number, String question, String photoUrl, Education education, int appearSecond) {
+        super(number, question, photoUrl, education, appearSecond);
     }
 }

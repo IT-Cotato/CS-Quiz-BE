@@ -1,10 +1,5 @@
 package cotato.csquiz.domain.entity;
 
-import static cotato.csquiz.domain.enums.MemberRole.ADMIN;
-import static cotato.csquiz.domain.enums.MemberRole.EDUCATION;
-import static cotato.csquiz.domain.enums.MemberRole.MEMBER;
-import static jakarta.persistence.FetchType.LAZY;
-
 import cotato.csquiz.domain.enums.MemberPosition;
 import cotato.csquiz.domain.enums.MemberRole;
 import cotato.csquiz.global.entity.BaseTimeEntity;
@@ -15,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,9 +52,8 @@ public class Member extends BaseTimeEntity {
     @ColumnDefault(value = "'GENERAL'")
     private MemberRole role;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "generation_id")
-    private Generation generation;
+    @Column(name = "passed_generation_number")
+    private Integer passedGenerationNumber;
 
     @Builder
     public Member(String email, String password, String name, String phoneNumber) {
@@ -79,15 +71,11 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    public void updateGeneration(Generation generation) {
-        this.generation = generation;
+    public void updateGeneration(Integer passedGenerationNumber) {
+        this.passedGenerationNumber = passedGenerationNumber;
     }
 
     public void updatePosition(MemberPosition position) {
         this.position = position;
-    }
-
-    public boolean isActiveRole() {
-        return role == ADMIN || role == EDUCATION || role == MEMBER;
     }
 }

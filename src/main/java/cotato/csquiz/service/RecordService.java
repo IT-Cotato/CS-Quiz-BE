@@ -69,7 +69,7 @@ public class RecordService {
         if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
             scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
 
-            Scorer scorer = Scorer.of(findMember, findQuiz);
+            Scorer scorer = Scorer.of(findMember.getId(), findQuiz);
             log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
             scorerRepository.save(scorer);
         }
@@ -82,7 +82,7 @@ public class RecordService {
     }
 
     private void checkMemberAlreadyCorrect(Quiz findQuiz, Member findMember) {
-        if (recordRepository.findByQuizAndMemberAndIsCorrect(findQuiz, findMember, true).isPresent()) {
+        if (recordRepository.findByQuizAndMemberIdAndIsCorrect(findQuiz, findMember.getId(), true).isPresent()) {
             log.warn("이미 해당 문제에 정답 제출한 사용자입니다.");
             log.warn("문제 번호: {}, 제출한 멤버: {}", findQuiz.getNumber(), findMember.getName());
             throw new AppException(ErrorCode.ALREADY_REPLY_CORRECT);
@@ -130,7 +130,7 @@ public class RecordService {
                 .min(Comparator.comparing(Record::getTicketNumber))
                 .orElseThrow(() -> new AppException(ErrorCode.REGRADE_FAIL));
 
-        scorerRepository.findByQuiz(quiz)
+        scorerRepository.findByQuizId(quiz.getId())
                 .ifPresentOrElse(
                         scorer -> updateScorer(scorer, fastestRecord),
                         () -> createScorer(fastestRecord)
@@ -146,18 +146,19 @@ public class RecordService {
     private void updateScorer(Scorer previousScorer, Record fastestRecord) {
         if (isFaster(previousScorer, fastestRecord)) {
             log.info("[득점자 변경] 새로운 티켓 번호: {}", fastestRecord.getTicketNumber());
-            Scorer changedScorer = previousScorer.changeMember(fastestRecord.getMember());
+            Scorer changedScorer = previousScorer.changeMemberId(fastestRecord.getMemberId());
             scorerRepository.save(changedScorer);
         }
     }
 
     private boolean isFaster(Scorer previousScorer, Record fastestRecord) {
-        return scorerExistRedisRepository.getScorerTicketNumber(previousScorer.getQuiz())
-                > fastestRecord.getTicketNumber();
+        Quiz findQuiz = quizRepository.findById(previousScorer.getQuizId())
+                .orElseThrow(() -> new EntityNotFoundException("이전 득점자가 맞춘 퀴즈가 존재하지 않습니다."));
+        return scorerExistRedisRepository.getScorerTicketNumber(findQuiz) > fastestRecord.getTicketNumber();
     }
 
     private void createScorer(Record fastestRecord) {
-        Scorer scorer = Scorer.of(fastestRecord.getMember(), fastestRecord.getQuiz());
+        Scorer scorer = Scorer.of(fastestRecord.getMemberId(), fastestRecord.getQuiz());
         scorerRepository.save(scorer);
         scorerExistRedisRepository.saveScorer(fastestRecord.getQuiz(), fastestRecord.getTicketNumber());
     }
@@ -165,26 +166,27 @@ public class RecordService {
     @Transactional
     public RecordsAndScorerResponse findRecordsAndScorer(Long quizId) {
         Quiz findQuiz = findQuizById(quizId);
-        List<RecordResponse> records = findRecordsByQuiz(findQuiz);
+        List<RecordResponse> records = findAllRecordByQuiz(findQuiz);
 
-        Optional<Scorer> maybeScorer = scorerRepository.findByQuiz(findQuiz);
+        Optional<Scorer> maybeScorer = scorerRepository.findByQuizId(findQuiz.getId());
         if (maybeScorer.isPresent()) {
-            ScorerResponse scorerResponse = ScorerResponse.from(maybeScorer.get(),
-                    memberService.findBackFourNumber(maybeScorer.get().getMember()));
-            log.info("[기존 득점자 존재]: {}", maybeScorer.get().getMember().getName());
+            Member findMember = memberService.findById(maybeScorer.get().getMemberId());
+            ScorerResponse scorerResponse = ScorerResponse.of(maybeScorer.get(), findMember,
+                    memberService.findBackFourNumber(findMember));
+            log.info("[기존 득점자 존재]: {}", findMember.getName());
             return RecordsAndScorerResponse.from(records, scorerResponse);
         }
         log.info("[응답과 득점자 반환 서비스]");
         return RecordsAndScorerResponse.from(records, null);
     }
 
-    private List<RecordResponse> findRecordsByQuiz(Quiz quiz) {
+    private List<RecordResponse> findAllRecordByQuiz(Quiz quiz) {
         List<Record> records = recordRepository.findAllFetchJoin();
         log.info("[문제에 모든 응답 반환 서비스]");
         return records.stream()
                 .filter(record -> record.getQuiz().equals(quiz))
                 .sorted(Comparator.comparing(Record::getTicketNumber))
-                .map(record -> RecordResponse.from(record, memberService.findBackFourNumber(record.getMember())))
+                .map(record -> RecordResponse.of(record, memberService.getMemberInfo(record.getMemberId())))
                 .toList();
     }
 

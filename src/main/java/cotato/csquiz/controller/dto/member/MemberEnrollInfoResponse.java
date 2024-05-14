@@ -13,12 +13,12 @@ public record MemberEnrollInfoResponse(
 ) {
 
 
-    public static MemberEnrollInfoResponse from(Member member) {
+    public static MemberEnrollInfoResponse of(Member member) {
         return new MemberEnrollInfoResponse(
                 member.getId(),
                 member.getName(),
                 member.getPosition(),
-                member.getGeneration().getNumber(),
+                member.getPassedGenerationNumber(),
                 member.getRole()
         );
     }

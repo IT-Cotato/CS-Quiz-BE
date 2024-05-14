@@ -1,7 +1,7 @@
 package cotato.csquiz.controller.dto.record;
 
+import cotato.csquiz.controller.dto.member.MemberInfo;
 import cotato.csquiz.domain.entity.Record;
-import java.io.Serializable;
 
 public record RecordResponse(
         Long recordId,
@@ -10,15 +10,15 @@ public record RecordResponse(
         String memberName,
         String backFourNumber,
         String reply
-) implements Serializable {
+) {
 
-    public static RecordResponse from(Record record, String backFourNumber) {
+    public static RecordResponse of(Record record, MemberInfo memberInfo) {
         return new RecordResponse(
                 record.getId(),
                 record.getTicketNumber(),
-                record.getMember().getId(),
-                record.getMember().getName(),
-                backFourNumber,
+                memberInfo.memberId(),
+                memberInfo.name(),
+                memberInfo.backFourNumber(),
                 record.getReply()
         );
     }

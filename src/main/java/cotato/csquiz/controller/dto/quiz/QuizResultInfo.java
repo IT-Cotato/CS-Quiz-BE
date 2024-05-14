@@ -6,7 +6,7 @@ import cotato.csquiz.domain.entity.Quiz;
 public record QuizResultInfo(
         Long quizId,
         Integer quizNumber,
-        Long scorerId,
+        Long scorerId, // Todo : 해당 컬럼명에 대한 고민
         String scorerName,
         String backFourNumber
 ) {

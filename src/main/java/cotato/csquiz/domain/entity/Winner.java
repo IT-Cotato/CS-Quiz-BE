@@ -24,22 +24,21 @@ public class Winner extends BaseTimeEntity {
     @Column(name = "winner_id")
     private Long id;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id", nullable = false, updatable = false)
+    private Long memberId;
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "education_id")
     private Education education;
 
-    public Winner(Member member, Education education) {
-        this.member = member;
+    private Winner(Long memberId, Education education) {
+        this.memberId = memberId;
         this.education = education;
     }
 
-    public static Winner of(Member member, Education education) {
+    public static Winner of(Long memberId, Education education) {
         return new Winner(
-                member,
+                memberId,
                 education
         );
     }

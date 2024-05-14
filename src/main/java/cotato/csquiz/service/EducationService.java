@@ -10,6 +10,7 @@ import cotato.csquiz.controller.dto.education.WinnerInfoResponse;
 import cotato.csquiz.controller.dto.quiz.KingMemberInfo;
 import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.KingMember;
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Quiz;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.entity.Winner;
@@ -34,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class EducationService {
 
-    private final SessionService sessionService;
     private final MemberService memberService;
     private final EducationRepository educationRepository;
     private final KingMemberRepository kingMemberRepository;
@@ -44,23 +44,25 @@ public class EducationService {
 
     @Transactional
     public CreateEducationResponse createEducation(CreateEducationRequest request) {
-        Session session = sessionService.findSessionById(request.sessionId());
-        checkEducationExist(session);
+        Session findSession = sessionRepository.findById(request.sessionId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
+        checkEducationExist(request.sessionId());
+
         Education education = Education.builder()
-                .session(session)
+                .sessionId(findSession.getId())
                 .subject(request.subject())
-                .educationNum(request.educationNum())
+                .educationNumber(request.educationNum())
+                .generationId(findSession.getGeneration().getId())
                 .build();
+
         Education saveEducation = educationRepository.save(education);
         return CreateEducationResponse.from(saveEducation);
     }
 
-    private void checkEducationExist(Session session) {
-        educationRepository.findBySession(session).ifPresent(
-                education -> {
-                    throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
-                }
-        );
+    private void checkEducationExist(Long sessionId) {
+        if (educationRepository.existsBySessionId(sessionId)) {
+            throw new AppException(ErrorCode.EDUCATION_DUPLICATED);
+        }
     }
 
     public FindEducationStatusResponse findEducationStatus(Long educationId) {
@@ -89,10 +91,7 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
-        return sessionRepository.findAllByGenerationId(generationId).stream()
-                .map(educationRepository::findBySession)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return educationRepository.findAllByGenerationId(generationId).stream()
                 .map(AllEducationResponse::from)
                 .toList();
     }
@@ -101,14 +100,14 @@ public class EducationService {
         Education findEducation = educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(findEducation);
-        validateEmpty(kingMembers);
+        validateIsEmpty(kingMembers);
         return kingMembers.stream()
-                .map(KingMember::getMember)
+                .map(kingMember -> memberService.findById(kingMember.getMemberId()))
                 .map(member -> KingMemberInfo.from(member, memberService.findBackFourNumber(member)))
                 .toList();
     }
 
-    private void validateEmpty(List<KingMember> kingMembers) {
+    private void validateIsEmpty(List<KingMember> kingMembers) {
         if (kingMembers.isEmpty()) {
             throw new EntityNotFoundException("아직 결승 진출자가 결정되지 않았습니다.");
         }
@@ -119,7 +118,8 @@ public class EducationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
         Winner findWinner = winnerRepository.findByEducation(findEducation)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육의 우승자를 찾을 수 없습니다."));
-        return WinnerInfoResponse.from(findWinner, memberService.findBackFourNumber(findWinner.getMember()));
+        Member findMember = memberService.findById(findWinner.getMemberId());
+        return WinnerInfoResponse.of(findWinner, findMember, memberService.findBackFourNumber(findMember));
     }
 
     public EducationIdOfQuizResponse findEducationIdOfQuizId(Long quizId) {

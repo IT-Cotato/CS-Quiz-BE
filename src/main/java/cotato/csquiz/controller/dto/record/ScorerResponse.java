@@ -1,5 +1,6 @@
 package cotato.csquiz.controller.dto.record;
 
+import cotato.csquiz.domain.entity.Member;
 import cotato.csquiz.domain.entity.Scorer;
 
 public record ScorerResponse(
@@ -8,11 +9,11 @@ public record ScorerResponse(
         String memberName,
         String backFourNumber
 ) {
-    public static ScorerResponse from(Scorer scorer, String backFourNumber) {
+    public static ScorerResponse of(Scorer scorer, Member member, String backFourNumber) {
         return new ScorerResponse(
                 scorer.getId(),
-                scorer.getMember().getId(),
-                scorer.getMember().getName(),
+                member.getId(),
+                member.getName(),
                 backFourNumber
         );
     }

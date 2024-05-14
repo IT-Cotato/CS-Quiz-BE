@@ -1,7 +1,5 @@
 package cotato.csquiz.domain.entity;
 
-import static jakarta.persistence.FetchType.LAZY;
-
 import cotato.csquiz.domain.enums.EducationStatus;
 import cotato.csquiz.global.entity.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -11,8 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +25,7 @@ public class Education extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "education_number")
-    private int number;
+    private Integer number;
 
     @Column(name = "education_subject")
     private String subject;
@@ -38,15 +34,18 @@ public class Education extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private EducationStatus status;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "session_id")
-    private Session session;
+    @Column(name = "session_id", nullable = false, unique = true)
+    private Long sessionId;
+
+    @Column(name = "generation_id", nullable = false)
+    private Long generationId;
 
     @Builder
-    public Education(String subject, int educationNum, Session session) {
+    public Education(String subject, Integer educationNumber, Long sessionId, Long generationId) {
         this.subject = subject;
-        this.number = educationNum;
-        this.session = session;
+        this.number = educationNumber;
+        this.sessionId = sessionId;
+        this.generationId = generationId;
         status = EducationStatus.BEFORE;
     }
 
@@ -58,7 +57,7 @@ public class Education extends BaseTimeEntity {
         this.subject = newSubject;
     }
 
-    public void updateNumber(int changeNumber) {
+    public void updateNumber(Integer changeNumber) {
         this.number = changeNumber;
     }
 }

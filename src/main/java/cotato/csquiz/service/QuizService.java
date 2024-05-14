@@ -115,10 +115,10 @@ public class QuizService {
     }
 
     private QuizResultInfo createQuizResultInfo(Quiz quiz) {
-        Optional<Scorer> mayBeScorer = scorerRepository.findByQuiz(quiz);
+        Optional<Scorer> mayBeScorer = scorerRepository.findByQuizId(quiz.getId());
 
         if (mayBeScorer.isPresent()) {
-            Member member = mayBeScorer.get().getMember();
+            Member member = memberService.findById(mayBeScorer.get().getMemberId());
 
             return QuizResultInfo.of(quiz, member, memberService.findBackFourNumber(member));
         }
@@ -138,7 +138,6 @@ public class QuizService {
                 .question(request.getQuestion())
                 .photoUrl(imageUrl)
                 .appearSecond(generateRandomTime())
-                .generation(findEducation.getSession().getGeneration())
                 .build();
 
         log.info("객관식 문제 생성, 사진 url {}", imageUrl);
@@ -174,7 +173,6 @@ public class QuizService {
                 .number(request.getNumber())
                 .photoUrl(imageUrl)
                 .appearSecond(generateRandomTime())
-                .generation(findEducation.getSession().getGeneration())
                 .build();
         log.info("주관식 문제 생성 완료: 사진 url {}", imageUrl);
         quizRepository.save(createdShortQuiz);

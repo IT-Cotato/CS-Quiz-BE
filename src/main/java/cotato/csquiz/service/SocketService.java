@@ -68,7 +68,7 @@ public class SocketService {
         Quiz quiz = findQuizById(request.quizId());
 
         checkEducationOpen(quiz.getEducation());
-        isQuizStatusTrue(quiz);
+        checkQuizIsStarted(quiz);
 
         sleepRandomTime(quiz);
         quiz.updateStart(QuizStatus.QUIZ_ON);
@@ -95,7 +95,7 @@ public class SocketService {
         if (quiz.getNumber() == 9) {
             List<KingMember> kingMembers = kingMemberService.calculateKingMember(quiz.getEducation());
             kingMemberService.saveKingMembers(kingMembers);
-            kingMemberService.saveWinnerIfKingMemberIsOne(kingMembers, quiz.getEducation());
+            kingMemberService.saveWinnerIfKingMemberIsOne(quiz.getEducation());
             webSocketHandler.stopQuiz(quiz);
         }
         if (quiz.getNumber() == 10) {
@@ -121,16 +121,16 @@ public class SocketService {
     }
 
     private void makeAllStatusFalse() {
-        quizRepository.findByStatus(QuizStatus.QUIZ_ON)
+        quizRepository.findAllByStatus(QuizStatus.QUIZ_ON)
                 .forEach(quiz -> quiz.updateStatus(QuizStatus.QUIZ_OFF));
     }
 
     private void makeAllStartFalse() {
-        quizRepository.findByStart(QuizStatus.QUIZ_ON)
+        quizRepository.findAllByStart(QuizStatus.QUIZ_ON)
                 .forEach(quiz -> quiz.updateStart(QuizStatus.QUIZ_OFF));
     }
 
-    private void isQuizStatusTrue(Quiz quiz) {
+    private void checkQuizIsStarted(Quiz quiz) {
         if (quiz.getStatus().equals(QuizStatus.QUIZ_OFF)) {
             throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
         }

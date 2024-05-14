@@ -19,7 +19,6 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -66,24 +65,15 @@ public class Quiz extends BaseTimeEntity {
     @JoinColumn(name = "education_id")
     private Education education;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "generation_id")
-    private Generation generation;
-
     @OneToMany(mappedBy = "quiz", orphanRemoval = true)
     private List<Record> records = new ArrayList<>();
 
-    @OneToOne(mappedBy = "quiz", orphanRemoval = true)
-    private Scorer scorer;
-
-    public Quiz(Integer number, String question, String photoUrl, Education education, int appearSecond,
-                Generation generation) {
+    public Quiz(Integer number, String question, String photoUrl, Education education, int appearSecond) {
         this.number = number;
         this.question = question;
         this.photoUrl = photoUrl;
         this.education = education;
         this.appearSecond = appearSecond;
-        this.generation = generation;
     }
 
     public List<Record> getRecords() {
