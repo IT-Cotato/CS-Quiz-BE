@@ -121,12 +121,12 @@ public class SocketService {
     }
 
     private void makeAllStatusFalse() {
-        quizRepository.findByStatus(QuizStatus.QUIZ_ON)
+        quizRepository.findAllByStatus(QuizStatus.QUIZ_ON)
                 .forEach(quiz -> quiz.updateStatus(QuizStatus.QUIZ_OFF));
     }
 
     private void makeAllStartFalse() {
-        quizRepository.findByStart(QuizStatus.QUIZ_ON)
+        quizRepository.findAllByStart(QuizStatus.QUIZ_ON)
                 .forEach(quiz -> quiz.updateStart(QuizStatus.QUIZ_OFF));
     }
 
