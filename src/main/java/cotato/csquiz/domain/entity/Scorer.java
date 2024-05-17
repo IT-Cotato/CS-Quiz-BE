@@ -38,8 +38,7 @@ public class Scorer extends BaseTimeEntity {
         return new Scorer(memberId, quiz);
     }
 
-    public Scorer changeMemberId(final Long memberId) {
+    public void updateMemberId(final Long memberId) {
         this.memberId = memberId;
-        return this;
     }
 }
