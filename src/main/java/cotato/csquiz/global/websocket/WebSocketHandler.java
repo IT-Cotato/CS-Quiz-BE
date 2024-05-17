@@ -95,9 +95,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 .start(QuizStatus.QUIZ_OFF)
                 .build();
 
+        log.info("[문제 {} 접근 허용]", quizId);
+        log.info("[연결된 사용자 : {}]", CLIENTS.keySet());
         for (WebSocketSession clientSession : CLIENTS.values()) {
             sendMessage(clientSession, response);
         }
+        log.info("[문제 전송 후 사용자 : {}]", CLIENTS.keySet());
     }
 
     public void startQuiz(Long quizId) {
@@ -106,9 +109,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 .command(START_COMMAND)
                 .build();
 
+        log.info("[문제 {} 풀이 허용]", quizId);
+        log.info("[연결된 사용자 : {}]", CLIENTS.keySet());
         for (WebSocketSession clientSession : CLIENTS.values()) {
             sendMessage(clientSession, response);
         }
+        log.info("[전구 전송 후 사용자 : {}]", CLIENTS.keySet());
     }
 
     public void stopQuiz(Quiz quiz) {

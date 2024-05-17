@@ -52,13 +52,11 @@ public class RecordService {
     public ReplyResponse replyToQuiz(ReplyRequest request) {
         Quiz findQuiz = findQuizById(request.quizId());
         checkQuizStart(findQuiz);
+        Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
 
         Member findMember = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 회원을 찾을 수 없습니다."));
         checkMemberAlreadyCorrect(findQuiz, findMember);
-
-        Long ticketNumber = ticketCountRedisRepository.increment(findQuiz.getId());
-
         List<String> inputs = request.inputs().stream()
                 .map(String::toLowerCase)
                 .map(String::trim)
@@ -66,18 +64,23 @@ public class RecordService {
                 .toList();
 
         boolean isCorrect = quizAnswerRedisRepository.isCorrect(findQuiz, inputs);
-        if (isCorrect && scorerExistRedisRepository.isNotExist(findQuiz)) {
-            scorerExistRedisRepository.saveScorer(findQuiz, ticketNumber);
 
-            Scorer scorer = Scorer.of(findMember.getId(), findQuiz);
-            log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
-            scorerRepository.save(scorer);
-        }
         String reply = String.join(INPUT_DELIMITER, inputs);
-
         Record createdRecord = Record.of(reply, isCorrect, findMember, findQuiz, ticketNumber);
-        recordRepository.save(createdRecord);
 
+        if (isCorrect && scorerExistRedisRepository.saveScorerIfIsFastest(findQuiz, ticketNumber)) {
+            scorerRepository.findByQuizId(findQuiz.getId())
+                    .ifPresentOrElse(
+                            scorer -> {
+                                scorer.updateMemberId(findMember.getId());
+                                scorerRepository.save(scorer);
+                            },
+                            () -> createScorer(createdRecord)
+                    );
+            log.info("득점자 생성 : {}, 티켓번호: {}", findMember.getId(), ticketNumber);
+        }
+
+        recordRepository.save(createdRecord);
         return ReplyResponse.from(isCorrect);
     }
 
@@ -146,8 +149,8 @@ public class RecordService {
     private void updateScorer(Scorer previousScorer, Record fastestRecord) {
         if (isFaster(previousScorer, fastestRecord)) {
             log.info("[득점자 변경] 새로운 티켓 번호: {}", fastestRecord.getTicketNumber());
-            Scorer changedScorer = previousScorer.changeMemberId(fastestRecord.getMemberId());
-            scorerRepository.save(changedScorer);
+            previousScorer.updateMemberId(fastestRecord.getMemberId());
+            scorerRepository.save(previousScorer);
         }
     }
 
@@ -195,5 +198,6 @@ public class RecordService {
         Quiz findQuiz = quizRepository.findById(request.quizId())
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
         quizAnswerRedisRepository.saveQuizAnswer(findQuiz);
+        scorerExistRedisRepository.saveScorer(findQuiz, Long.MAX_VALUE);
     }
 }

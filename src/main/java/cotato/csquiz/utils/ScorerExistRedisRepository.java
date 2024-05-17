@@ -37,17 +37,26 @@ public class ScorerExistRedisRepository {
         String quizKey = KEY_PREFIX + quiz.getId();
         redisTemplate.opsForValue().set(
                 quizKey,
-                ticketNumber
+                ticketNumber,
+                SCORER_EXPIRATION,
+                TimeUnit.MINUTES
         );
     }
 
-    public boolean isNotExist(Quiz quiz) {
-        String quizKey = KEY_PREFIX + quiz.getId();
-        return NONE_VALUE.equals(redisTemplate.opsForValue().get(quizKey));
+    public boolean saveScorerIfIsFastest(Quiz quiz, Long ticketNumber) {
+        if (getScorerTicketNumber(quiz) > ticketNumber) {
+            saveScorer(quiz, ticketNumber);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Long getScorerTicketNumber(Quiz quiz) {
         String quizKey = KEY_PREFIX + quiz.getId();
+        if (redisTemplate.opsForValue().get(quizKey) == null) {
+            return NONE_VALUE;
+        }
         return redisTemplate.opsForValue().get(quizKey);
     }
 }
