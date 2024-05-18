@@ -8,6 +8,7 @@ import cotato.csquiz.controller.dto.session.UpdateSessionDescriptionRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionNumberRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionPhotoRequest;
 import cotato.csquiz.controller.dto.session.UpdateSessionRequest;
+import cotato.csquiz.domain.entity.Education;
 import cotato.csquiz.domain.entity.Generation;
 import cotato.csquiz.domain.entity.Session;
 import cotato.csquiz.domain.enums.CSEducation;
@@ -32,6 +33,7 @@ public class SessionService {
     private static final String SESSION_BUCKET_DIRECTORY = "session";
     private final SessionRepository sessionRepository;
     private final GenerationRepository generationRepository;
+    private final EducationService educationService;
     private final S3Uploader s3Uploader;
 
     @Transactional
@@ -126,13 +128,17 @@ public class SessionService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
     }
 
-    public List<CsEducationOnSessionNumberResponse> findAllCsOnSessionsByGenerationId(Long generationId) {
+    public List<CsEducationOnSessionNumberResponse> findAllNotLinkedCsOnSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
-        List<Session> sessions = sessionRepository.findAllByGeneration(generation);
+        List<Session> sessions = sessionRepository.findAllByGenerationAndCsEducation(generation, CSEducation.CS_ON);
+
+        List<Long> educationLinkedSessionIds = educationService.findAllEducationByGenerationId(generationId).stream()
+                .map(Education::getSessionId)
+                .toList();
 
         return sessions.stream()
-                .filter(session -> session.getCsEducation() == CSEducation.CS_ON)
+                .filter(session -> !educationLinkedSessionIds.contains(session.getId()))
                 .map(CsEducationOnSessionNumberResponse::from)
                 .toList();
     }

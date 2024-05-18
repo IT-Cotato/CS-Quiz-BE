@@ -91,7 +91,7 @@ public class EducationService {
     }
 
     public List<AllEducationResponse> findEducationListByGeneration(Long generationId) {
-        return educationRepository.findAllByGenerationId(generationId).stream()
+        return findAllEducationByGenerationId(generationId).stream()
                 .map(AllEducationResponse::from)
                 .toList();
     }
@@ -127,4 +127,9 @@ public class EducationService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 문제를 찾을 수 없습니다."));
         return EducationIdOfQuizResponse.from(quiz);
     }
+
+    public List<Education> findAllEducationByGenerationId(Long generationId) {
+        return educationRepository.findAllByGenerationId(generationId);
+    }
 }
+
