@@ -75,6 +75,6 @@ public class SessionController {
     public ResponseEntity<List<CsEducationOnSessionNumberResponse>> findAllCsOnSessionsByGenerationId(
             @RequestParam Long generationId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(sessionService.findAllCsOnSessionsByGenerationId(generationId));
+                .body(sessionService.findAllNotLinkedCsOnSessionsByGenerationId(generationId));
     }
 }
