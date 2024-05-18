@@ -43,21 +43,6 @@ public class KingMemberService {
                 .toList();
     }
 
-    @Transactional
-    public void saveKingMembers(List<KingMember> kingMembers) {
-        kingMemberRepository.saveAll(kingMembers);
-    }
-
-    @Transactional
-    public void saveWinnerIfKingMemberIsOne(Education education) {
-        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
-        if (kingMembers.size() == 1) {
-            Member findMember = memberRepository.findById(kingMembers.get(0).getMemberId())
-                    .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
-            saveWinner(findMember.getId(), education);
-        }
-    }
-
     private List<Member> findKingMembersFromEducation(Education education) {
         List<Quiz> quizzes = quizRepository.findAllByEducationId(education.getId());
         List<Scorer> scorersInEducation = findScorersFromQuizzes(quizzes);
@@ -71,15 +56,19 @@ public class KingMemberService {
                 .toList();
     }
 
-    private List<Member> findKingMembers(List<Scorer> scorers) {
-        Map<Member, Long> countByMember = scorers.stream()
-                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
-                        Collectors.counting()));
-        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
-        return countByMember.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
-                .map(Entry::getKey)
-                .toList();
+    @Transactional
+    public void saveKingMembers(List<KingMember> kingMembers) {
+        kingMemberRepository.saveAll(kingMembers);
+    }
+
+    @Transactional
+    public void saveWinnerIfKingMemberIsOne(Education education) {
+        List<KingMember> kingMembers = kingMemberRepository.findAllByEducation(education);
+        if (kingMembers.size() == 1) {
+            Member findMember = memberRepository.findById(kingMembers.get(0).getMemberId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
+            saveWinner(findMember.getId(), education);
+        }
     }
 
     @Transactional
@@ -100,5 +89,16 @@ public class KingMemberService {
 
     public boolean isWinnerExist(Education education) {
         return winnerRepository.findByEducation(education).isPresent();
+    }
+
+    private List<Member> findKingMembers(List<Scorer> scorers) {
+        Map<Member, Long> countByMember = scorers.stream()
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
+        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
+        return countByMember.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
+                .map(Entry::getKey)
+                .toList();
     }
 }

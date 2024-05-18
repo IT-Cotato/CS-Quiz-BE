@@ -58,11 +58,29 @@ public class MyPageService {
         return HallOfFameResponse.of(scorerHallOfFame, answerHallOfFame, myHallOfFameInfo);
     }
 
-    public MyPageMemberInfoResponse findMemberInfo(Long memberId) {
-        Member member = findMemberById(memberId);
-        String originPhoneNumber = encryptService.decryptPhoneNumber(member.getPhoneNumber());
+    private List<HallOfFameInfo> createScorerHallOfFameByGeneration(Generation generation) {
+        List<Scorer> scorers = findAllScorersByGeneration(generation);
 
-        return MyPageMemberInfoResponse.of(member, originPhoneNumber);
+        Map<Member, Long> memberScoreMap = scorers.stream()
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
+        List<Map.Entry<Member, Long>> topMemberEntry = sortTopMemberEntry(memberScoreMap);
+
+        return topMemberEntry.stream()
+                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    private List<HallOfFameInfo> createRecordsHallOfFameInfoByGeneration(Generation generation) {
+        List<Record> records = findAllCorrectRecordByGeneration(generation);
+
+        Map<Member, Long> countByMember = records.stream()
+                .collect(Collectors.groupingBy(record -> memberService.findById(record.getMemberId()),
+                        Collectors.counting()));
+        List<Entry<Member, Long>> sorted5MemberEntry = sortTopMemberEntry(countByMember);
+        return sorted5MemberEntry.stream()
+                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
+                .toList();
     }
 
     private MyHallOfFameInfo createMyHallOfFameInfoByGeneration(Member member, Generation generation) {
@@ -70,11 +88,6 @@ public class MyPageService {
         long answerCount = countMyAnswerByGeneration(member, generation);
 
         return MyHallOfFameInfo.of(member, scorerCount, answerCount);
-    }
-
-    private Member findMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 id를 가진 멤버를 찾을 수 없습니다."));
     }
 
     private long countMyScorerByGeneration(Member member, Generation generation) {
@@ -90,31 +103,6 @@ public class MyPageService {
         return myRecords.stream()
                 .filter(record -> record.getMemberId().equals(member.getId()))
                 .count();
-    }
-
-    private List<HallOfFameInfo> createRecordsHallOfFameInfoByGeneration(Generation generation) {
-        List<Record> records = findAllCorrectRecordByGeneration(generation);
-
-        Map<Member, Long> countByMember = records.stream()
-                .collect(Collectors.groupingBy(record -> memberService.findById(record.getMemberId()),
-                        Collectors.counting()));
-        List<Entry<Member, Long>> sorted5MemberEntry = sortTopMemberEntry(countByMember);
-        return sorted5MemberEntry.stream()
-                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
-                .toList();
-    }
-
-    private List<HallOfFameInfo> createScorerHallOfFameByGeneration(Generation generation) {
-        List<Scorer> scorers = findAllScorersByGeneration(generation);
-
-        Map<Member, Long> memberScoreMap = scorers.stream()
-                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
-                        Collectors.counting()));
-        List<Map.Entry<Member, Long>> topMemberEntry = sortTopMemberEntry(memberScoreMap);
-
-        return topMemberEntry.stream()
-                .map(entry -> HallOfFameInfo.of(entry.getKey(), entry.getValue()))
-                .toList();
     }
 
     private List<Scorer> findAllScorersByGeneration(final Generation generation) {
@@ -145,5 +133,17 @@ public class MyPageService {
                 .sorted(Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(SHOW_PEOPLE_COUNT)
                 .toList();
+    }
+
+    public MyPageMemberInfoResponse findMemberInfo(Long memberId) {
+        Member member = findMemberById(memberId);
+        String originPhoneNumber = encryptService.decryptPhoneNumber(member.getPhoneNumber());
+
+        return MyPageMemberInfoResponse.of(member, originPhoneNumber);
+    }
+
+    private Member findMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 id를 가진 멤버를 찾을 수 없습니다."));
     }
 }

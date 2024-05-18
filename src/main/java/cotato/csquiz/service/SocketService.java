@@ -44,6 +44,12 @@ public class SocketService {
         education.updateStatus(EducationStatus.ONGOING);
     }
 
+    private void checkEducationBefore(Education education) {
+        if (EducationStatus.BEFORE != education.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_STATUS_NOT_BEFORE);
+        }
+    }
+
     @Transactional
     public void accessQuiz(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
@@ -57,12 +63,6 @@ public class SocketService {
         webSocketHandler.accessQuiz(quiz.getId());
     }
 
-    private void checkEducationOpen(Education education) {
-        if (EducationStatus.ONGOING != education.getStatus()) {
-            throw new AppException(ErrorCode.EDUCATION_CLOSED);
-        }
-    }
-
     @Transactional
     public void startQuizSolve(QuizSocketRequest request) {
         Quiz quiz = findQuizById(request.quizId());
@@ -74,6 +74,20 @@ public class SocketService {
         quiz.updateStart(QuizStatus.QUIZ_ON);
 
         webSocketHandler.startQuiz(quiz.getId());
+    }
+
+    private void checkQuizIsStarted(Quiz quiz) {
+        if (quiz.getStatus().equals(QuizStatus.QUIZ_OFF)) {
+            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
+        }
+    }
+
+    private void sleepRandomTime(Quiz quiz) {
+        try {
+            Thread.sleep(1000L * quiz.getAppearSecond());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Transactional
@@ -120,40 +134,6 @@ public class SocketService {
         makeAllStartFalse();
     }
 
-    private void makeAllStatusFalse() {
-        quizRepository.findAllByStatus(QuizStatus.QUIZ_ON)
-                .forEach(quiz -> quiz.updateStatus(QuizStatus.QUIZ_OFF));
-    }
-
-    private void makeAllStartFalse() {
-        quizRepository.findAllByStart(QuizStatus.QUIZ_ON)
-                .forEach(quiz -> quiz.updateStart(QuizStatus.QUIZ_OFF));
-    }
-
-    private void checkQuizIsStarted(Quiz quiz) {
-        if (quiz.getStatus().equals(QuizStatus.QUIZ_OFF)) {
-            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
-        }
-    }
-
-    private Quiz findQuizById(Long quizId) {
-        return quizRepository.findById(quizId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
-    }
-
-    private Education findEducationById(Long educationId) {
-        return educationRepository.findById(educationId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
-    }
-
-    private void sleepRandomTime(Quiz quiz) {
-        try {
-            Thread.sleep(1000L * quiz.getAppearSecond());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
     @Transactional
     public SocketTokenDto createSocketToken(String authorizationHeader) {
         String token = jwtTokenProvider.resolveAccessToken(authorizationHeader);
@@ -166,9 +146,29 @@ public class SocketService {
         return SocketTokenDto.from(socketToken);
     }
 
-    private void checkEducationBefore(Education education) {
-        if (EducationStatus.BEFORE != education.getStatus()) {
-            throw new AppException(ErrorCode.EDUCATION_STATUS_NOT_BEFORE);
+    private void makeAllStatusFalse() {
+        quizRepository.findAllByStatus(QuizStatus.QUIZ_ON)
+                .forEach(quiz -> quiz.updateStatus(QuizStatus.QUIZ_OFF));
+    }
+
+    private void makeAllStartFalse() {
+        quizRepository.findAllByStart(QuizStatus.QUIZ_ON)
+                .forEach(quiz -> quiz.updateStart(QuizStatus.QUIZ_OFF));
+    }
+
+    private void checkEducationOpen(Education education) {
+        if (EducationStatus.ONGOING != education.getStatus()) {
+            throw new AppException(ErrorCode.EDUCATION_CLOSED);
         }
+    }
+
+    private Quiz findQuizById(Long quizId) {
+        return quizRepository.findById(quizId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
+    }
+
+    private Education findEducationById(Long educationId) {
+        return educationRepository.findById(educationId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 교육을 찾을 수 없습니다."));
     }
 }
