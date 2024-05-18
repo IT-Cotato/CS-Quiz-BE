@@ -111,26 +111,6 @@ public class QuizService {
         quizRepository.deleteAllByQuizIdsInQuery(quizIds);
     }
 
-    @Transactional
-    public List<QuizResultInfo> createQuizResults(Long educationId) {
-        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
-
-        return quizzes.stream()
-                .map(this::createQuizResultInfo)
-                .toList();
-    }
-
-    private QuizResultInfo createQuizResultInfo(Quiz quiz) {
-        Optional<Scorer> mayBeScorer = scorerRepository.findByQuizId(quiz.getId());
-
-        if (mayBeScorer.isPresent()) {
-            Member member = memberService.findById(mayBeScorer.get().getMemberId());
-
-            return QuizResultInfo.of(quiz, member, memberService.findBackFourNumber(member));
-        }
-        return QuizResultInfo.noScorer(quiz);
-    }
-
     private void createShortQuiz(Education findEducation, CreateShortQuizRequest request)
             throws ImageException {
         String imageUrl = null;
@@ -194,14 +174,29 @@ public class QuizService {
         }
     }
 
-    private int generateRandomTime() {
-        final ThreadLocalRandom random = ThreadLocalRandom.current();
-        return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
+    @Transactional
+    public List<QuizResultInfo> createQuizResults(Long educationId) {
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
+
+        return quizzes.stream()
+                .map(this::createQuizResultInfo)
+                .toList();
+    }
+
+    private QuizResultInfo createQuizResultInfo(Quiz quiz) {
+        Optional<Scorer> mayBeScorer = scorerRepository.findByQuizId(quiz.getId());
+
+        if (mayBeScorer.isPresent()) {
+            Member member = memberService.findById(mayBeScorer.get().getMemberId());
+
+            return QuizResultInfo.of(quiz, member, memberService.findBackFourNumber(member));
+        }
+        return QuizResultInfo.noScorer(quiz);
     }
 
     @Transactional
     public AllQuizzesResponse findAllQuizzesForEducationTeam(Long educationId) {
-        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
 
         List<MultipleQuizResponse> multiples = quizzes.stream()
                 .filter(quiz -> quiz instanceof MultipleQuiz)
@@ -235,7 +230,7 @@ public class QuizService {
 
     @Transactional
     public AllQuizzesInCsQuizResponse findAllQuizzesForAdminCsQuiz(Long educationId) {
-        List<Quiz> quizzes = findQuizzesByEducationId(educationId);
+        List<Quiz> quizzes = quizRepository.findAllByEducationId(educationId);
 
         List<CsAdminQuizResponse> responses = quizzes.stream()
                 .map(CsAdminQuizResponse::from)
@@ -334,12 +329,13 @@ public class QuizService {
                 .orElseThrow(() -> new EntityNotFoundException("해당 퀴즈를 찾을 수 없습니다."));
     }
 
-    private List<Quiz> findQuizzesByEducationId(Long educationId) {
-        return quizRepository.findAllByEducationId(educationId);
-    }
-
     private Education findEducationById(Long educationId) {
         return educationRepository.findById(educationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 교육 id:" + educationId + " 찾다가 에러 발생했습니다."));
+    }
+
+    private int generateRandomTime() {
+        final ThreadLocalRandom random = ThreadLocalRandom.current();
+        return random.nextInt(QuizService.RANDOM_DELAY_TIME_BOUNDARY);
     }
 }

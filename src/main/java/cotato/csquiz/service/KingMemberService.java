@@ -44,15 +44,22 @@ public class KingMemberService {
     }
 
     private List<Member> findKingMembersFromEducation(Education education) {
-        List<Quiz> quizzes = quizRepository.findAllByEducationId(education.getId());
-        List<Scorer> scorersInEducation = findScorersFromQuizzes(quizzes);
+        List<Long> quizIds = quizRepository.findAllByEducationId(education.getId()).stream()
+                .map(Quiz::getId)
+                .toList();
+        List<Scorer> scorers = scorerRepository.findAllByQuizIdsInQuery(quizIds);
 
-        return findKingMembers(scorersInEducation);
+        return findKingMembers(scorers);
     }
 
-    private List<Scorer> findScorersFromQuizzes(List<Quiz> quizzes) {
-        return quizzes.stream()
-                .flatMap(tempQuiz -> scorerRepository.findAllByQuizId(tempQuiz.getId()).stream())
+    private List<Member> findKingMembers(List<Scorer> scorers) {
+        Map<Member, Long> countByMember = scorers.stream()
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
+        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
+        return countByMember.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
+                .map(Entry::getKey)
                 .toList();
     }
 
@@ -89,16 +96,5 @@ public class KingMemberService {
 
     public boolean isWinnerExist(Education education) {
         return winnerRepository.findByEducation(education).isPresent();
-    }
-
-    private List<Member> findKingMembers(List<Scorer> scorers) {
-        Map<Member, Long> countByMember = scorers.stream()
-                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
-                        Collectors.counting()));
-        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
-        return countByMember.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
-                .map(Entry::getKey)
-                .toList();
     }
 }
