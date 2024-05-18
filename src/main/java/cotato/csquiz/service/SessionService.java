@@ -60,20 +60,6 @@ public class SessionService {
         return AddSessionResponse.from(savedSession);
     }
 
-    @Transactional
-    public void updateSession(UpdateSessionRequest request) throws ImageException {
-        Session session = findSessionById(request.sessionId());
-
-        session.updateDescription(request.description());
-        session.updateToggle(request.itIssue(), request.csEducation(),
-                request.networking());
-        if (request.isPhotoUpdated()) {
-            updatePhoto(session, request.sessionImage());
-        }
-
-        sessionRepository.save(session);
-    }
-
     private int calculateLastSessionNumber(Generation generation) {
         List<Session> allSession = sessionRepository.findAllByGeneration(generation);
         return allSession.stream().mapToInt(Session::getNumber).max()
@@ -90,6 +76,20 @@ public class SessionService {
     public void updateSessionDescription(UpdateSessionDescriptionRequest request) {
         Session session = findSessionById(request.sessionId());
         session.updateDescription(request.description());
+    }
+
+    @Transactional
+    public void updateSession(UpdateSessionRequest request) throws ImageException {
+        Session session = findSessionById(request.sessionId());
+
+        session.updateDescription(request.description());
+        session.updateToggle(request.itIssue(), request.csEducation(),
+                request.networking());
+        if (request.isPhotoUpdated()) {
+            updatePhoto(session, request.sessionImage());
+        }
+
+        sessionRepository.save(session);
     }
 
     @Transactional
@@ -110,6 +110,12 @@ public class SessionService {
         }
     }
 
+    private void deleteOldImage(Session session) throws ImageException {
+        if (session.getPhotoUrl() != null) {
+            s3Uploader.deleteFile(session.getPhotoUrl());
+        }
+    }
+
     public List<SessionListResponse> findSessionsByGenerationId(Long generationId) {
         Generation generation = generationRepository.findById(generationId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 기수를 찾을 수 없습니다."));
@@ -119,11 +125,6 @@ public class SessionService {
         return sessions.stream()
                 .map(SessionListResponse::from)
                 .toList();
-    }
-
-    public Session findSessionById(Long sessionId) {
-        return sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
     }
 
     public List<CsEducationOnSessionNumberResponse> findAllCsOnSessionsByGenerationId(Long generationId) {
@@ -137,10 +138,9 @@ public class SessionService {
                 .toList();
     }
 
-    private void deleteOldImage(Session session) throws ImageException {
-        if (session.getPhotoUrl() != null) {
-            s3Uploader.deleteFile(session.getPhotoUrl());
-        }
+    private Session findSessionById(Long sessionId) {
+        return sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 세션을 찾을 수 없습니다."));
     }
 
     private boolean isImageExist(MultipartFile sessionImage) {

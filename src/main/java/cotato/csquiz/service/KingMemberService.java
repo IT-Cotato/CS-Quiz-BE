@@ -43,6 +43,26 @@ public class KingMemberService {
                 .toList();
     }
 
+    private List<Member> findKingMembersFromEducation(Education education) {
+        List<Long> quizIds = quizRepository.findAllByEducationId(education.getId()).stream()
+                .map(Quiz::getId)
+                .toList();
+        List<Scorer> scorers = scorerRepository.findAllByQuizIdsInQuery(quizIds);
+
+        return findKingMembers(scorers);
+    }
+
+    private List<Member> findKingMembers(List<Scorer> scorers) {
+        Map<Member, Long> countByMember = scorers.stream()
+                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
+                        Collectors.counting()));
+        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
+        return countByMember.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
+                .map(Entry::getKey)
+                .toList();
+    }
+
     @Transactional
     public void saveKingMembers(List<KingMember> kingMembers) {
         kingMemberRepository.saveAll(kingMembers);
@@ -56,30 +76,6 @@ public class KingMemberService {
                     .orElseThrow(() -> new EntityNotFoundException("해당 멤버를 찾을 수 없습니다."));
             saveWinner(findMember.getId(), education);
         }
-    }
-
-    private List<Member> findKingMembersFromEducation(Education education) {
-        List<Quiz> quizzes = quizRepository.findAllByEducationId(education.getId());
-        List<Scorer> scorersInEducation = findScorersFromQuizzes(quizzes);
-
-        return findKingMembers(scorersInEducation);
-    }
-
-    private List<Scorer> findScorersFromQuizzes(List<Quiz> quizzes) {
-        return quizzes.stream()
-                .flatMap(tempQuiz -> scorerRepository.findAllByQuizId(tempQuiz.getId()).stream())
-                .toList();
-    }
-
-    private List<Member> findKingMembers(List<Scorer> scorers) {
-        Map<Member, Long> countByMember = scorers.stream()
-                .collect(Collectors.groupingBy(scorer -> memberService.findById(scorer.getMemberId()),
-                        Collectors.counting()));
-        Optional<Long> maxCount = countByMember.values().stream().max(Long::compareTo);
-        return countByMember.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(maxCount.orElse(null)))
-                .map(Entry::getKey)
-                .toList();
     }
 
     @Transactional
