@@ -62,20 +62,6 @@ public class SessionService {
         return AddSessionResponse.from(savedSession);
     }
 
-    @Transactional
-    public void updateSession(UpdateSessionRequest request) throws ImageException {
-        Session session = findSessionById(request.sessionId());
-
-        session.updateDescription(request.description());
-        session.updateToggle(request.itIssue(), request.csEducation(),
-                request.networking());
-        if (request.isPhotoUpdated()) {
-            updatePhoto(session, request.sessionImage());
-        }
-
-        sessionRepository.save(session);
-    }
-
     private int calculateLastSessionNumber(Generation generation) {
         List<Session> allSession = sessionRepository.findAllByGeneration(generation);
         return allSession.stream().mapToInt(Session::getNumber).max()
@@ -95,6 +81,20 @@ public class SessionService {
     }
 
     @Transactional
+    public void updateSession(UpdateSessionRequest request) throws ImageException {
+        Session session = findSessionById(request.sessionId());
+
+        session.updateDescription(request.description());
+        session.updateToggle(request.itIssue(), request.csEducation(),
+                request.networking());
+        if (request.isPhotoUpdated()) {
+            updatePhoto(session, request.sessionImage());
+        }
+
+        sessionRepository.save(session);
+    }
+
+    @Transactional
     public void updateSessionPhoto(UpdateSessionPhotoRequest request) throws ImageException {
         Session session = findSessionById(request.sessionId());
         updatePhoto(session, request.sessionImage());
@@ -109,6 +109,12 @@ public class SessionService {
         if (!isImageExist(sessionImage)) {
             deleteOldImage(session);
             session.changePhotoUrl(null);
+        }
+    }
+
+    private void deleteOldImage(Session session) throws ImageException {
+        if (session.getPhotoUrl() != null) {
+            s3Uploader.deleteFile(session.getPhotoUrl());
         }
     }
 
@@ -141,12 +147,6 @@ public class SessionService {
                 .filter(session -> !educationLinkedSessionIds.contains(session.getId()))
                 .map(CsEducationOnSessionNumberResponse::from)
                 .toList();
-    }
-
-    private void deleteOldImage(Session session) throws ImageException {
-        if (session.getPhotoUrl() != null) {
-            s3Uploader.deleteFile(session.getPhotoUrl());
-        }
     }
 
     private boolean isImageExist(MultipartFile sessionImage) {

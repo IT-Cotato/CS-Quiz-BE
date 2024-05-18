@@ -84,6 +84,12 @@ public class RecordService {
         return ReplyResponse.from(isCorrect);
     }
 
+    private void checkQuizStart(Quiz findQuiz) {
+        if (findQuiz.isOff() || !findQuiz.isStart()) {
+            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
+        }
+    }
+
     private void checkMemberAlreadyCorrect(Quiz findQuiz, Member findMember) {
         if (recordRepository.findByQuizAndMemberIdAndIsCorrect(findQuiz, findMember.getId(), true).isPresent()) {
             log.warn("이미 해당 문제에 정답 제출한 사용자입니다.");
@@ -106,12 +112,6 @@ public class RecordService {
     private Quiz findQuizById(Long quizId) {
         return quizRepository.findById(quizId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 문제를 찾을 수 없습니다."));
-    }
-
-    private void checkQuizStart(Quiz findQuiz) {
-        if (findQuiz.isOff() || !findQuiz.isStart()) {
-            throw new AppException(ErrorCode.QUIZ_ACCESS_DENIED);
-        }
     }
 
     @Transactional
